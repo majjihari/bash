@@ -2,8 +2,8 @@
 
 set -x
 
-export BRANCH=${BRANCH:-"master"}
-export CODEDIR=${CODEDIR:-"~/code"}
+export ZBRANCH=${ZBRANCH:-"master"}
+export ZCODEDIR=${ZCODEDIR:-"~/code"}
 
 
 
@@ -14,8 +14,8 @@ branchExists() {
     local repository="$1"
     local branch="$2"
 
-    echo "* Checking if ${repository}/${BRANCH} exists"
-    httpcode=$(curl -o /dev/null -I -s --write-out '%{http_code}\n' https://github.com/${repository}/tree/${branch})
+    echo "* Checking if ${repository}/${ZBRANCH} exists"
+    httpcode=$(curl -o /dev/null -I -s --write-out '%{http_code}\n' https://github.com/${repository}/tree/${ZBRANCH})
 
     if [ "$httpcode" = "200" ]; then
         return 0
@@ -85,23 +85,23 @@ dockerRun() {
 
 }
 
-getCode() {
-    mkdir -p $CODEDIR
+ZGetCode() {
+    mkdir -p $ZCODEDIR
     #giturl like: git@github.com:mathieuancelin/duplicates.git 
     local name="$1"    
     local giturl="$2"
-    local branch=${3:-${BRANCH}}
+    local branch=${3:-${ZBRANCH}}
     echo "* get code $repository ($branch)"
-    pushd $CODEDIR
+    pushd $ZCODEDIR
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
         ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1
     fi
 
-    if [ ! -e $CODEDIR/$name ]; then    
+    if [ ! -e $ZCODEDIR/$name ]; then    
         (git clone -b ${branch}  || git clone -b ${branch} $giturl) || return 1
     else
-        pushd $CODEDIR/$name
+        pushd $ZCODEDIR/$name
         git pull || return 1
         popd
     fi
@@ -170,9 +170,4 @@ container() {
     ssh -A root@localhost -p ${port} "$@" > ${logfile} 2>&1
 }
 
-# alias docker for docker.exe for windows subsystem(WSL) linux because docker isn't supported natively on WSL
-if grep -q Microsoft /proc/version; then
-    docker() {
-        docker.exe "$@"
-    }
-fi
+
