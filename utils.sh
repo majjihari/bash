@@ -99,7 +99,7 @@ ZGetCode() {
     fi
 
     if [ ! -e $ZCODEDIR/$name ]; then    
-        git clone -b ${branch} $giturl) || return 1
+        git clone -b ${branch} $giturl || return 1
     else
         pushd $ZCODEDIR/$name
         git pull || return 1
