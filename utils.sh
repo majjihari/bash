@@ -91,7 +91,7 @@ ZGetCode() {
     local name="$1"    
     local giturl="$2"
     local branch=${3:-${ZBRANCH}}
-    echo "* get code $repository ($branch)"
+    echo "* get code $giturl ($branch)"
     pushd $ZCODEDIR
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
@@ -99,7 +99,7 @@ ZGetCode() {
     fi
 
     if [ ! -e $ZCODEDIR/$name ]; then    
-        (git clone -b ${branch}  || git clone -b ${branch} $giturl) || return 1
+        git clone -b ${branch} $giturl) || return 1
     else
         pushd $ZCODEDIR/$name
         git pull || return 1
