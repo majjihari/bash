@@ -3,19 +3,19 @@
 
 ZSSHTEST() {
     ZNodeEnvSet
-    ssh root@$RNODE -p $RPORT 'ls /' > $logfile 2>&1 || die "could not connect over ssh to $RNODE:$RPORT"
+    ssh root@$RNODE -p $RPORT 'ls /' > $ZLogFile 2>&1 || die "could not connect over ssh to $RNODE:$RPORT"
     #TODO: check and if not connect, ask the params again, till its all ok
 }
 
 ZSSH() {
     ZNodeEnvSet
-    ssh root@$RNODE -p $RPORT "$@" > $logfile 2>&1 || die "could not ssh command: $@"
+    ssh root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@"
 }
 
 #interactive version
 ZSSHi() {
     ZNodeEnvSet
-    ssh root@$RNODE -p $RPORT "$@" | tee $logfile || die "could not ssh command: $@"
+    ssh root@$RNODE -p $RPORT "$@" | tee $ZLogFile || die "could not ssh command: $@"
 }
 
 ZNodePortSet() {

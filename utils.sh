@@ -1,42 +1,65 @@
 #!/bin/bash
-set -x
+# set +x
 
-#. ~/code/varia/bash/utils.sh
-
-
-
-# unset ZCODEDIR
-# unset ZBRANCH
-
-
-export ZBRANCH=${ZBRANCH:-master}
-export ZCODEDIR=${ZCODEDIR:-~/code}
-export logfile='/tmp/z.log'
+# export ZBRANCH=${ZBRANCH:-master}
+# export ZCODEDIR=${ZCODEDIR:-~/code}
+export ZLogFile='/tmp/z.log'
 
 die() {
     echo "ERROR"
     echo "[-] something went wrong: $1"
     rm -f /tmp/sdwfa #to remove temp passwd for restic, just to be sure
-    cat $logfile
+    cat $ZLogFile
     return 1
-    # exit 1
 }
 
 
+# #
+# # Warning: this is bash specific
+# #
+# catcherror_handler() {
+#     if [ "${ZLogFile}" != "" ]; then
+#         echo "[-] line $1: script error, backlog from ${ZLogFile}:"
+#         cat ${ZLogFile}
+#         exit 1
+#     fi
 #
-# Warning: this is bash specific
+#     echo "[-] line $1: script error, no logging file defined"
+#     exit 1
+# }
 #
-catcherror_handler() {
-    if [ "${logfile}" != "" ]; then
-        echo "[-] line $1: script error, backlog from ${logfile}:"
-        cat ${logfile}
-        exit 1
-    fi
+# catcherror() {
+#     trap 'catcherror_handler $LINENO' ERR
+# }
 
-    echo "[-] line $1: script error, no logging file defined"
-    exit 1
+
+
+ZTestUsage() {
+   cat <<EOF
+Usage: ZTest [-n $name] [-p $port]
+   -n $name: name of container
+   -p $port: port on which to install
+   -h: help
+EOF
 }
+set -x
 
-catcherror() {
-    trap 'catcherror_handler $LINENO' ERR
+ZTest() {
+    local iname=''
+    local port=''
+    while getopts "n:p:h" opt; do
+        echo OPTARG
+        case $opt in
+           n )  iname=$OPTARG ;;
+           p )  port=$OPTARG ;;
+           h )  ZTestUsage ; return 0 ;;
+           \?)  ZTestUsage ; return 1 ;;
+        esac
+    done
+    # if [ -z "$iname" ]; then ZTestUsage;return 0; fi
+    # if [ -z "$port" ]; then port=22; fi
+    echo iname:$iname
+    echo port:$port
+
+
 }

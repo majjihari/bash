@@ -3,11 +3,11 @@
 
 container() {
     ZDockerConfig
-    ssh -A root@localhost -p $RPORT "$@" > ${logfile} 2>&1 | tee > $logfile 2>&1 || die "ssh error"
+    ssh -A root@localhost -p $RPORT "$@" > ${ZLogFile} 2>&1 | tee > $ZLogFile 2>&1 || die "ssh error"
 }
 
 # die and get docker log back to host
-# $1 = docker container name, $2 = logfile name, $3 = optional message
+# $1 = docker container name, $2 = ZLogFile name, $3 = optional message
 dockerdie() {
     if [ "$3" != "" ]; then
         echo "[-] something went wrong in docker $1: $3"
@@ -29,7 +29,7 @@ ZDockerConfig() {
 
 ZDockerCommit() {
     echo "[+] Commit docker: $1"
-    docker commit $1 jumpscale/$2 > ${logfile} 2>&1 || return 1
+    docker commit $1 jumpscale/$2 > ${ZLogFile} 2>&1 || return 1
     if [ "$3" != "" ]; then
         dockerremove $1
     fi
@@ -57,7 +57,7 @@ ZDockerEnableSSH(){
     docker exec -t $ZDockerName  /etc/my_init.d/00_regen_ssh_host_keys.sh
     #
     echo "[+]   start ssh"
-    docker exec -t $ZDockerName  sv start sshd > ${logfile} 2>&1
+    docker exec -t $ZDockerName  sv start sshd > ${ZLogFile} 2>&1
 
     echo "[+]   Waiting for ssh to allow connections"
     while ! ssh-keyscan -p $RPORT localhost 2>&1 | grep -q "OpenSSH"; do
@@ -87,7 +87,7 @@ ZDockerRemove(){
 ZDockerRemoveImage(){
     ZDockerConfig
     echo "[+] remove docker image $1"
-    docker rmi  -f "$1"  > ${logfile} 2>&1 || true
+    docker rmi  -f "$1"  > ${ZLogFile} 2>&1 || true
 }
 
 ZDockerRunUbuntu() {
@@ -149,7 +149,7 @@ ZDockerRun() {
         --cap-add=NET_ADMIN --cap-add=SYS_ADMIN \
         --cap-add=DAC_OVERRIDE --cap-add=DAC_READ_SEARCH \
         ${mounted_volumes} \
-        $bname > ${logfile} 2>&1 || die "docker could not start, please check ${logfile}"
+        $bname > ${ZLogFile} 2>&1 || die "docker could not start, please check ${ZLogFile}"
 
     sleep 1
 

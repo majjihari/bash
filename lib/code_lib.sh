@@ -12,16 +12,16 @@ ZGetCode() {
     pushd $ZCODEDIR
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
-        ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 > $logfile || die
+        ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 > $ZLogFile || die
     fi
 
     if [ ! -e $ZCODEDIR/$name ]; then
         echo " * clone"
-        git clone -b ${branch} $giturl $name 2>&1 > $logfile || die
+        git clone -b ${branch} $giturl $name 2>&1 > $ZLogFile || die
     else
         pushd $ZCODEDIR/$name
         echo " * pull"
-        git pull  2>&1 > $logfile || die
+        git pull  2>&1 > $ZLogFile || die
         popd
     fi
     popd
