@@ -1,5 +1,5 @@
 
-update_code_jumpscale() {
+ZInstaller_code_jumpscale() {
     local branch="${1:-master}"
     echo "[+] loading or updating jumpscale source code (branch:$branch)"
     ZGetCodeJS -r core9 -b $branch > ${ZLogFile} 2>&1 || die
@@ -15,7 +15,23 @@ update_code_jumpscale() {
     echo "[+] update jumpscale code done"
 }
 
-installjs9() {
+ZInstaller_python() {
+    echo "[+]   installing python"
+    container apt-get install -y python3  python3-cryptography python3-paramiko python3-psutil
+
+    echo "[+]   installing pip system"
+    container "curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py"
+    container python3 /tmp/get-pip.py
+
+    echo "[+]   installing some pip dependencies"
+    container pip3 install --upgrade pip
+    container pip3 install tmuxp
+    container pip3 install gitpython
+
+}
+
+
+ZInstaller_js9() {
     echo "[+] install js9"
     # ZSSH "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
     echo "[+]   synchronizing developer files"

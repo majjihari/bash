@@ -230,8 +230,10 @@ ZDockerBuildJS9() {
     echo "[+]   installing basic dependencies"
     container apt-get install -y curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet
 
-    echo "JS9 BUILD"
-    update_code_jumpscale
+    echo "[+] JS9 BUILD"
+    ZInstaller_code_jumpscale
+    ZInstaller_python
+    ZInstaller_js9
 
 }
 
