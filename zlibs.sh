@@ -1,0 +1,38 @@
+
+set +x
+
+export ZUTILSDIR=${ZUTILSDIR:-~}
+export ZLogFile='/tmp/zutils.log'
+
+die() {
+    echo "[-] something went wrong: $1"
+    rm -f /tmp/sdwfa #to remove temp passwd for restic, just to be sure
+    cat $ZLogFile
+    return 1
+}
+
+catcherror_handler() {
+    if [ "${ZLogFile}" != "" ]; then
+        echo "[-] line $1: script error, backlog from ${ZLogFile}:"
+        cat ${ZLogFile}
+        return 1
+    fi
+
+    echo "[-] line $1: script error, no logging file defined"
+    return 1
+}
+
+catcherror() {
+    trap 'catcherror_handler $LINENO' ERR
+}
+
+catcherror
+
+pushd $ZUTILSDIR/zutils
+. lib/code_lib.sh
+. lib/config_lib.sh
+. lib/docker_lib.sh
+. lib/restic_lib.sh
+. lib/ssh_lib.sh
+. lib/installers.sh
+popd

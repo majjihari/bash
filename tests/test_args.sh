@@ -42,22 +42,22 @@ Usage: ZTest [-n $name] [-p $port]
    -h: help
 EOF
 }
-set -x
+set +x
 
 ZTest() {
+    local OPTIND
     local iname=''
     local port=''
     while getopts "n:p:h" opt; do
-        echo OPTARG
         case $opt in
            n )  iname=$OPTARG ;;
            p )  port=$OPTARG ;;
            h )  ZTestUsage ; return 0 ;;
-           \?)  ZTestUsage ; return 1 ;;
+           \? )  ZTestUsage ; return 1 ;;
         esac
     done
-    # if [ -z "$iname" ]; then ZTestUsage;return 0; fi
-    # if [ -z "$port" ]; then port=22; fi
+    if [ -z "$iname" ]; then ZTestUsage;return 0; fi
+    if [ -z "$port" ]; then port=22; fi
     echo iname:$iname
     echo port:$port
 

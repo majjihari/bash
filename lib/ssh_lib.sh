@@ -9,13 +9,13 @@ ZSSHTEST() {
 
 ZSSH() {
     ZNodeEnvSet
-    ssh root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@"
+    ssh -A root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@"
 }
 
 #interactive version
 ZSSHi() {
     ZNodeEnvSet
-    ssh root@$RNODE -p $RPORT "$@" | tee $ZLogFile || die "could not ssh command: $@"
+    ssh -A root@$RNODE -p $RPORT "$@" | tee $ZLogFile || die "could not ssh command: $@"
 }
 
 ZNodePortSet() {

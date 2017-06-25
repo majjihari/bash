@@ -2,8 +2,25 @@
 ######### DOCKER
 
 container() {
+    echo '' > $ZLogFile
+
     ZDockerConfig
-    ssh -A root@localhost -p $RPORT "$@" > ${ZLogFile} 2>&1 | tee > $ZLogFile 2>&1 || die "ssh error"
+    if [ "$RNODE" = '' ]; then
+        die "rnode cannot be empty"
+        return 1
+    fi
+    if [ ! "$RNODE" = 'localhost' ]; then
+        die "rnode needs to be localhost"
+        return 1
+    fi
+
+    if [[ -z "$RPORT" ]]; then
+        die "rnode port to exist"
+        return 1
+    fi
+
+    ssh root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@"
+    ssh -A root@localhost -p $RPORT "$@" > ${ZLogFile} 2>&1 > $ZLogFile 2>&1 || die "could not ssh command: $@"
 }
 
 # die and get docker log back to host
@@ -21,32 +38,71 @@ dockerdie() {
 }
 
 ZDockerConfig() {
-    export CONTAINERDIR=~/gig
-    mkdir -p ${CONTAINERDIR}/code
+    ZCodeConfig
+    export CONTAINERDIR=~/docker
     mkdir -p ${CONTAINERDIR}/private
     mkdir -p ${CONTAINERDIR}/.cache/pip
 }
 
+ZDockerCommitUsage() {
+   cat <<EOF
+Usage: ZDockerCommit [-b $bname] [-i $iname] [-p port]
+   -b  bname: name of base image to commit to e.g. jumpscale/ub1704
+   -i  iname: name of docker which needs to be committed, will default be global arg ZDockerName
+   -s: stop active docker
+   -h: help
+EOF
+}
+
 ZDockerCommit() {
-    echo "[+] Commit docker: $1"
-    docker commit $1 jumpscale/$2 > ${ZLogFile} 2>&1 || return 1
-    if [ "$3" != "" ]; then
-        dockerremove $1
+    ZDockerConfig
+    local OPTIND
+    local bname=''
+    local iname=$ZDockerName
+    while getopts "b:i:hs" opt; do
+        case $opt in
+           b )  bname=$OPTARG ;;
+           i )  iname=$OPTARG ;;
+           s )  stop=1 ;;
+           h )  ZDockerCommitUsage ; return 0 ;;
+           \? )  ZDockerCommitUsage ; return 1 ;;
+        esac
+    done
+    if [ -z "$bname" ]; then ZDockerCommitUsage;return 0; fi
+    echo "[+] Commit docker: $iname to $bname"
+    docker commit $iname $bname > ${ZLogFile} 2>&1 || return 1
+    export ZDockerImage=$bname
+    if [ "$stop" == "1" ]; then
+        ZDockerRemove $iname
     fi
 }
 
 ZDockerSSHAuthorize() {
-    if [ "$1" = "" ]; then
-        echo "[-] ssh_authorize: missing container target"
-        return
-    fi
 
-    echo "[+] authorizing local ssh keys on docker: $1"
+    local ZDockerName="${1:-$ZDockerName}"
+    echo "[+] authorizing local ssh keys on docker: $ZDockerName"
+
+    echo "[+]   start ssh"
+    docker exec -t $ZDockerName  sv start sshd > ${ZLogFile} 2>&1
+
+    echo "[+]   Waiting for ssh to allow connections"
+    while ! ssh-keyscan -p $RPORT localhost 2>&1 | grep -q "OpenSSH"; do
+        sleep 0.2
+    done
+
+    sed -i.bak /localhost.:$RPORT/d ~/.ssh/known_hosts
+    rm -f ~/.ssh/known_hosts.bak
+    ssh-keyscan -p $RPORT localhost 2>&1 | grep -v '^#' >> ~/.ssh/known_hosts
+
     SSHKEYS=$(ssh-add -L)
-    docker exec -t "$1" /bin/sh -c "echo ${SSHKEYS} >> /root/.ssh/authorized_keys"
+    docker exec -t "$1" /bin/sh -c "echo ${SSHKEYS} > /root/.ssh/authorized_keys"
+
+    echo "* SSH authorized"
 }
 
 ZDockerEnableSSH(){
+
+    local ZDockerName="${1:-$ZDockerName}"
 
     echo "[+]   configuring services"
     docker exec -t $ZDockerName mkdir -p /var/run/sshd
@@ -56,67 +112,196 @@ ZDockerEnableSSH(){
     docker exec -t $ZDockerName  rm -f /etc/service/sshd/down
     docker exec -t $ZDockerName  /etc/my_init.d/00_regen_ssh_host_keys.sh
     #
-    echo "[+]   start ssh"
-    docker exec -t $ZDockerName  sv start sshd > ${ZLogFile} 2>&1
-
-    echo "[+]   Waiting for ssh to allow connections"
-    while ! ssh-keyscan -p $RPORT localhost 2>&1 | grep -q "OpenSSH"; do
-        sleep 0.2
-    done
-
-    echo "[+]   remove machine from localhost"
-    sed -i.bak /localhost.:$RPORT/d ~/.ssh/known_hosts
-    rm -f ~/.ssh/known_hosts.bak
-    ssh-keyscan -p $RPORT localhost 2>&1 | grep -v '^#' >> ~/.ssh/known_hosts
 
     ZDockerSSHAuthorize $ZDockerName
 
     container 'echo export "LC_ALL=C.UTF-8" >> /root/.profile'
     container 'echo "export LANG=C.UTF-8" >> /root/.profile'
 
+    echo "* SSH enabled OK"
 
 }
 
 ZDockerRemove(){
     ZDockerConfig
-    echo "[+] remove docker $1"
-    docker rm  -f "$1" || true
+    local ZDockerName="${1:-$ZDockerName}"
+    echo "[+] remove docker $ZDockerName"
+    docker rm  -f "$ZDockerName" || true
     # docker inspect $iname >  /dev/null 2>&1 &&  docker rm  -f "$iname" > /dev/null 2>&1
 }
 
 ZDockerRemoveImage(){
     ZDockerConfig
-    echo "[+] remove docker image $1"
-    docker rmi  -f "$1"  > ${ZLogFile} 2>&1 || true
+    local ZDockerImage="${1:-$ZDockerImage}"
+    echo "[+] remove docker image $ZDockerImage"
+    docker rmi  -f "$ZDockerImage"  > ${ZLogFile} 2>&1 || true
 }
 
-ZDockerRunUbuntu() {
+ZDockerBuildUbuntu() {
     ZDockerConfig
-    local bname="phusion/baseimage"
-    local iname="${1:-ubuntu}"
-    local port="${2:-2222}"
-    local addarg="${3:-}"
-    ZDockerRun $bname $iname $port $addarg || return 1
+    local OPTIND
+    local bname='phusion/baseimage'
+    local iname='build'
+    local port=2222
+    local addarg=''
+    while getopts "b:i:p:a:h" opt; do
+        case $opt in
+           b )  bname=$OPTARG ;;
+           i )  iname=$OPTARG ;;
+           p )  port=$OPTARG ;;
+           a )  addarg=$OPTARG ;;
+           h )  ZDockerRunUsage ; return 0 ;;
+           \? )  ZDockerRunUsage ; return 1 ;;
+        esac
+    done
+
+    export SSHNOAUTH=1
+
+    if [[ ! -z "$addarg" ]]; then
+        ZDockerRun -b $bname -i $iname -p $port -a $addarg || return 1
+    else
+        ZDockerRun -b $bname -i $iname -p $port || return 1
+    fi
+
+    unset SSHNOAUTH
 
     #basic deps
     docker exec -t $ZDockerName apt update
     docker exec -t $ZDockerName apt upgrade -y
-    docker exec -t $ZDockerName apt install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet -y
+    docker exec -t $ZDockerName apt install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync -y
 
     ZDockerEnableSSH
+
+    echo "[+]   setting up default environment"
+    container 'echo "" > /etc/motd'
+    container touch /root/.iscontainer
+
+    ZDockerCommit -b jumpscale/ubuntu -s #also stop
+
+    echo "* DOCKER UBUNTU OK"
+}
+
+ZDockerRunSomethingUsage() {
+   cat <<EOF
+Usage: ZDockerRun... [-i $iname] [-p port]
+   -i iname: name of docker which will be spawned, default to 'build'
+   -p port: ssh port for docker defaults to 2222
+   -a addarg: is additional arguments for docker e.g. -p 10700-10800:10700-10800
+   -h: help
+
+EOF
+}
+
+ZDockerRunUbuntu() {
+    local OPTIND
+    local bname='jumpscale/ubuntu'
+    local iname='build'
+    local port=2222
+    local addarg=''
+    while getopts "b:i:p:a:h" opt; do
+        case $opt in
+           i )  iname=$OPTARG ;;
+           p )  port=$OPTARG ;;
+           a )  addarg=$OPTARG ;;
+           h )  ZDockerRunSomethingUsage ; return 0 ;;
+           \? )  ZDockerRunSomethingUsage ; return 1 ;;
+        esac
+    done
+
+    existing="$(docker images ${bname} -q)"
+
+    if [[ -z "$existing" ]]; then
+        ZDockerBuildUbuntu
+    fi
+
+    if [[ ! -z "$addarg" ]]; then
+        ZDockerRun -b $bname -i $iname -p $port -a $addarg || return 1
+    else
+        ZDockerRun -b $bname -i $iname -p $port || return 1
+    fi
+
+    echo '* Ubuntu Docker Is Active (OK)'
+}
+
+ZDockerBuildJS9() {
+
+    ZDockerRunUbuntu $@
+
+    echo "[+]   installing basic dependencies"
+    container apt-get install -y curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet
+
+    echo "JS9 BUILD"
+    update_code_jumpscale
+
+}
+
+ZDockerRunJS9() {
+
+    ZDockerRunUbuntu $@
+
+    local OPTIND
+    local bname='jumpscale/ubuntu'
+    local iname='build'
+    local port=2222
+    local addarg=''
+    while getopts "b:i:p:a:h" opt; do
+        case $opt in
+           i )  iname=$OPTARG ;;
+           p )  port=$OPTARG ;;
+           a )  addarg=$OPTARG ;;
+           h )  ZDockerRunSomethingUsage ; return 0 ;;
+           \? )  ZDockerRunSomethingUsage ; return 1 ;;
+        esac
+    done
+
+    existing="$(docker images ${bname} -q)"
+
+    if [[ -z "$existing" ]]; then
+        ZDockerBuildUbuntu
+    fi
+
+    if [[ ! -z "$addarg" ]]; then
+        ZDockerRun -b $bname -i $iname -p $port -a $addarg || return 1
+    else
+        ZDockerRun -b $bname -i $iname -p $port || return 1
+    fi
+
+
+
+}
+
+ZDockerRunUsage() {
+   cat <<EOF
+Usage: ZDockerRun [-b $bname] [-i $iname] [-p port]
+   -b bname: name of base image, defaults to jumpscale/jsbase (which is ubuntu with some basic tools)
+   -i iname: name of docker which will be spawned, default to 'build'
+   -p port: ssh port for docker defaults to 2222
+   -a addarg: is additional arguments for docker e.g. -p 10700-10800:10700-10800
+   -h: help
+
+EOF
 }
 
 ZDockerRun() {
     ZDockerConfig
-    local bname="$1"
-    local iname="$2"
-    local port="${3:-2222}"
-    local addarg="${4:-}"
+    local OPTIND
+    local bname='jumpscale/js9_base'
+    local iname='build'
+    local port=2222
+    local addarg=''
+    while getopts "b:i:p:a:h" opt; do
+        case $opt in
+           b )  bname=$OPTARG ;;
+           i )  iname=$OPTARG ;;
+           p )  port=$OPTARG ;;
+           a )  addarg=$OPTARG ;;
+           h )  ZDockerRunUsage ; return 0 ;;
+           \? )  ZDockerRunUsage ; return 1 ;;
+        esac
+    done
     ZNodePortSet $port
     ZNodeSet localhost
     export ZDockerName=$iname
-
-    #addarg: -p 10700-10800:10700-10800
 
     echo "[+] start docker $bname -> $iname (port:$port)"
 
@@ -128,7 +313,7 @@ ZDockerRun() {
 
     mounted_volumes="\
         -v ${CONTAINERDIR}/:/root/host/ \
-        -v ${CONTAINERDIR}/code/:/opt/code/ \
+        -v ${ZCODEDIR}/:/opt/code/ \
         -v ${CONTAINERDIR}/private/:/optvar/private \
         -v ${CONTAINERDIR}/.cache/pip/:/root/.cache/pip/ \
     "
@@ -153,7 +338,11 @@ ZDockerRun() {
 
     sleep 1
 
-    # ssh_authorize "${iname}"
+    #only authorize when var not set
+    if [[ -z "$SSHNOAUTH" ]]; then
+        ZDockerSSHAuthorize || die
+    fi
+
 
 
 }
