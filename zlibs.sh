@@ -12,7 +12,7 @@ die() {
     echo "[-] something went wrong: $1"
     rm -f /tmp/sdwfa #to remove temp passwd for restic, just to be sure
     cat $ZLogFile
-    exit 1
+    exit
 }
 
 catcherror_handler() {
