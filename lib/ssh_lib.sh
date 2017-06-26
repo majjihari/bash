@@ -45,7 +45,7 @@ ZSSH() {(
     echo '' > $ZLogFile
     ZNodeEnvSet
     if [ -n "$1" ]; then
-        ssh -A root@$RNODE -p $RPORT TERM=xterm;"$@" || die "could not ssh command: $@"
+        ssh -A root@$RNODE -p $RPORT "TERM=xterm;$@" || die "could not ssh command: $@"
     else
         ssh -A root@$RNODE -p $RPORT || die "could not ssh command: $@"
     fi
