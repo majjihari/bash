@@ -5,7 +5,7 @@ ZResticBuild() {
     go run build.go 2>&1 > $ZLogFile || die 'could not build restic'
     mv restic /usr/local/bin/ || die 'could not build restic'
     # rm -rf $ZCODEDIR/restic
-    popd
+    popd > /dev/null 2>&1
 }
 
 ZResticEnv() {
@@ -69,7 +69,7 @@ ZResticBackup() {
     local RTAG=$2
     touch $ZLogFile #to make sure we don't show other error
     echo $RPASSWD > /tmp/sdwfa
-    echo $RSOURCE
+    # echo $RSOURCE
     if [ ! -e $RSOURCE ]; then
         die "Could not find sourcedir: $RSOURCE" && return 1
     fi
@@ -99,6 +99,6 @@ ZResticMount() {
     echo $RPASSWD > /tmp/sdwfa
     restic -r sftp:root@$RNODE:$RDEST/$RNAME -p /tmp/sdwfa  --allow-root mount ~/restic 2>&1 | tee $ZLogFile || die
     rm -f /tmp/sdwfa
-    # pushd ~/restic
+    # pushd ~/restic > /dev/null 2>&1
     umount ~/restic 2>&1  /dev/null
 }

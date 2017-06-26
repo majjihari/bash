@@ -19,7 +19,7 @@ ZUtilsGetCode() {
     #giturl like: git@github.com:mathieuancelin/duplicates.git
     local giturl=git@github.com:Jumpscale/bash.git
     local branch=master
-    echo "* get code $giturl ($branch)"
+    echo "[+] get code $giturl ($branch)"
     pushd $ZUTILSDIR
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
@@ -27,15 +27,15 @@ ZUtilsGetCode() {
     fi
 
     if [ ! -e $ZUTILSDIR/bash ]; then
-        echo " * clone zutils"
+        echo " [+] clone zutils"
         git clone -b ${branch} $giturl bash 2>&1 > $ZLogFile || die
     else
         pushd $ZCODEDIR/bash
-        echo " * pull"
+        echo " [+] pull"
         git pull  2>&1 > $ZLogFile || die
-        popd
+        popd > /dev/null 2>&1
     fi
-    popd
+    popd > /dev/null 2>&1
 }
 
 ZUtilsGetCode

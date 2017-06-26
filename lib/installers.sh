@@ -39,6 +39,10 @@ ZInstaller_js9() {
 
     echo "[+]   installing jumpscale core9"
     container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/core9"
+    echo "[+]   installing jumpscale prefab9"
+    container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/prefab9"
+    echo "[+]   installing jumpscale lib9"
+    container "source ~/.jsenv.sh && pip3 install --no-deps -e /opt/code/github/jumpscale/lib9"
 
     echo "[+]   installing binaries files"
     container 'find  /opt/code/github/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \;'
@@ -47,7 +51,7 @@ ZInstaller_js9() {
     container rm -rf /usr/local/bin/cmds
     container rm -rf /usr/local/bin/cmds_guest
 
-    echo "[+]   initializing jumpscale part3"
+    echo "[+]   initializing jumpscale"
     container 'python3 -c "from JumpScale9 import j; j.do.initEnv()"'
     container 'python3 -c "from JumpScale9 import j; j.tools.jsloader.generate()"'
 

@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+set +x
 
 export ZUTILSDIR=${ZUTILSDIR:-~/code/jumpscale}
 export ZLogFile='/tmp/zutils.log'
@@ -52,11 +52,11 @@ if [ ! -d "${ZUTILSDIR}/bash" ]; then
     return
 fi
 
-pushd $ZUTILSDIR/bash
+pushd $ZUTILSDIR/bash > /dev/null 2>&1
 . lib/code_lib.sh
 . lib/config_lib.sh
 . lib/docker_lib.sh
 . lib/restic_lib.sh
 . lib/ssh_lib.sh
 . lib/installers.sh
-popd
+popd > /dev/null 2>&1

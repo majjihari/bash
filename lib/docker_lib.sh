@@ -110,7 +110,7 @@ ZDockerSSHAuthorize() {
         docker exec -t "${ZDockerName}" /bin/sh -c "echo $key >> /root/.ssh/authorized_keys"
     done
 
-    echo "* SSH authorized"
+    echo "[+] SSH authorized"
 }
 
 ZDockerEnableSSH(){
@@ -133,7 +133,7 @@ ZDockerEnableSSH(){
     container 'echo export "LC_ALL=C.UTF-8" >> /root/.profile'
     container 'echo "export LANG=C.UTF-8" >> /root/.profile'
 
-    echo "* SSH enabled OK"
+    echo "[+] SSH enabled OK"
 
 }
 
@@ -202,7 +202,7 @@ ZDockerBuildUbuntu() {
 
     ZDockerCommit -b jumpscale/ubuntu -s #also stop
 
-    echo "* DOCKER UBUNTU OK"
+    echo "[+] DOCKER UBUNTU OK"
 }
 
 ZDockerRunSomethingUsage() {
@@ -249,7 +249,7 @@ ZDockerRunUbuntu() {
         ZDockerRun -b $bname -i $iname -p $port || return 1
     fi
 
-    echo '* Ubuntu Docker Is Active (OK)'
+    echo '[+] Ubuntu Docker Is Active (OK)'
 }
 
 ZDockerBuildJS9() {(

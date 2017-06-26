@@ -81,25 +81,25 @@ ZGetCode() {
     fi
 
     mkdir -p $ZCODEDIR/$account
-    echo "* get code $giturl ($branch)"
+    echo "[+] get code $giturl ($branch)"
 
-    pushd $ZCODEDIR/$account
+    pushd $ZCODEDIR/$account > /dev/null 2>&1
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
         ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 > $ZLogFile || die
     fi
 
     if [ ! -e $ZCODEDIR/$account/$reponame ]; then
-        echo " * clone"
+        echo " [+] clone"
         git clone -b ${branch} $giturl $reponame 2>&1 > $ZLogFile || die
     else
-        pushd $ZCODEDIR/$account/$reponame
-        echo " * pull"
+        pushd $ZCODEDIR/$account/$reponame > /dev/null 2>&1
+        echo " [+] pull"
         git pull  2>&1 > $ZLogFile || die
-        popd
+        popd > /dev/null 2>&1
     fi
-    popd
-    # pushd $ZCODEDIR/$account/$reponame
+    popd > /dev/null 2>&1
+    # pushd $ZCODEDIR/$account/$reponame  > /dev/null 2>&1
 }
 
 
@@ -107,7 +107,7 @@ ZGetCode() {
 #     local giturl="$1"
 #     local branch=${2:-${ZBRANCH}}
 #
-#     echo "* Checking if ${repository}/${ZBRANCH} exists"
+#     echo "[+] Checking if ${repository}/${ZBRANCH} exists"
 #     httpcode=$(curl -o /dev/null -I -s --write-out '%{http_code}\n' $giturl/tree/${branch})
 #
 #     if [ "$httpcode" = "200" ]; then
