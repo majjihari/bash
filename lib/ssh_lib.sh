@@ -59,6 +59,14 @@ js9() {(
 
 )}
 
+ZNodeUbuntuPrepare() {
+    ZNodeEnvSet
+    ZSSH 'apt-get update;apt-get upgrade -y'
+    ZDockerInstall
+    ZSSHi
+}
+
+
 
 ZNodePortSet() {
     echo '' > $ZLogFile
