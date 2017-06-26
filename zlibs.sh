@@ -1,7 +1,7 @@
 
 set +x
 
-export ZUTILSDIR=${ZUTILSDIR:-~}
+export ZUTILSDIR=${ZUTILSDIR:-~/code/jumpscale}
 export ZLogFile='/tmp/zutils.log'
 
 die() {
@@ -28,7 +28,7 @@ catcherror() {
 
 catcherror
 
-pushd $ZUTILSDIR/zutils
+pushd $ZUTILSDIR/bash
 . lib/code_lib.sh
 . lib/config_lib.sh
 . lib/docker_lib.sh

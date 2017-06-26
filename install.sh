@@ -2,7 +2,7 @@
 set -x
 
 
-export ZUTILSDIR=${ZUTILSDIR:-~}
+export ZUTILSDIR=${ZUTILSDIR:-~/code/jumpscale}
 export ZLogFile='/tmp/zutils.log'
 
 die() {
@@ -26,11 +26,11 @@ ZUtilsGetCode() {
         ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 > $ZLogFile || die
     fi
 
-    if [ ! -e $ZUTILSDIR/zutils ]; then
+    if [ ! -e $ZUTILSDIR/bash ]; then
         echo " * clone zutils"
-        git clone -b ${branch} $giturl zutils 2>&1 > $ZLogFile || die
+        git clone -b ${branch} $giturl bash 2>&1 > $ZLogFile || die
     else
-        pushd $ZCODEDIR/zutils
+        pushd $ZCODEDIR/bash
         echo " * pull"
         git pull  2>&1 > $ZLogFile || die
         popd
@@ -40,4 +40,4 @@ ZUtilsGetCode() {
 
 ZUtilsGetCode
 
-. ${ZUTILSDIR}/zutils/zlibs.sh
+. ${ZUTILSDIR}/bash/zlibs.sh
