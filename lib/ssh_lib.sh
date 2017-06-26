@@ -32,10 +32,10 @@ ZEXEC() {
 
     #check that if RNODE is there RPORT needs to be there too
 
-    if [ -z "$RNODE" ] && [ ! "$RNODE" = "localhost" ] && [ ! "$loc" = "1" ]; then
-        ssh -A root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@" || return 1
+    if [ "$RNODE" != "" ] && [ "$loc" != "1" ]; then
+        ssh -A root@$RNODE -p $RPORT "$@" || die "could not ssh command: $@"
     else
-        $@ > $ZLogFile 2>&1 || die "could not exec command: $@" || return 1
+        $@ > $ZLogFile 2>&1 || die "could not exec command: $@"
     fi
 
 }
