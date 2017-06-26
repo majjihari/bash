@@ -60,6 +60,16 @@ ZInstaller_js9() {
 }
 
 ZInstall_docker() {
-    #check if platform is ubuntu, only if ubuntu then install docker
-    echo "hello"
+    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    catchfatal
+
+    if [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
+        dist=$(grep DISTRIB_ID /etc/*-release | awk -F '=' '{print $2}' || true)
+        if [ "$dist" = "Ubuntu" ]; then
+            apt-get update
+            apt-get install -y docker.io
+        fi
+    fi
+
+    echo "[-] plateforme not supported"
 }
