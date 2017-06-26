@@ -54,3 +54,8 @@ ZInstaller_js9() {
     echo "[+] js9 installed (OK)"
 
 }
+
+ZInstall_docker(){
+    #check if platform is ubuntu, only if ubuntu then install docker
+
+}
