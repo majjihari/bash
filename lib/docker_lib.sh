@@ -1,6 +1,14 @@
 
 ######### DOCKER
 
+ZDockerInstall(){
+    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    catchfatal
+    echo "[+] install docker on remote machine."
+    ssh -A root@$RNODE -p $RPORT "wget -qO- https://get.docker.com/ | sh" > ${ZLogFile} 2>&1 || die "could install docker"
+
+}
+
 container() {
     echo '[${FUNCNAME[0]}]' > $ZLogFile
     catchfatal
@@ -21,7 +29,7 @@ container() {
     fi
 
     ssh root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@"
-    ssh -A root@localhost -p $RPORT "$@" > ${ZLogFile} 2>&1 > $ZLogFile 2>&1 || die "could not ssh command: $@"
+    ssh -A root@localhost -p $RPORT "$@" > ${ZLogFile} 2>&1 || die "could not ssh command: $@"
 }
 
 # die and get docker log back to host
