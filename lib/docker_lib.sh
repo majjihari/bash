@@ -2,7 +2,8 @@
 ######### DOCKER
 
 container() {
-    echo '' > $ZLogFile
+    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    catchfatal
 
     ZDockerConfig
     if [ "$RNODE" = '' ]; then
@@ -38,6 +39,9 @@ dockerdie() {
 }
 
 ZDockerConfig() {
+    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    catchfatal
+
     ZCodeConfig
     export CONTAINERDIR=~/docker
     mkdir -p ${CONTAINERDIR}/private
@@ -55,7 +59,9 @@ EOF
 }
 
 ZDockerCommit() {
-    echo '' > $ZLogFile
+    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    catchfatal
+
     ZDockerConfig
     local OPTIND
     local bname=''
@@ -79,12 +85,16 @@ ZDockerCommit() {
 }
 
 ZDockerSSHAuthorize() {
-    echo '' > $ZLogFile
+    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    catchfatal
+
     local ZDockerName="${1:-$ZDockerName}"
     echo "[+] authorizing local ssh keys on docker: $ZDockerName"
 
     echo "[+]   start ssh"
-    docker exec -t $ZDockerName  sv start sshd > ${ZLogFile} 2>&1
+    docker exec -t "${ZDockerName}" rm -f /etc/service/sshd/down
+    docker exec -t "${ZDockerName}" /etc/my_init.d/00_regen_ssh_host_keys.sh
+    docker exec -t "${ZDockerName}" sv start sshd > ${ZLogFile} 2>&1
 
     echo "[+]   Waiting for ssh to allow connections"
     while ! ssh-keyscan -p $RPORT localhost 2>&1 | grep -q "OpenSSH"; do
@@ -95,14 +105,18 @@ ZDockerSSHAuthorize() {
     rm -f ~/.ssh/known_hosts.bak
     ssh-keyscan -p $RPORT localhost 2>&1 | grep -v '^#' >> ~/.ssh/known_hosts
 
-    SSHKEYS=$(ssh-add -L)
-    docker exec -t "$1" /bin/sh -c "echo ${SSHKEYS} > /root/.ssh/authorized_keys"
+    # authorizing keys
+    ssh-add -L | while read key; do
+        docker exec -t "${ZDockerName}" /bin/sh -c "echo $key >> /root/.ssh/authorized_keys"
+    done
 
     echo "* SSH authorized"
 }
 
 ZDockerEnableSSH(){
-    echo '' > $ZLogFile
+    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    catchfatal
+
     local ZDockerName="${1:-$ZDockerName}"
 
     echo "[+]   configuring services"
@@ -124,7 +138,9 @@ ZDockerEnableSSH(){
 }
 
 ZDockerRemove(){
-    echo '' > $ZLogFile
+    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    catchfatal
+
     ZDockerConfig
     local ZDockerName="${1:-$ZDockerName}"
     echo "[+] remove docker $ZDockerName"
@@ -133,7 +149,9 @@ ZDockerRemove(){
 }
 
 ZDockerRemoveImage(){
-    echo '' > $ZLogFile
+    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    catchfatal
+
     ZDockerConfig
     local ZDockerImage="${1:-$ZDockerImage}"
     echo "[+] remove docker image $ZDockerImage"
@@ -141,7 +159,9 @@ ZDockerRemoveImage(){
 }
 
 ZDockerBuildUbuntu() {
-    echo '' > $ZLogFile
+    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    catchfatal
+
     ZDockerConfig
     local OPTIND
     local bname='phusion/baseimage'
@@ -197,12 +217,16 @@ EOF
 }
 
 ZDockerRunUbuntu() {
-    echo '' > $ZLogFile
+    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    # [[ $ZINTERACTIVE -eq 1 ]] && catchfatal
+    catchfatal
+
     local OPTIND
     local bname='jumpscale/ubuntu'
     local iname='build'
     local port=2222
     local addarg=''
+
     while getopts "b:i:p:a:h" opt; do
         case $opt in
            i )  iname=$OPTARG ;;
@@ -228,22 +252,24 @@ ZDockerRunUbuntu() {
     echo '* Ubuntu Docker Is Active (OK)'
 }
 
-ZDockerBuildJS9() {
-    echo '' > $ZLogFile
+ZDockerBuildJS9() {(
+    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    catchfatal
+
     ZDockerRunUbuntu $@
 
     echo "[+]   installing basic dependencies"
+    container apt-get update
     container apt-get install -y curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet
 
     echo "[+] JS9 BUILD"
     ZInstaller_code_jumpscale
     ZInstaller_python
     ZInstaller_js9
-
-}
+)}
 
 ZDockerRunJS9() {
-    echo '' > $ZLogFile
+    echo '[${FUNCNAME[0]}]' > $ZLogFile
     ZDockerRunUbuntu $@
 
     local OPTIND
@@ -290,7 +316,9 @@ EOF
 }
 
 ZDockerRun() {
-    echo '' > $ZLogFile
+    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    catchfatal
+
     ZDockerConfig
     local OPTIND
     local bname='jumpscale/js9_base'
@@ -321,7 +349,7 @@ ZDockerRun() {
 
     mounted_volumes="\
         -v ${CONTAINERDIR}/:/root/host/ \
-        -v ${ZCODEDIR}/:/opt/code/ \
+        -v ${ZCODEDIR}/:/opt/code/github \
         -v ${CONTAINERDIR}/private/:/optvar/private \
         -v ${CONTAINERDIR}/.cache/pip/:/root/.cache/pip/ \
     "

@@ -3,12 +3,16 @@ set -x
 
 export ZUTILSDIR=${ZUTILSDIR:-~/code/jumpscale}
 export ZLogFile='/tmp/zutils.log'
+export ZINTERACTIVE=1
+echo 'Initialzing environement' > $ZLogFile
+
+[[ $ZINTERACTIVE -eq 1 ]] && echo "[+] interactive interface enabled"
 
 die() {
     echo "[-] something went wrong: $1"
     rm -f /tmp/sdwfa #to remove temp passwd for restic, just to be sure
     cat $ZLogFile
-    return 1
+    exit 1
 }
 
 catcherror_handler() {
@@ -22,8 +26,23 @@ catcherror_handler() {
     return 1
 }
 
+catchfatal_handler() {
+    if [ "${ZLogFile}" != "" ]; then
+        echo "[-] script error, backlog from ${ZLogFile}:"
+        cat ${ZLogFile}
+        exit 1
+    fi
+
+    echo "[-] script error, no logging file defined"
+    exit 1
+}
+
 catcherror() {
     trap 'catcherror_handler $LINENO' ERR
+}
+
+catchfatal() {
+    trap 'catchfatal_handler $LINENO' ERR
 }
 
 catcherror

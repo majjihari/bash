@@ -30,7 +30,11 @@ ZGetCodeJS() {
            \? )  ZGetCodeJSUsage ; return 1 ;;
         esac
     done
-    if [ -z "$reponame" ]; then ZGetCodeJSUsage;return 0; fi
+
+    if [ -z "$reponame" ]; then
+        ZGetCodeJSUsage
+        return
+    fi
 
     local giturl="git@github.com:Jumpscale/$reponame.git"
 
@@ -66,8 +70,15 @@ ZGetCode() {
            \? )  ZGetCodeUsage ; return 1 ;;
         esac
     done
-    if [ -z "$giturl" ]; then ZGetCodeUsage;return 0; fi
-    if [ -z "$reponame" ]; then ZGetCodeUsage;return 0; fi
+    if [ -z "$giturl" ]; then
+        ZGetCodeUsage
+        return
+    fi
+
+    if [ -z "$reponame" ]; then
+        ZGetCodeUsage
+        return
+    fi
 
     mkdir -p $ZCODEDIR/$account
     echo "* get code $giturl ($branch)"
@@ -88,7 +99,7 @@ ZGetCode() {
         popd
     fi
     popd
-    pushd $ZCODEDIR/$account/$reponame
+    # pushd $ZCODEDIR/$account/$reponame
 }
 
 

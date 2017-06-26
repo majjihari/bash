@@ -3,15 +3,15 @@ ZInstaller_code_jumpscale() {
     local branch="${1:-master}"
     echo "[+] loading or updating jumpscale source code (branch:$branch)"
     ZGetCodeJS -r core9 -b $branch > ${ZLogFile} 2>&1 || die
-    popd
+    # popd
     ZGetCodeJS -r lib9 -b $branch > ${ZLogFile} 2>&1 || die
-    popd
+    # popd
     ZGetCodeJS -r prefab9 -b $branch > ${ZLogFile} 2>&1 || die
-    popd
+    # popd
     ZGetCodeJS -r builder_bootstrap -b $branch > ${ZLogFile} 2>&1 || die
-    popd
+    # popd
     ZGetCodeJS -r developer -b $branch > ${ZLogFile} 2>&1 || die
-    popd
+    # popd
     echo "[+] update jumpscale code done"
 }
 
@@ -35,10 +35,10 @@ ZInstaller_js9() {
     echo "[+] install js9"
     # ZSSH "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
     echo "[+]   synchronizing developer files"
-    container rsync -rv /opt/code/jumpscale/developer/files_guest/ /
+    container rsync -rv /opt/code/github/jumpscale/developer/files_guest/ /
 
     echo "[+]   installing jumpscale core9"
-    container pip3 install -e /opt/code/jumpscale/core9
+    container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/core9"
 
     echo "[+]   installing binaries files"
     container 'find  /opt/code/github/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \;'
@@ -55,7 +55,7 @@ ZInstaller_js9() {
 
 }
 
-ZInstall_docker(){
+ZInstall_docker() {
     #check if platform is ubuntu, only if ubuntu then install docker
-
+    echo "hello"
 }

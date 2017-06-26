@@ -41,11 +41,11 @@ ZEXEC() {
 }
 
 #goal is to allow people to get into their container without thinking
-ZSSH() {
+ZSSH() {(
     echo '' > $ZLogFile
     ZNodeEnvSet
     ssh -A root@$RNODE -p $RPORT "$@" || die "could not ssh command: $@"
-}
+)}
 
 
 
