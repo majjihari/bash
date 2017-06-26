@@ -44,9 +44,20 @@ ZEXEC() {
 ZSSH() {(
     echo '' > $ZLogFile
     ZNodeEnvSet
-    ssh -A root@$RNODE -p $RPORT "$@" || die "could not ssh command: $@"
+    if [ -n "$1" ]; then
+        ssh -A root@$RNODE -p $RPORT TERM=xterm;"$@" || die "could not ssh command: $@"
+    else
+        ssh -A root@$RNODE -p $RPORT || die "could not ssh command: $@"
+    fi
+
 )}
 
+js9() {(
+    echo '' > $ZLogFile
+    ZNodeEnvSet
+    ssh -A root@$RNODE -p $RPORT TERM=xterm;js9 "$@" || die "could not ssh command: $@"
+
+)}
 
 
 ZNodePortSet() {
