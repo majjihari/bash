@@ -1,4 +1,4 @@
-
+#!/bin/bash
 set -x
 
 export ZUTILSDIR=${ZUTILSDIR:-~/code/jumpscale}
@@ -27,6 +27,11 @@ catcherror() {
 }
 
 catcherror
+
+if [ ! -d "${ZUTILSDIR}/bash" ]; then
+    echo "[-] ${ZUTILSDIR}/bash: directory not found"
+    return
+fi
 
 pushd $ZUTILSDIR/bash
 . lib/code_lib.sh
