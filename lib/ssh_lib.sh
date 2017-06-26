@@ -7,13 +7,40 @@ ZSSHTEST() {
     #TODO: check and if not connect, ask the params again, till its all ok
 }
 
-ZSSH() {
+
+ZEXECUsage() {
+   cat <<EOF
+Usage: ZEXEC [-l]
+   -l: local execution even if a docker exists
+   -h: help
+
+executes a command local or over ssh (using variable RNODE & RPORT)
+
+EOF
+}
+ZEXEC() {
+    local loc=0
+    local OPTIND
+    while getopts "lh" opt; do
+        case $opt in
+           l )  loc=1 ;;
+           h )  ZEXECUsage ; return 0 ;;
+        esac
+    done
+
+    #check that if RNODE is there RPORT needs to be there too
+
+    if [ -z "$RNODE" ] && [ not "$RNODE" = "localhost" ] && [ not "$loc" = "1" ]; then
+        ssh -A root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@"
+    else
+        $@ > $ZLogFile 2>&1 || die "could not exec command: $@"
+    fi
     ZNodeEnvSet
-    ssh -A root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@"
+
 }
 
 #interactive version
-ZSSHi() {
+ZSSH() {
     ZNodeEnvSet
     ssh -A root@$RNODE -p $RPORT "$@" | tee $ZLogFile || die "could not ssh command: $@"
 }

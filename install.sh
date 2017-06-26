@@ -39,3 +39,5 @@ ZUtilsGetCode() {
 }
 
 ZUtilsGetCode
+
+. ${ZUTILSDIR}/zutils/zlibs.sh
