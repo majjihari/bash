@@ -55,6 +55,7 @@ EOF
 }
 
 ZDockerCommit() {
+    echo '' > $ZLogFile
     ZDockerConfig
     local OPTIND
     local bname=''
@@ -78,7 +79,7 @@ ZDockerCommit() {
 }
 
 ZDockerSSHAuthorize() {
-
+    echo '' > $ZLogFile
     local ZDockerName="${1:-$ZDockerName}"
     echo "[+] authorizing local ssh keys on docker: $ZDockerName"
 
@@ -101,7 +102,7 @@ ZDockerSSHAuthorize() {
 }
 
 ZDockerEnableSSH(){
-
+    echo '' > $ZLogFile
     local ZDockerName="${1:-$ZDockerName}"
 
     echo "[+]   configuring services"
@@ -123,6 +124,7 @@ ZDockerEnableSSH(){
 }
 
 ZDockerRemove(){
+    echo '' > $ZLogFile
     ZDockerConfig
     local ZDockerName="${1:-$ZDockerName}"
     echo "[+] remove docker $ZDockerName"
@@ -131,6 +133,7 @@ ZDockerRemove(){
 }
 
 ZDockerRemoveImage(){
+    echo '' > $ZLogFile
     ZDockerConfig
     local ZDockerImage="${1:-$ZDockerImage}"
     echo "[+] remove docker image $ZDockerImage"
@@ -138,6 +141,7 @@ ZDockerRemoveImage(){
 }
 
 ZDockerBuildUbuntu() {
+    echo '' > $ZLogFile
     ZDockerConfig
     local OPTIND
     local bname='phusion/baseimage'
@@ -193,6 +197,7 @@ EOF
 }
 
 ZDockerRunUbuntu() {
+    echo '' > $ZLogFile
     local OPTIND
     local bname='jumpscale/ubuntu'
     local iname='build'
@@ -224,7 +229,7 @@ ZDockerRunUbuntu() {
 }
 
 ZDockerBuildJS9() {
-
+    echo '' > $ZLogFile
     ZDockerRunUbuntu $@
 
     echo "[+]   installing basic dependencies"
@@ -238,7 +243,7 @@ ZDockerBuildJS9() {
 }
 
 ZDockerRunJS9() {
-
+    echo '' > $ZLogFile
     ZDockerRunUbuntu $@
 
     local OPTIND
@@ -285,6 +290,7 @@ EOF
 }
 
 ZDockerRun() {
+    echo '' > $ZLogFile
     ZDockerConfig
     local OPTIND
     local bname='jumpscale/js9_base'

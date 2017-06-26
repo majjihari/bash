@@ -1,5 +1,5 @@
 
-set +x
+set -x
 
 export ZUTILSDIR=${ZUTILSDIR:-~/code/jumpscale}
 export ZLogFile='/tmp/zutils.log'

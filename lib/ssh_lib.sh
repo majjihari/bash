@@ -2,6 +2,7 @@
 
 
 ZSSHTEST() {
+    echo '' > $ZLogFile
     ZNodeEnvSet
     ssh root@$RNODE -p $RPORT 'ls /' > $ZLogFile 2>&1 || die "could not connect over ssh to $RNODE:$RPORT"
     #TODO: check and if not connect, ask the params again, till its all ok
@@ -19,6 +20,7 @@ executes a command local or over ssh (using variable RNODE & RPORT)
 EOF
 }
 ZEXEC() {
+    echo '' > $ZLogFile
     local loc=0
     local OPTIND
     while getopts "lh" opt; do
@@ -31,21 +33,24 @@ ZEXEC() {
     #check that if RNODE is there RPORT needs to be there too
 
     if [ -z "$RNODE" ] && [ not "$RNODE" = "localhost" ] && [ not "$loc" = "1" ]; then
-        ssh -A root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@"
+        ssh -A root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@" || return 1
     else
-        $@ > $ZLogFile 2>&1 || die "could not exec command: $@"
+        $@ > $ZLogFile 2>&1 || die "could not exec command: $@" || return 1
     fi
-    ZNodeEnvSet
 
 }
 
-#interactive version
+#goal is to allow people to get into their container without thinking
 ZSSH() {
+    echo '' > $ZLogFile
     ZNodeEnvSet
-    ssh -A root@$RNODE -p $RPORT "$@" | tee $ZLogFile || die "could not ssh command: $@"
+    ssh -A root@$RNODE -p $RPORT "$@" || die "could not ssh command: $@"
 }
+
+
 
 ZNodePortSet() {
+    echo '' > $ZLogFile
     if [ ! -n "$1" ]; then
         read -p "port of node: " RPORT
     else
@@ -55,6 +60,7 @@ ZNodePortSet() {
 }
 
 ZNodeSet() {
+    echo '' > $ZLogFile
     if [ ! -n "$1" ]; then
         read -p "ipaddr or hostname of node: " RNODE
     else
@@ -64,6 +70,7 @@ ZNodeSet() {
 }
 
 ZNodeEnvSet() {
+    echo '' > $ZLogFile
     export RPORT=${RPORT:-22}
     if [ ! -n "$RNODE" ]; then
         read -s -p "ssh node (ip addr or hostname): " RNODE
