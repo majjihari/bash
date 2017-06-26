@@ -30,7 +30,7 @@ ZUtilsGetCode() {
         echo " [+] clone zutils"
         git clone -b ${branch} $giturl bash 2>&1 > $ZLogFile || die
     else
-        pushd $ZCODEDIR/bash
+        pushd $ZUTILSDIR/bash
         echo " [+] pull"
         git pull  2>&1 > $ZLogFile || die
         popd > /dev/null 2>&1
