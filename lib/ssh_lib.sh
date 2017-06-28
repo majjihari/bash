@@ -19,7 +19,7 @@ executes a command local or over ssh (using variable RNODE & RPORT)
 
 EOF
 }
-ZEXEC() {
+ZEXEC() {(
     echo '' > $ZLogFile
     local loc=0
     local OPTIND
@@ -28,17 +28,18 @@ ZEXEC() {
            l )  loc=1 ;;
            h )  ZEXECUsage ; return 0 ;;
         esac
+
+        shift
     done
 
-    #check that if RNODE is there RPORT needs to be there too
-
-    if [ "$RNODE" != "" ] && [ "$loc" != "1" ]; then
+    if [ "$RNODE" != "" ] && [ "$RPORT" != "" ] && [ $loc -ne 1 ]; then
         ssh -A root@$RNODE -p $RPORT "$@" || die "could not ssh command: $@"
+
     else
-        $@ > $ZLogFile 2>&1 || die "could not exec command: $@"
+        $@ || die "could not execute locally command: $@"
     fi
 
-}
+)}
 
 #goal is to allow people to get into their container without thinking
 ZSSH() {(
