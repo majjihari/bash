@@ -47,7 +47,7 @@ ZSSH() {(
     if [ -n "$1" ]; then
         ssh -A root@$RNODE -p $RPORT "TERM=xterm;$@" || die "could not ssh command: $@"
     else
-        ssh -A root@$RNODE -p $RPORT || die "could not ssh command: $@"
+        ssh -A root@$RNODE -p $RPORT "bash . ~/code/jumpscale/bash/zlibs.sh"|| die "could not ssh command: $@"
     fi
 
 )}
@@ -63,7 +63,7 @@ ZNodeUbuntuPrepare() {
     ZNodeEnvSet
     ZSSH 'apt-get update;apt-get upgrade -y'
     ZDockerInstall
-    ZSSHi
+    ZSSH "curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;sh /tmp/install.sh"
 }
 
 
