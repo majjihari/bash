@@ -118,6 +118,9 @@ ZDockerSSHAuthorize() {
         docker exec -t "${ZDockerName}" /bin/sh -c "echo $key >> /root/.ssh/authorized_keys"
     done
 
+    ZNodeSet 'localhost'
+    ZNodePortSet $RPORT
+
     echo "[+] SSH authorized"
 }
 
