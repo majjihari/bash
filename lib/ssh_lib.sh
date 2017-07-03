@@ -9,6 +9,53 @@ ZSSHTEST() {
 }
 
 
+ZSSH_RFORWARD_Usage() {
+   cat <<EOF
+Forward remote port to a local one (e.g. give people access to your machine or a machine in your network)
+Usage: ZEXEC [-l]
+   -a: host, is obligatary (is where people will have to connect to to get access to your local machine)
+   -l: local address, std is localhost
+   -p: local port, std is 22
+   -r: remote port, std is 2244
+   -u: user, std = root
+   -h: help
+executes a command local or over ssh (using variable RNODE & RPORT)
+
+EOF
+}
+ZSSH_RFORWARD() {(
+    echo '' > $ZLogFile
+    local raddress=""
+    local laddress=localhost
+    local lport=22
+    local rport=2244
+    local user='root'
+
+    local OPTIND
+    while getopts "a:l:p:r:u:h" opt; do
+        case $opt in
+           a )  raddress=$OPTARG ;;
+           l )  laddress=$OPTARG ;;
+           p )  lport=$OPTARG ;;
+           r )  rport=$OPTARG ;;
+           u )  user=$OPTARG ;;
+           h )  ZSSH_RFORWARD_Usage ; return 0 ;;
+        esac
+
+        shift
+    done
+    set -x
+    if [ "$raddress" != "" ] ; then
+        ssh -R $rport:$laddress:$lport $user@$raddress || die "could not to remote portforward: $@"
+    else
+        die "could not forward remote port to local, check syntax: $@"
+    fi
+
+)}
+
+
+
+
 ZEXECUsage() {
    cat <<EOF
 Usage: ZEXEC [-l]

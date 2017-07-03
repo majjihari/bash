@@ -359,8 +359,8 @@ ZDockerRun() {
     fi
 
     mounted_volumes="\
-        -v ${CONTAINERDIR}/:/root/host/ \
-        -v ${ZCODEDIR}/:/opt/code/github \
+        -v ${CONTAINERDIR}/:/root/host \
+        -v ${ZCODEDIR}/:/opt/code \
         -v ${CONTAINERDIR}/private/:/optvar/private \
         -v ${CONTAINERDIR}/.cache/pip/:/root/.cache/pip/ \
     "

@@ -59,4 +59,5 @@ pushd $ZUTILSDIR/bash > /dev/null 2>&1
 . lib/restic_lib.sh
 . lib/ssh_lib.sh
 . lib/installers.sh
+. lib/tmux.sh
 popd > /dev/null 2>&1
