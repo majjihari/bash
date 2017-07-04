@@ -63,6 +63,7 @@ ZEXECUsage() {
 Usage: ZEXEC [-c command to execute] [-b] [-h]
    -c: command to execute
    -b: execute bash tools remotely before calling this command
+   -i: interactive mode
    -h: help
 
 executes a command local or over ssh (using variable RNODE & RPORT)
@@ -75,10 +76,12 @@ ZEXEC() {(
     echo '' > $ZLogFile
     set -x
     local OPTIND
-    local cmd
-    while getopts "c:hb" opt; do
+    local cmd=""
+    local interactive=0
+    while getopts "c:hbi" opt; do
         case $opt in
            c )  cmd=$OPTARG ;;
+           i )  interactive=1 ;;
            h )  ZEXECUsage ; return 0 ;;
            b )  RSync_bash || die "could not rsync bash" && return 1;;
         esac
@@ -88,32 +91,24 @@ ZEXEC() {(
     fi
     echo '' > $ZLogFile
     if [ "$RNODE" != "" ] ; then
-        ssh -A root@$RNODE -p $RPORT "$cmd" > $ZLogFile 2>&1 || die "could not ssh command: $cmd" && return 1
+        if [ $interactive -eq 1 ] ; then
+            ssh -A root@$RNODE -p $RPORT "$cmd" && return 1
+        else
+            ssh -A root@$RNODE -p $RPORT "$cmd" > $ZLogFile 2>&1 || die "could not ssh command: $cmd" && return 1
+        fi
     else
-        $cmd || die "error in ZEXEC local execute: $@"  > $ZLogFile 2>&1 && return 1
+
+        if [ $interactive -eq 1 ] ; then
+            $cmd && return 1
+        else
+            $cmd || die "error in ZEXEC local execute: $@"  > $ZLogFile 2>&1 && return 1
+        fi
     fi
     cat $ZLogFile
 
 )}
 
 
-ZEXECiUsage() {
-   cat <<EOF
-Usage: ZEXECi [-c command to execute] [-b] [-h]
-   -c: command to execute
-   -b: execute bash tools remotely before calling this command
-   -h: help
-
-executes a command local or over ssh (using variable RNODE & RPORT)
-
-is interactive, do not use in scripts
-
-EOF
-}
-ZEXECi() {(
-    die "implement"
-    return 1
-)}
 
 #goal is to allow people to get into their container without thinking
 ZSSH() {(
