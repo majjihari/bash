@@ -20,7 +20,7 @@ RSyncTo() {(
     local all=0
     local rsource=""
     local rdest=""
-    local rexclude="--exclude='.git/' --exclude='*.pyc'"
+    local rexclude=--exclude='.git/' --exclude='*.pyc'
     ZNodeEnvSet
     while getopts "s:d:ah" opt; do
         case $opt in
@@ -47,7 +47,7 @@ RSyncTo() {(
 
 RSync_bash() {(
     echo '' > $ZLogFile
-    ZEXEC 'mkdir -p /root/code/jumpscale/bash && rm -rf /root/code/jumpscale/bash'
+    # ZEXEC 'mkdir -p /root/code/jumpscale/bash && rm -rf /root/code/'
     set -x
     RSyncTo  -s "$ZUTILSDIR/bash/" -d "/root/code/jumpscale/bash/"
 )}
