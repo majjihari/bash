@@ -96,6 +96,25 @@ ZEXEC() {(
 
 )}
 
+
+ZEXECiUsage() {
+   cat <<EOF
+Usage: ZEXECi [-c command to execute] [-b] [-h]
+   -c: command to execute
+   -b: execute bash tools remotely before calling this command
+   -h: help
+
+executes a command local or over ssh (using variable RNODE & RPORT)
+
+is interactive, do not use in scripts
+
+EOF
+}
+ZEXECi() {(
+    die "implement"
+    return 1
+)}
+
 #goal is to allow people to get into their container without thinking
 ZSSH() {(
     echo '' > $ZLogFile
