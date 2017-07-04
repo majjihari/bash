@@ -33,14 +33,14 @@ RSyncTo() {(
     done
 
     if [ "$rdest" != "" ] ; then
-        ZEXEC "mkdir -p $rdest" || die "could not mkdir $rdest as part of rsync: $@"
+        ZEXEC "mkdir -p $rdest" || die "could not mkdir $rdest as part of rsync: $@" && return 1
     fi
 
     if [ "$rsource" != "" ] && [ "$rdest" != "" ] ; then
         if [ $all -eq 1 ] ; then
-            rsync -rav -e "ssh -p $RPORT" $rsource root@$RNODE:$rdest > $ZLogFile 2>&1 || die "could not rsync: $@"
+            rsync -rav -e "ssh -p $RPORT" $rsource root@$RNODE:$rdest > $ZLogFile 2>&1 || die "could not rsync: $@" && return 1
         else
-            rsync -rav --exclude='.git/' --exclude='*.pyc' -e "ssh -p $RPORT" $rsource root@$RNODE:$rdest > $ZLogFile 2>&1 || die "could not rsync: $@"
+            rsync -rav --exclude='.git/' --exclude='*.pyc' -e "ssh -p $RPORT" $rsource root@$RNODE:$rdest > $ZLogFile 2>&1 || die "could not rsync: $@" && return 1
         fi
 
 

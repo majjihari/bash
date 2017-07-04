@@ -77,7 +77,7 @@ ZEXEC() {(
         case $opt in
            c )  cmd=$OPTARG ;;
            h )  ZEXECUsage ; return 0 ;;
-           b )  RSync_bash || die "could not rsync bash";;
+           b )  RSync_bash || die "could not rsync bash" && return 1;;
         esac
     done
     if [ "$RNODE" != "" ] && [ "$RPORT" != "" ]  && [ "$cmd" != "" ]; then
