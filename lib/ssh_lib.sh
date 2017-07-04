@@ -67,10 +67,13 @@ Usage: ZEXEC [-c command to execute] [-b] [-h]
 
 executes a command local or over ssh (using variable RNODE & RPORT)
 
+is non interactive !!!
+
 EOF
 }
 ZEXEC() {(
     echo '' > $ZLogFile
+    set -x
     local OPTIND
     local cmd
     while getopts "c:hb" opt; do
@@ -80,11 +83,16 @@ ZEXEC() {(
            b )  RSync_bash || die "could not rsync bash" && return 1;;
         esac
     done
-    if [ "$RNODE" != "" ] && [ "$RPORT" != "" ]  && [ "$cmd" != "" ]; then
-        ssh -A root@$RNODE -p $RPORT "$cmd" || die "could not ssh command: $cmd"
-    else
-        $@ || die "could not execute locally command: $cmd"
+    if [ "$cmd" = "" ] ; then
+        die "syntax error in ZEXEC: $@" && return 1
     fi
+    echo '' > $ZLogFile
+    if [ "$RNODE" != "" ] ; then
+        ssh -A root@$RNODE -p $RPORT "$cmd" > $ZLogFile 2>&1 || die "could not ssh command: $cmd" && return 1
+    else
+        $cmd || die "error in ZEXEC local execute: $@"  > $ZLogFile 2>&1 && return 1
+    fi
+    cat $ZLogFile
 
 )}
 
