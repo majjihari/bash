@@ -14,3 +14,36 @@ curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM 
 ```
 
 this will source all methods, codecompletion will now work.
+
+# ssh tools
+
+```bash
+#set node we will work on
+ZNodeSet 192.168.10.1
+
+#if different port
+ZNodePortSet 2222
+
+#to see which env has been set
+ZNodeEnv
+
+#to sync local install bash tools to the remote node
+RSync_bash
+
+#to remote execute something
+ZEXEC ls /
+
+#to remote execute something and make sure bash tools are there & loaded
+ZEXEC -b ls /
+
+```
+
+# lede tools
+
+```bash
+#configure a remote lede box, first make sure the ZNodeSet ... is done
+#will install mc, curl, git, ...
+LEDE_Install
+
+
+```

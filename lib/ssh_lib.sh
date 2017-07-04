@@ -19,7 +19,9 @@ Usage: ZEXEC [-l]
    -r: remote port, std is 2244
    -u: user, std = root
    -h: help
+
 executes a command local or over ssh (using variable RNODE & RPORT)
+will std run in background (tmux)
 
 EOF
 }
@@ -140,7 +142,7 @@ ZNodeEnvSet() {
     echo '' > $ZLogFile
     export RPORT=${RPORT:-22}
     if [ ! -n "$RNODE" ]; then
-        read -s -p "ssh node (ip addr or hostname): " RNODE
+        read -p "ssh node (ip addr or hostname): " RNODE
     fi
     export RNODE
 }

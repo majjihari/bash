@@ -60,4 +60,6 @@ pushd $ZUTILSDIR/bash > /dev/null 2>&1
 . lib/ssh_lib.sh
 . lib/installers.sh
 . lib/tmux.sh
+. lib/rsync.sh
+. lib/lede.sh
 popd > /dev/null 2>&1
