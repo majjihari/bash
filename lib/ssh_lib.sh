@@ -64,6 +64,7 @@ Usage: ZEXEC [-c command to execute] [-b] [-h]
    -c: command to execute
    -b: execute bash tools remotely before calling this command
    -i: interactive mode
+   -t: tmux mode, the command will be executed in tmux (local or remote), not implemented yet
    -h: help
 
 executes a command local or over ssh (using variable RNODE & RPORT)
