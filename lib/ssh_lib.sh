@@ -42,9 +42,9 @@ ZSSH_RFORWARD() {(
            r )  rport=$OPTARG ;;
            u )  user=$OPTARG ;;
            h )  ZSSH_RFORWARD_Usage ; return 0 ;;
+           \? )  ZSSH_RFORWARD_Usage ; return 0 ;;
         esac
-
-        shift
+        # shift
     done
     set -x
     if [ "$raddress" != "" ] ; then
@@ -61,7 +61,6 @@ ZSSH_RFORWARD() {(
 ZEXECUsage() {
    cat <<EOF
 Usage: ZEXEC [-l]
-   -l: local execution even if a docker exists
    -h: help
 
 executes a command local or over ssh (using variable RNODE & RPORT)
@@ -70,20 +69,15 @@ EOF
 }
 ZEXEC() {(
     echo '' > $ZLogFile
-    local loc=0
     local OPTIND
-    while getopts "lh" opt; do
+    while getopts "h" opt; do
         case $opt in
-           l )  loc=1 ;;
            h )  ZEXECUsage ; return 0 ;;
         esac
-
-        shift
+        # shift
     done
-
-    if [ "$RNODE" != "" ] && [ "$RPORT" != "" ] && [ $loc -ne 1 ]; then
+    if [ "$RNODE" != "" ] && [ "$RPORT" != "" ] ; then
         ssh -A root@$RNODE -p $RPORT "$@" || die "could not ssh command: $@"
-
     else
         $@ || die "could not execute locally command: $@"
     fi

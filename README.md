@@ -33,6 +33,9 @@ RSync_bash
 #to remote execute something
 ZEXEC ls /
 
+#to remote execute multiple commands, do not forget the `` IMPORTANT
+ ZEXEC 'mkdir -p /tmp/1;mkdir -p /tmp/2'
+
 #to remote execute something and make sure bash tools are there & loaded
 ZEXEC -b ls /
 
