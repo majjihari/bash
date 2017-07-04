@@ -15,12 +15,12 @@ EOF
 
 RSyncTo() {(
     echo '' > $ZLogFile
-    set -x
     local OPTIND
     local all=0
     local rsource=""
     local rdest=""
-    local rexclude=--exclude='.git/' --exclude='*.pyc'
+    # local rexclude=--exclude='.git/' --exclude='*.pyc'
+
     ZNodeEnvSet
     while getopts "s:d:ah" opt; do
         case $opt in
@@ -31,11 +31,18 @@ RSyncTo() {(
            \? )  RSyncToUsage ; return 0 ;;
         esac
     done
+
+    if [ "$rdest" != "" ] ; then
+        ZEXEC "mkdir -p $rdest" || die "could not mkdir $rdest as part of rsync: $@"
+    fi
+
     if [ "$rsource" != "" ] && [ "$rdest" != "" ] ; then
         if [ $all -eq 1 ] ; then
-            rexclude=""
+            rsync -rav -e "ssh -p $RPORT" $rsource root@$RNODE:$rdest > $ZLogFile 2>&1 || die "could not rsync: $@"
+        else
+            rsync -rav --exclude='.git/' --exclude='*.pyc' -e "ssh -p $RPORT" $rsource root@$RNODE:$rdest > $ZLogFile 2>&1 || die "could not rsync: $@"
         fi
-        rsync -rav -e "ssh -p $RPORT" $rexclude $rsource root@$RNODE:$rdest || die "could not rsync: $@"
+
 
     else
         $@ || die "could not rsync to node, check syntax: $@"
@@ -47,7 +54,5 @@ RSyncTo() {(
 
 RSync_bash() {(
     echo '' > $ZLogFile
-    # ZEXEC 'mkdir -p /root/code/jumpscale/bash && rm -rf /root/code/'
-    set -x
     RSyncTo  -s "$ZUTILSDIR/bash/" -d "/root/code/jumpscale/bash/"
 )}

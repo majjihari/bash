@@ -60,7 +60,9 @@ ZSSH_RFORWARD() {(
 
 ZEXECUsage() {
    cat <<EOF
-Usage: ZEXEC [-l]
+Usage: ZEXEC [-c command to execute] [-b] [-h]
+   -c: command to execute
+   -b: execute bash tools remotely before calling this command
    -h: help
 
 executes a command local or over ssh (using variable RNODE & RPORT)
@@ -70,16 +72,18 @@ EOF
 ZEXEC() {(
     echo '' > $ZLogFile
     local OPTIND
-    while getopts "h" opt; do
+    local cmd
+    while getopts "c:hb" opt; do
         case $opt in
+           c )  cmd=$OPTARG ;;
            h )  ZEXECUsage ; return 0 ;;
+           b )  RSync_bash || die "could not rsync bash";;
         esac
-        # shift
     done
-    if [ "$RNODE" != "" ] && [ "$RPORT" != "" ] ; then
-        ssh -A root@$RNODE -p $RPORT "$@" || die "could not ssh command: $@"
+    if [ "$RNODE" != "" ] && [ "$RPORT" != "" ]  && [ "$cmd" != "" ]; then
+        ssh -A root@$RNODE -p $RPORT "$cmd" || die "could not ssh command: $cmd"
     else
-        $@ || die "could not execute locally command: $@"
+        $@ || die "could not execute locally command: $cmd"
     fi
 
 )}
