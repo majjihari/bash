@@ -265,18 +265,17 @@ ZDockerRunUbuntu() {
 
 ZDockerBuildJS9() {(
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catcherror
 
-    ZDockerRunUbuntu $@
+    ZDockerRunUbuntu $@ || return 1
 
     echo "[+]   installing basic dependencies"
-    container apt-get update
-    container apt-get install -y curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet
+    container 'apt-get update' || return 1
+    container 'apt-get install -y curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet' || return 1
 
     echo "[+] JS9 BUILD"
-    ZInstaller_code_jumpscale
-    ZInstaller_python
-    ZInstaller_js9
+    ZInstaller_code_jumpscale || return 1
+    ZInstaller_python || return 1
+    ZInstaller_js9 || return 1
 )}
 
 ZDockerRunJS9() {

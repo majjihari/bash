@@ -50,3 +50,32 @@ if reponame not specified then will checkout
 - ays9
 - prefab
 ```
+
+### ZCodePushJS
+
+very handy shortcut to commit/add/pull & push repos (this case for jumoscale)
+
+```
+ZCodePushJS -h
+Usage: ZCodePushJS [-r reponame] [-a account] [-m message]
+    -r reponame: name or repo
+    -m message for commit: required !
+    -h: help
+
+    will add/remove files, commit, pull & push
+```
+
+### ZCodePush
+
+This case commit/add/pull & push for generic repo;s
+
+```
+ZCodePush -h
+Usage: ZCodePush [-r reponame] [-a account] [-m message]
+  -a account: will default to 'varia', but can be account name
+  -r reponame: name or repo
+  -m message for commit: required !
+  -h: help
+
+  will add/remove files, commit, pull & push
+```
