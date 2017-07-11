@@ -178,7 +178,7 @@ ZCodePush() {
         return
     fi
 
-    echo "[+] push code $ZCODEDIR/$account/$reponame"
+    echo "[+] commit-pull-push  code $ZCODEDIR/$account/$reponame"
 
     pushd $ZCODEDIR/$account > /dev/null 2>&1
 
@@ -186,10 +186,13 @@ ZCodePush() {
         die "could not find $ZCODEDIR/$account/$reponame" || return 1
     else
         pushd $ZCODEDIR/$account/$reponame > /dev/null 2>&1
-        echo " [+] commit-pull-push $ZCODEDIR/$account/$reponame"
+        echo " [+] add"
         git add . -A  2>&1 > $ZLogFile #|| die "ZCodePush (add) $@" || return 1
+        echo " [+] commit"
         git commit -m '$message'  2>&1 > $ZLogFile #|| die "ZCodePush (commit) $@" || return 1
+        echo " [+] pull"
         git pull  2>&1 > $ZLogFile || die "ZCodePush (pull) $@" || return 1
+        echo " [+] push"
         git push  2>&1 > $ZLogFile || die "ZCodePush (push) $@" || return 1
         popd > /dev/null 2>&1
     fi

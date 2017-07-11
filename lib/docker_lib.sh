@@ -3,7 +3,7 @@
 
 ZDockerInstall(){
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catchfatal
+    catcherror
     echo "[+] install docker on remote machine."
     ssh -A root@$RNODE -p $RPORT "wget -qO- https://get.docker.com/ | sh" > ${ZLogFile} 2>&1 || die "could install docker"
 
@@ -11,7 +11,7 @@ ZDockerInstall(){
 
 container() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catchfatal
+    catcherror
 
     ZDockerConfig
     if [ "$RNODE" = '' ]; then
@@ -49,6 +49,7 @@ dockerdie() {
 
 ZDockerConfig() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    catcherror
     ZCodeConfig
     export CONTAINERDIR=~/docker
     mkdir -p ${CONTAINERDIR}/private
@@ -67,7 +68,7 @@ EOF
 
 ZDockerCommit() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catchfatal
+    catcherror
 
     ZDockerConfig
     local OPTIND
@@ -93,7 +94,7 @@ ZDockerCommit() {
 
 ZDockerSSHAuthorize() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catchfatal
+    catcherror
 
     local ZDockerName="${1:-$ZDockerName}"
     echo "[+] authorizing local ssh keys on docker: $ZDockerName"
@@ -125,7 +126,7 @@ ZDockerSSHAuthorize() {
 
 ZDockerEnableSSH(){
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catchfatal
+    catcherror
 
     local ZDockerName="${1:-$ZDockerName}"
 
@@ -149,7 +150,7 @@ ZDockerEnableSSH(){
 
 ZDockerRemove(){
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catchfatal
+    catcherror
 
     ZDockerConfig
     local ZDockerName="${1:-$ZDockerName}"
@@ -160,7 +161,7 @@ ZDockerRemove(){
 
 ZDockerRemoveImage(){
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catchfatal
+    catcherror
 
     ZDockerConfig
     local ZDockerImage="${1:-$ZDockerImage}"
@@ -170,7 +171,7 @@ ZDockerRemoveImage(){
 
 ZDockerBuildUbuntu() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catchfatal
+    catcherror
 
     ZDockerConfig
     local OPTIND
@@ -228,8 +229,8 @@ EOF
 
 ZDockerRunUbuntu() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFileecho '[${FUNCNAME[0]}]' > $ZLogFile
-    # [[ $ZINTERACTIVE -eq 1 ]] && catchfatal
-    catchfatal
+    # [[ $ZINTERACTIVE -eq 1 ]] && catcherror
+    catcherror
 
     local OPTIND
     local bname='jumpscale/ubuntu'
@@ -264,7 +265,7 @@ ZDockerRunUbuntu() {
 
 ZDockerBuildJS9() {(
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catchfatal
+    catcherror
 
     ZDockerRunUbuntu $@
 
@@ -327,7 +328,7 @@ EOF
 
 ZDockerRun() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catchfatal
+    catcherror
 
     ZDockerConfig
     local OPTIND

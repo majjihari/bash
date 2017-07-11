@@ -61,7 +61,7 @@ ZInstaller_js9() {
 
 ZInstall_docker() {
     echo '[${FUNCNAME[0]}]' > $ZLogFile
-    catchfatal
+    catcherror
 
     if [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
         dist=$(grep DISTRIB_ID /etc/*-release | awk -F '=' '{print $2}' || true)
