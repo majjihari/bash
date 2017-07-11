@@ -28,8 +28,8 @@ container() {
         return 1
     fi
 
-    ssh root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@"
-    ssh -A root@localhost -p $RPORT "$@" > ${ZLogFile} 2>&1 || die "could not ssh command: $@"
+    ssh root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@" || return 1
+    ssh -A root@localhost -p $RPORT "$@" > ${ZLogFile} 2>&1 || die "could not ssh command: $@" || return 1
 }
 
 # die and get docker log back to host
@@ -49,8 +49,6 @@ dockerdie() {
 
 ZDockerConfig() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catchfatal
-
     ZCodeConfig
     export CONTAINERDIR=~/docker
     mkdir -p ${CONTAINERDIR}/private

@@ -16,17 +16,17 @@ die() {
     return 1
 }
 
-# catcherror_handler() {
-#     if [ "${ZLogFile}" != "" ]; then
-#         echo "[-] line $1: script error, backlog from ${ZLogFile}:"
-#         cat ${ZLogFile}
-#         return 1
-#     fi
-#
-#     echo "[-] line $1: script error, no logging file defined"
-#     return 1
-# }
-#
+catcherror_handler() {
+    if [ "${ZLogFile}" != "" ]; then
+        echo "[-] line $1: script error, backlog from ${ZLogFile}:"
+        cat ${ZLogFile}
+        return 1
+    fi
+
+    echo "[-] line $1: script error, no logging file defined"
+    return 1
+}
+
 # catchfatal_handler() {
 #     if [ "${ZLogFile}" != "" ]; then
 #         echo "[-] script error, backlog from ${ZLogFile}:"
@@ -38,10 +38,10 @@ die() {
 #     exit 1
 # }
 
-# catcherror() {
-#     trap 'catcherror_handler $LINENO' ERR
-# }
-#
+catcherror() {
+    trap 'catcherror_handler $LINENO' ERR
+}
+
 # catchfatal() {
 #     trap 'catchfatal_handler $LINENO' ERR
 # }
