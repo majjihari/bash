@@ -14,7 +14,7 @@ EOF
 }
 
 RSyncTo() {(
-    echo '' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     local OPTIND
     local all=0
     local rsource=""
@@ -53,6 +53,6 @@ RSyncTo() {(
 
 
 RSync_bash() {(
-    echo '' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     RSyncTo  -s "$ZUTILSDIR/bash/" -d "/root/code/jumpscale/bash/"
 )}

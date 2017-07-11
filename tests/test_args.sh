@@ -1,8 +1,7 @@
 #!/bin/bash
-# set +x
-
 # export ZBRANCH=${ZBRANCH:-master}
 # export ZCODEDIR=${ZCODEDIR:-~/code}
+
 export ZLogFile='/tmp/z.log'
 
 die() {

@@ -26,7 +26,7 @@ will std run in background (tmux)
 EOF
 }
 ZSSH_RFORWARD() {(
-    echo '' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     local raddress=""
     local laddress=localhost
     local lport=22
@@ -74,7 +74,7 @@ is non interactive !!!
 EOF
 }
 ZEXEC() {(
-    echo '' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     set -x
     local OPTIND
     local cmd=""
@@ -102,7 +102,7 @@ ZEXEC() {(
         if [ $interactive -eq 1 ] ; then
             $cmd && return 1
         else
-            $cmd || die "error in ZEXEC local execute: $@"  > $ZLogFile 2>&1 && return 1
+            $cmd  > $ZLogFile 2>&1 || die "error in ZEXEC local execute: $@"  && return 1
         fi
     fi
     cat $ZLogFile
@@ -113,7 +113,7 @@ ZEXEC() {(
 
 #goal is to allow people to get into their container without thinking
 ZSSH() {(
-    echo '' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     ZNodeEnvSet
     if [ -n "$1" ]; then
         ssh -A root@$RNODE -p $RPORT "TERM=xterm;$@" || die "could not ssh command: $@"
@@ -131,6 +131,7 @@ js9() {(
 )}
 
 ZNodeUbuntuPrepare() {
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     ZNodeEnvSet
     ZSSH 'apt-get update;apt-get upgrade -y'
     ZDockerInstall

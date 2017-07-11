@@ -2,7 +2,7 @@
 ######### DOCKER
 
 ZDockerInstall(){
-    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     catchfatal
     echo "[+] install docker on remote machine."
     ssh -A root@$RNODE -p $RPORT "wget -qO- https://get.docker.com/ | sh" > ${ZLogFile} 2>&1 || die "could install docker"
@@ -10,7 +10,7 @@ ZDockerInstall(){
 }
 
 container() {
-    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     catchfatal
 
     ZDockerConfig
@@ -35,6 +35,7 @@ container() {
 # die and get docker log back to host
 # $1 = docker container name, $2 = ZLogFile name, $3 = optional message
 dockerdie() {
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     if [ "$3" != "" ]; then
         echo "[-] something went wrong in docker $1: $3"
         exit 1
@@ -47,7 +48,7 @@ dockerdie() {
 }
 
 ZDockerConfig() {
-    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     catchfatal
 
     ZCodeConfig
@@ -67,7 +68,7 @@ EOF
 }
 
 ZDockerCommit() {
-    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     catchfatal
 
     ZDockerConfig
@@ -93,7 +94,7 @@ ZDockerCommit() {
 }
 
 ZDockerSSHAuthorize() {
-    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     catchfatal
 
     local ZDockerName="${1:-$ZDockerName}"
@@ -125,7 +126,7 @@ ZDockerSSHAuthorize() {
 }
 
 ZDockerEnableSSH(){
-    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     catchfatal
 
     local ZDockerName="${1:-$ZDockerName}"
@@ -149,7 +150,7 @@ ZDockerEnableSSH(){
 }
 
 ZDockerRemove(){
-    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     catchfatal
 
     ZDockerConfig
@@ -160,7 +161,7 @@ ZDockerRemove(){
 }
 
 ZDockerRemoveImage(){
-    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     catchfatal
 
     ZDockerConfig
@@ -170,7 +171,7 @@ ZDockerRemoveImage(){
 }
 
 ZDockerBuildUbuntu() {
-    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     catchfatal
 
     ZDockerConfig
@@ -228,7 +229,7 @@ EOF
 }
 
 ZDockerRunUbuntu() {
-    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFileecho '[${FUNCNAME[0]}]' > $ZLogFile
     # [[ $ZINTERACTIVE -eq 1 ]] && catchfatal
     catchfatal
 
@@ -264,7 +265,7 @@ ZDockerRunUbuntu() {
 }
 
 ZDockerBuildJS9() {(
-    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     catchfatal
 
     ZDockerRunUbuntu $@
@@ -280,7 +281,7 @@ ZDockerBuildJS9() {(
 )}
 
 ZDockerRunJS9() {
-    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     ZDockerRunUbuntu $@
 
     local OPTIND
@@ -327,7 +328,7 @@ EOF
 }
 
 ZDockerRun() {
-    echo '[${FUNCNAME[0]}]' > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     catchfatal
 
     ZDockerConfig

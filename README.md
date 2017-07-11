@@ -41,6 +41,15 @@ ZEXEC -b ls /
 
 ```
 
+# docker tools
+
+```bash
+~/code/jumpscale/bash/zlibs.sh
+ZDockerRunJS9
+```
+
+will install js9 & build docker with ubuntu 17.04 and required tools.
+
 # lede tools
 
 ```bash

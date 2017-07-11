@@ -1,7 +1,8 @@
 
 
 ZResticBuild() {
-    ZGetCode restic git@github.com:restic/restic.git
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    ZCodeGet restic git@github.com:restic/restic.git
     go run build.go 2>&1 > $ZLogFile || die 'could not build restic'
     mv restic /usr/local/bin/ || die 'could not build restic'
     # rm -rf $ZCODEDIR/restic
@@ -19,6 +20,7 @@ ZResticEnv() {
 }
 
 ZResticEnvSet() {
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     #set params for ssh, test connection
     ZSSHTEST
     if [ ! -n "$RNAME" ]; then
@@ -64,6 +66,7 @@ ZResticInit() {
 
 
 ZResticBackup() {
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     ZResticEnvSet
     local RSOURCE=$1
     local RTAG=$2
@@ -78,6 +81,7 @@ ZResticBackup() {
 }
 
 ZResticCheck() {
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     touch $ZLogFile #to make sure we don't show other error
     echo $RPASSWD > /tmp/sdwfa
     restic -r sftp:root@$RNODE:$RDEST/$RNAME -p /tmp/sdwfa  check 2>&1 | tee $ZLogFile || die
@@ -87,6 +91,7 @@ ZResticCheck() {
 
 
 ZResticSnapshots() {
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     touch $ZLogFile #to make sure we don't show other error
     echo $RPASSWD > /tmp/sdwfa
     restic -r sftp:root@$RNODE:$RDEST/$RNAME -p /tmp/sdwfa  snapshots 2>&1 | tee $ZLogFile || die
@@ -94,6 +99,7 @@ ZResticSnapshots() {
 }
 
 ZResticMount() {
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     touch $ZLogFile #to make sure we don't show other error
     mkdir -p ~/restic > $ZLogFile 2>&1  || die
     echo $RPASSWD > /tmp/sdwfa

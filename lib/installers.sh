@@ -2,15 +2,15 @@
 ZInstaller_code_jumpscale() {
     local branch="${1:-master}"
     echo "[+] loading or updating jumpscale source code (branch:$branch)"
-    ZGetCodeJS -r core9 -b $branch > ${ZLogFile} 2>&1 || die
+    ZCodeGetJS -r core9 -b $branch > ${ZLogFile} 2>&1 || die
     # popd
-    ZGetCodeJS -r lib9 -b $branch > ${ZLogFile} 2>&1 || die
+    ZCodeGetJS -r lib9 -b $branch > ${ZLogFile} 2>&1 || die
     # popd
-    ZGetCodeJS -r prefab9 -b $branch > ${ZLogFile} 2>&1 || die
+    ZCodeGetJS -r prefab9 -b $branch > ${ZLogFile} 2>&1 || die
     # popd
-    ZGetCodeJS -r builder_bootstrap -b $branch > ${ZLogFile} 2>&1 || die
+    ZCodeGetJS -r builder_bootstrap -b $branch > ${ZLogFile} 2>&1 || die
     # popd
-    ZGetCodeJS -r developer -b $branch > ${ZLogFile} 2>&1 || die
+    ZCodeGetJS -r developer -b $branch > ${ZLogFile} 2>&1 || die
     # popd
     echo "[+] update jumpscale code done"
 }
