@@ -10,7 +10,7 @@ curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM 
 # to use
 
 ```
-. ~/code/jumpscale/bash/zlibs.sh
+. ~/code/github/jumpscale/bash/zlibs.sh
 ```
 
 this will source all methods, codecompletion will now work.
