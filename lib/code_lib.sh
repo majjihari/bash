@@ -63,13 +63,14 @@ ZCodeGetJS() {
 ZCodeGetUsage() {
    cat <<EOF
 Usage: ZCodeGet [-r reponame] [-g giturl] [-a account] [-b branch]
+   -t type: default is github but could be e.g. gitlab, ...
    -a account: will default to 'varia', but can be account name
    -r reponame: name or repo which is being downloaded
    -u giturl: e.g. git@github.com:mathieuancelin/duplicates.git
    -b branchname: defaults to master
    -h: help
 
-check's out any git repo repo to ~/code/$account/$reponame
+check's out any git repo repo to ~/code/$type/$account/$reponame
 branchname can optionally be specified.
 
 if specified but repo exists then a pull will be done & branch will be ignored !!!
@@ -81,13 +82,15 @@ ZCodeGet() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     ZCodeConfig
     local OPTIND
+    local type='github'
     local account='varia'
     local reponame=''
     local giturl=''
     local branch='master'
-    while getopts "a:r:u:b:h" opt; do
+    while getopts "a:r:u:b:t:h" opt; do
         case $opt in
            a )  account=$OPTARG ;;
+           t )  type=$OPTARG ;;
            r )  reponame=$OPTARG ;;
            u )  giturl=$OPTARG ;;
            b )  branch=$OPTARG ;;
@@ -105,31 +108,31 @@ ZCodeGet() {
         return 0
     fi
 
-    mkdir -p $ZCODEDIR/$account
+    mkdir -p $ZCODEDIR/$type/$account
     echo "[+] get code $giturl ($branch)"
 
-    pushd $ZCODEDIR/$account > /dev/null 2>&1
+    pushd $ZCODEDIR/$type/$account > /dev/null 2>&1
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
         ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 > $ZLogFile || die || return 1
     fi
 
-    if [ ! -e $ZCODEDIR/$account/$reponame ]; then
+    if [ ! -e $ZCODEDIR/$type/$account/$reponame ]; then
         echo " [+] clone"
         git clone -b ${branch} $giturl $reponame 2>&1 > $ZLogFile || die || return 1
     else
-        pushd $ZCODEDIR/$account/$reponame > /dev/null 2>&1
+        pushd $ZCODEDIR/$type/$account/$reponame > /dev/null 2>&1
         echo " [+] pull"
         git pull  2>&1 > $ZLogFile || die || return 1
         popd > /dev/null 2>&1
     fi
     popd > /dev/null 2>&1
-    # pushd $ZCODEDIR/$account/$reponame  > /dev/null 2>&1
 }
 
 ZCodePushUsage(){
    cat <<EOF
 Usage: ZCodePush [-r reponame] [-a account] [-m message]
+   -t type: default is github but could be e.g. gitlab, ...
    -a account: will default to 'varia', but can be account name
    -r reponame: name or repo
    -m message for commit: required !
@@ -144,11 +147,13 @@ ZCodePush() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     ZCodeConfig
     local OPTIND
+    local type='github'
     local account='varia'
     local reponame=''
     local message=''
-    while getopts "a:r:m:h" opt; do
+    while getopts "a:r:m:t:h" opt; do
         case $opt in
+           t )  type=$OPTARG ;;
            a )  account=$OPTARG ;;
            r )  reponame=$OPTARG ;;
            m )  message=$OPTARG ;;
@@ -167,9 +172,9 @@ ZCodePush() {
     fi
 
     if [ -z "$reponame" ]; then
-        echo "walk over directories: $ZCODEDIR/$account"
+        echo "walk over directories: $ZCODEDIR/$type/$account"
 
-        ls -d $ZCODEDIR/$account/*/ | {
+        ls -d $ZCODEDIR/$type/$account/*/ | {
             while read DIRPATH ; do
                 DIRNAME=$(basename $DIRPATH)
                 ZCodePush -a $account -r $DIRNAME -m $message || die || return 1
@@ -178,14 +183,14 @@ ZCodePush() {
         return
     fi
 
-    echo "[+] commit-pull-push  code $ZCODEDIR/$account/$reponame"
+    echo "[+] commit-pull-push  code $ZCODEDIR/$type/$account/$reponame"
 
-    pushd $ZCODEDIR/$account > /dev/null 2>&1
+    pushd $ZCODEDIR/$type/$account > /dev/null 2>&1
 
-    if [ ! -e $ZCODEDIR/$account/$reponame ]; then
-        die "could not find $ZCODEDIR/$account/$reponame" || return 1
+    if [ ! -e $ZCODEDIR/$type/$account/$reponame ]; then
+        die "could not find $ZCODEDIR/$type/$account/$reponame" || return 1
     else
-        pushd $ZCODEDIR/$account/$reponame > /dev/null 2>&1
+        pushd $ZCODEDIR/$type/$account/$reponame > /dev/null 2>&1
         echo " [+] add"
         git add . -A  2>&1 > $ZLogFile #|| die "ZCodePush (add) $@" || return 1
         echo " [+] commit"

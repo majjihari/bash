@@ -1,21 +1,26 @@
 
+
 ZInstaller_code_jumpscale() {
+    if doneCheck "ZInstaller_code_jumpscale" ; then
+        echo "[+] update jumpscale code was already done."
+       return 0
+    fi
     local branch="${1:-master}"
     echo "[+] loading or updating jumpscale source code (branch:$branch)"
     ZCodeGetJS -r core9 -b $branch > ${ZLogFile} 2>&1 || die || return 1
-    # popd
     ZCodeGetJS -r lib9 -b $branch > ${ZLogFile} 2>&1 || die || return 1
-    # popd
     ZCodeGetJS -r prefab9 -b $branch > ${ZLogFile} 2>&1 || die || return 1
-    # popd
     # ZCodeGetJS -r builder_bootstrap -b $branch > ${ZLogFile} 2>&1 || die || return 1
-    # popd
     ZCodeGetJS -r developer -b $branch > ${ZLogFile} 2>&1 || die || return 1
-    popd
     echo "[+] update jumpscale code done"
+    doneSet "ZInstaller_code_jumpscale"
 }
 
 ZInstaller_python() {
+    if doneCheck "ZInstaller_python" ; then
+        echo "[+] install python & deps already done."
+       return 0
+    fi
     echo "[+]   installing python"
     container 'apt-get install -y python3  python3-cryptography python3-paramiko python3-psutil' || return 1
 
@@ -28,25 +33,31 @@ ZInstaller_python() {
     container 'pip3 install tmuxp' || return 1
     container 'pip3 install gitpython' || return 1
 
+    doneSet "ZInstaller_python"
+
 }
 
 
 ZInstaller_js9() {
+    if doneCheck "ZInstaller_js9" ; then
+        echo "[+] install js9 already done."
+       return 0
+    fi
     echo "[+] install js9"
     # ZSSH "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
     echo "[+]   synchronizing developer files"
-    container 'rsync -rv /opt/code/jumpscale/developer/files_guest/ /' || return 1
+    container 'rsync -rv /opt/code/github/jumpscale/developer/files_guest/ /' || return 1
 
     echo "[+]   installing jumpscale core9"
-    container "source ~/.jsenv.sh && pip3 install -e /opt/code/jumpscale/core9" || return 1
+    container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/core9" || return 1
     echo "[+]   installing jumpscale prefab9"
-    container "source ~/.jsenv.sh && pip3 install -e /opt/code/jumpscale/prefab9" || return 1
+    container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/prefab9" || return 1
     echo "[+]   installing jumpscale lib9"
-    container "source ~/.jsenv.sh && pip3 install --no-deps -e /opt/code/jumpscale/lib9" || return 1
+    container "source ~/.jsenv.sh && pip3 install --no-deps -e /opt/code/github/jumpscale/lib9" || return 1
 
     echo "[+]   installing binaries files"
-    container 'find  /opt/code/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \;' || return 1
-    container 'find  /opt/code/jumpscale/developer/cmds_guest -exec ln -s {} "/usr/local/bin/" \;' || return 1
+    container 'find  /opt/code/github/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \;' || return 1
+    container 'find  /opt/code/github/jumpscale/developer/cmds_guest -exec ln -s {} "/usr/local/bin/" \;' || return 1
 
     container 'rm -rf /usr/local/bin/cmds' || return 1
     container 'rm -rf /usr/local/bin/cmds_guest' || return 1
@@ -57,9 +68,11 @@ ZInstaller_js9() {
 
     echo "[+] js9 installed (OK)"
 
+    doneSet "ZInstaller_js9"
+
 }
 
-ZInstaller_js9() {
+ZInstaller_docgenerator() {
     echo "[+] install docgenerator"
     container 'ls /' || return 1
 }

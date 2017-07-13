@@ -2,7 +2,7 @@
 
 PS4='(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]} - [${SHLVL},${BASH_SUBSHELL}, $?]'
 
-export ZUTILSDIR=${ZUTILSDIR:-~/code/jumpscale}
+export ZUTILSDIR=${ZUTILSDIR:-~/code/github/jumpscale}
 export ZLogFile='/tmp/zutils.log'
 export ZINTERACTIVE=1
 echo 'Initialzing environement' > $ZLogFile
@@ -26,6 +26,24 @@ catcherror_handler() {
     echo "[-] line $1: script error, no logging file defined"
     return 1
 }
+
+doneSet() {
+    mkdir -p /tmp/zutils_done
+    touch /tmp/zutils_done/$1
+}
+
+doneCheck() {
+    if [ -f /tmp/zutils_done/$1 ]; then
+       return 0
+    fi
+    return 1
+}
+
+doneReset() {
+    rm -rf /tmp/zutils_done
+    mkdir -p /tmp/zutils_done
+}
+
 
 # catchfatal_handler() {
 #     if [ "${ZLogFile}" != "" ]; then

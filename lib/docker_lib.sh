@@ -11,7 +11,6 @@ ZDockerInstall(){
 
 container() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catcherror
 
     ZDockerConfig
     if [ "$RNODE" = '' ]; then
@@ -29,7 +28,7 @@ container() {
     fi
 
     ssh root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@" || return 1
-    ssh -A root@localhost -p $RPORT "$@" > ${ZLogFile} 2>&1 || die "could not ssh command: $@" || return 1
+    # ssh -A root@localhost -p $RPORT "$@" > ${ZLogFile} 2>&1 || die "could not ssh command: $@" || return 1
 }
 
 # die and get docker log back to host
@@ -201,9 +200,9 @@ ZDockerBuildUbuntu() {
     unset SSHNOAUTH
 
     #basic deps
-    docker exec -t $ZDockerName apt update
-    docker exec -t $ZDockerName apt upgrade -y
-    docker exec -t $ZDockerName apt install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync -y
+    docker exec -t $ZDockerName 'apt update' > ${ZLogFile} 2>&1 || die "apt update"  || return 1
+    docker exec -t $ZDockerName 'apt upgrade -y' > ${ZLogFile} 2>&1 || die "apt upgrade" || return 1
+    docker exec -t $ZDockerName 'apt install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync -y' > ${ZLogFile} 2>&1 || die "basic linux deps" || return 1
 
     ZDockerEnableSSH
 
@@ -211,7 +210,7 @@ ZDockerBuildUbuntu() {
     container 'echo "" > /etc/motd'
     container touch /root/.iscontainer
 
-    ZDockerCommit -b jumpscale/ubuntu -s #also stop
+    ZDockerCommit -b jumpscale/ubuntu -s || die "docker commit" || return 1
 
     echo "[+] DOCKER UBUNTU OK"
 }
@@ -228,9 +227,10 @@ EOF
 }
 
 ZDockerRunUbuntu() {
+    doneClean
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFileecho '[${FUNCNAME[0]}]' > $ZLogFile
     # [[ $ZINTERACTIVE -eq 1 ]] && catcherror
-    catcherror
+    # catcherror
 
     local OPTIND
     local bname='jumpscale/ubuntu'
@@ -251,13 +251,13 @@ ZDockerRunUbuntu() {
     existing="$(docker images ${bname} -q)"
 
     if [[ -z "$existing" ]]; then
-        ZDockerBuildUbuntu
+        ZDockerBuildUbuntu || die "could not build ubuntu docker" || return 1
     fi
 
     if [[ ! -z "$addarg" ]]; then
-        ZDockerRun -b $bname -i $iname -p $port -a $addarg || return 1
+        ZDockerRun -b $bname -i $iname -p $port -a $addarg || die "could not do zdockerun" || return 1
     else
-        ZDockerRun -b $bname -i $iname -p $port || return 1
+        ZDockerRun -b $bname -i $iname -p $port || die "could not do zdockerun" || return 1
     fi
 
     echo '[+] Ubuntu Docker Is Active (OK)'
@@ -266,52 +266,52 @@ ZDockerRunUbuntu() {
 ZDockerBuildJS9() {(
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
 
-    ZDockerRunUbuntu $@ || return 1
+    ZDockerRunUbuntu $@ || die "could not build ubuntu docker" || return 1
 
     echo "[+]   installing basic dependencies"
-    container 'apt-get update' || return 1
-    container 'apt-get install -y curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet' || return 1
+    container 'apt-get update' > ${ZLogFile} 2>&1 || die "apt update" || return 1
+    container 'apt-get install -y curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet'  > ${ZLogFile} 2>&1 || die "js9 linux deps" || return 1
 
     echo "[+] JS9 BUILD"
-    ZInstaller_code_jumpscale || return 1
-    ZInstaller_python || return 1
-    ZInstaller_js9 || return 1
+    ZInstaller_code_jumpscale || die "ZInstaller_code_jumpscale" || return 1
+    ZInstaller_python || die "ZInstaller_python" || return 1
+    ZInstaller_js9 || die "ZInstaller_js9" || return 1
 )}
 
-ZDockerRunJS9() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    ZDockerRunUbuntu $@
-
-    local OPTIND
-    local bname='jumpscale/ubuntu'
-    local iname='build'
-    local port=2222
-    local addarg=''
-    while getopts "b:i:p:a:h" opt; do
-        case $opt in
-           i )  iname=$OPTARG ;;
-           p )  port=$OPTARG ;;
-           a )  addarg=$OPTARG ;;
-           h )  ZDockerRunSomethingUsage ; return 0 ;;
-           \? )  ZDockerRunSomethingUsage ; return 1 ;;
-        esac
-    done
-
-    existing="$(docker images ${bname} -q)"
-
-    if [[ -z "$existing" ]]; then
-        ZDockerBuildUbuntu
-    fi
-
-    if [[ ! -z "$addarg" ]]; then
-        ZDockerRun -b $bname -i $iname -p $port -a $addarg || return 1
-    else
-        ZDockerRun -b $bname -i $iname -p $port || return 1
-    fi
-
-
-
-}
+# ZDockerRunJS9() {
+#     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+#     ZDockerRunUbuntu $@
+#
+#     local OPTIND
+#     local bname='jumpscale/ubuntu'
+#     local iname='build'
+#     local port=2222
+#     local addarg=''
+#     while getopts "b:i:p:a:h" opt; do
+#         case $opt in
+#            i )  iname=$OPTARG ;;
+#            p )  port=$OPTARG ;;
+#            a )  addarg=$OPTARG ;;
+#            h )  ZDockerRunSomethingUsage ; return 0 ;;
+#            \? )  ZDockerRunSomethingUsage ; return 1 ;;
+#         esac
+#     done
+#
+#     existing="$(docker images ${bname} -q)"
+#
+#     if [[ -z "$existing" ]]; then
+#         ZDockerBuildUbuntu
+#     fi
+#
+#     if [[ ! -z "$addarg" ]]; then
+#         ZDockerRun -b $bname -i $iname -p $port -a $addarg || return 1
+#     else
+#         ZDockerRun -b $bname -i $iname -p $port || return 1
+#     fi
+#
+#
+#
+# }
 
 ZDockerRunUsage() {
    cat <<EOF
