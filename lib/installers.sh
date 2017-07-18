@@ -22,7 +22,7 @@ ZInstaller_python() {
        return 0
     fi
     echo "[+]   installing python"
-    container 'apt-get install -y python3  python3-cryptography python3-paramiko python3-psutil' || return 1
+    container 'apt-get install -y python3' || return 1
 
     echo "[+]   installing pip system"
     container "curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py" || return 1
@@ -47,13 +47,15 @@ ZInstaller_js9() {
     # ZSSH "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
     echo "[+]   synchronizing developer files"
     container 'rsync -rv /opt/code/github/jumpscale/developer/files_guest/ /' || return 1
-
+    echo "[+]   installing jumpscale build dependencies"
+    container "apt-get install build-essential python3-dev libvirt-dev libssl-dev libffi-dev libssh-dev -y" || return 1
     echo "[+]   installing jumpscale core9"
+    container "pip3 install Cython>=0.25.2 asyncssh>=1.9.0 numpy>=1.12.1 tarantool>=0.5.4" || return 1
     container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/core9" || return 1
     echo "[+]   installing jumpscale prefab9"
     container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/prefab9" || return 1
     echo "[+]   installing jumpscale lib9"
-    container "source ~/.jsenv.sh && pip3 install --no-deps -e /opt/code/github/jumpscale/lib9" || return 1
+    container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/lib9" || return 1
 
     echo "[+]   installing binaries files"
     container 'find  /opt/code/github/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \;' || return 1
@@ -63,9 +65,8 @@ ZInstaller_js9() {
     container 'rm -rf /usr/local/bin/cmds_guest' || return 1
 
     echo "[+]   initializing jumpscale"
-    container 'python3 -c "from JumpScale9 import j; j.do.initEnv()"' || return 1
-    container 'python3 -c "from JumpScale9 import j; j.tools.jsloader.generate()"' || return 1
-
+    container 'js9_init' || return 1
+    ZInstall_zerotier
     echo "[+] js9 installed (OK)"
 
     doneSet "ZInstaller_js9"
@@ -75,6 +76,44 @@ ZInstaller_js9() {
 ZInstaller_docgenerator() {
     echo "[+] install docgenerator"
     container 'ls /' || return 1
+}
+
+ZInstaller_ays9() {
+    if doneCheck "ZInstaller_ays9" ; then
+        echo "[+] install ays9 already done."
+       return 0
+    fi
+    local port=${RPORT:-2222}
+    local addarg="${RNODE:-localhost}"
+    echo "[+] install AYS9"
+    local branch="${1:-master}"
+    echo "[+] loading or updating AYS source code (branch:$branch)"
+    ZCodeGetJS -r ays9 -b $branch > ${ZLogFile} 2>&1 || die || return 1
+    echo "[+]   installing jumpscale ays9"
+    ZNodeSet $addarg
+    ZNodePortSet $port
+    container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/ays9" || return 1
+    container "js9_init"
+    doneSet "ZInstaller_ays9"
+}
+
+ZInstaller_portal9() {
+    if doneCheck "ZInstaller_portal9" ; then
+        echo "[+] install portal9 already done."
+       return 0
+    fi
+    local port=${RPORT:-2222}
+    local addarg="${RNODE:-localhost}"
+    echo "[+] install Portal9"
+    local branch="${1:-master}"
+    echo "[+] loading or updating Portal source code (branch:$branch)"
+    ZCodeGetJS -r portal9 -b $branch > ${ZLogFile} 2>&1 || die || return 1
+    echo "[+]   installing jumpscale portal9"
+    ZNodeSet $addarg
+    ZNodePortSet $port
+    container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/portal9" || return 1
+    container "js9_init"
+    doneSet "ZInstaller_portal9"
 }
 
 ZInstall_docker() {
@@ -90,4 +129,10 @@ ZInstall_docker() {
     fi
 
     echo "[-] plateforme not supported"
+}
+
+ZInstall_zerotier() {
+    container "apt-get install gpgv2 -y"
+    container "curl -s 'https://pgp.mit.edu/pks/lookup?op=get&search=0x1657198823E52A61' | gpg --import"
+    container "curl -s https://install.zerotier.com/ | bash || true"
 }

@@ -28,7 +28,7 @@ container() {
         return 1
     fi
 
-    ssh root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@" || return 1
+    ssh -A root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@" || return 1
     # ssh -A root@localhost -p $RPORT "$@" > ${ZLogFile} 2>&1 || die "could not ssh command: $@" || return 1
 }
 
