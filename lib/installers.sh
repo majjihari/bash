@@ -22,7 +22,11 @@ ZInstaller_python() {
        return 0
     fi
     echo "[+]   installing python"
-    container 'apt-get install -y python3' || return 1
+    if [[ $1 == "full" ]]; then
+        container 'apt-get install -y python3' || return 1
+    else
+        container 'apt-get install -y python3 python3-cryptography python3-paramiko python3-psutil' || return 1
+    fi
 
     echo "[+]   installing pip system"
     container "curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py" || return 1
@@ -47,15 +51,23 @@ ZInstaller_js9() {
     # ZSSH "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
     echo "[+]   synchronizing developer files"
     container 'rsync -rv /opt/code/github/jumpscale/developer/files_guest/ /' || return 1
-    echo "[+]   installing jumpscale build dependencies"
-    container "apt-get install build-essential python3-dev libvirt-dev libssl-dev libffi-dev libssh-dev -y" || return 1
-    echo "[+]   installing jumpscale core9"
-    container "pip3 install Cython>=0.25.2 asyncssh>=1.9.0 numpy>=1.12.1 tarantool>=0.5.4" || return 1
+    if [[ $1 == "full" ]]; then
+        echo "[+]   installing jumpscale build dependencies"
+        container "apt-get install build-essential python3-dev libvirt-dev libssl-dev libffi-dev libssh-dev -y" || return 1
+        echo "[+]   installing jumpscale core9"
+        container "pip3 install Cython>=0.25.2 asyncssh>=1.9.0 numpy>=1.12.1 tarantool>=0.5.4" || return 1
+    fi
     container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/core9" || return 1
     echo "[+]   installing jumpscale prefab9"
     container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/prefab9" || return 1
     echo "[+]   installing jumpscale lib9"
-    container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/lib9" || return 1
+    if [[ $1 == "full" ]]; then
+        container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/lib9" || return 1
+    else
+        container "source ~/.jsenv.sh && pip3 install --no-deps -e /opt/code/github/jumpscale/lib9" || return 1
+    fi
+
+
 
     echo "[+]   installing binaries files"
     container 'find  /opt/code/github/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \;' || return 1
@@ -66,7 +78,6 @@ ZInstaller_js9() {
 
     echo "[+]   initializing jumpscale"
     container 'js9_init' || return 1
-    ZInstall_zerotier
     echo "[+] js9 installed (OK)"
 
     doneSet "ZInstaller_js9"
