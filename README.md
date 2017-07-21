@@ -45,6 +45,7 @@ ZEXEC -b ls /
 
 ```bash
 ~/code/jumpscale/bash/zlibs.sh
+ZDockerBuildJS9 # -f to build full js9 not the minimal
 ZDockerRunJS9
 ```
 

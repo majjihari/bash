@@ -28,7 +28,7 @@ container() {
         return 1
     fi
 
-    ssh root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@" || return 1
+    ssh -A root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@" || return 1
     # ssh -A root@localhost -p $RPORT "$@" > ${ZLogFile} 2>&1 || die "could not ssh command: $@" || return 1
 }
 
@@ -228,7 +228,6 @@ EOF
 }
 
 ZDockerRunUbuntu() {
-#    doneClean
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     # [[ $ZINTERACTIVE -eq 1 ]] && catcherror
     # catcherror
@@ -264,10 +263,20 @@ ZDockerRunUbuntu() {
     echo '[+] Ubuntu Docker Is Active (OK)'
 }
 
-ZDockerBuildJS9() {(
+ZDockerBuildJS9() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-
-    ZDockerRunUbuntu $@ || die "could not build ubuntu docker" || return 1
+    local i=0
+    local full=""
+    run_args=()
+    for arg in $@;
+    do
+        if [[ $arg == "-f" ]]; then
+            full="full"
+        else
+            run_args+=($arg)
+        fi
+    done
+    ZDockerRunUbuntu ${run_args[@]} || die "could not build ubuntu docker" || return 1
 
     echo "[+]   installing basic dependencies"
     container 'apt-get update' > ${ZLogFile} 2>&1 || die "apt update" || return 1
@@ -275,9 +284,9 @@ ZDockerBuildJS9() {(
 
     echo "[+] JS9 BUILD"
     ZInstaller_code_jumpscale || die "ZInstaller_code_jumpscale" || return 1
-    ZInstaller_python || die "ZInstaller_python" || return 1
-    ZInstaller_js9 || die "ZInstaller_js9" || return 1
-)}
+    ZInstaller_python $full || die "ZInstaller_python" || return 1
+    ZInstaller_js9 $full || die "ZInstaller_js9" || return 1
+}
 
 ZDockerRunJS9() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
@@ -309,9 +318,6 @@ ZDockerRunJS9() {
     else
         ZDockerRun -b $bname -i $iname -p $port || return 1
     fi
-
-
-
 }
 
 ZDockerRunUsage() {
