@@ -6,6 +6,11 @@ if [ -e ~/code/github/jumpscale ]; then
     export ZUTILSDIR=~/code/github/jumpscale
 fi
 
+#then in /opt
+if [ -e /opt/code/github/jumpscale ]; then
+    export ZUTILSDIR=/opt/code/github/jumpscale
+fi
+
 #if not exist then do in /opt/code...
 export ZUTILSDIR=${ZUTILSDIR:-/opt/code/github/jumpscale}
 
