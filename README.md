@@ -4,6 +4,7 @@ bash utilities
 # to install
 
 ```
+apt-get install curl -y
 curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
 ```
 
