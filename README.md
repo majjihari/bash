@@ -11,7 +11,7 @@ curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM 
 
 ```
 #LINUX
-. /opt/code/github/jumpscale/bash/zlibs.sh || 
+. /opt/code/github/jumpscale/bash/zlibs.sh
 
 #OSX
 . ~/code/github/jumpscale/bash/zlibs.sh
