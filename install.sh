@@ -1,6 +1,8 @@
 #!/bin/bash
 set -x
 
+apt-get install git -y
+
 #first check is in home
 if [ -e ~/code/github/jumpscale ]; then
     export ZUTILSDIR=~/code/github/jumpscale
