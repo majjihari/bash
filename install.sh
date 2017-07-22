@@ -1,5 +1,5 @@
 #!/bin/bash
-# set -x
+set -x
 
 
 export ZUTILSDIR=${ZUTILSDIR:-~/code/github/jumpscale}
