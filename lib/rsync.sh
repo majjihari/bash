@@ -21,7 +21,18 @@ RSyncTo() {(
     local rdest=""
     # local rexclude=--exclude='.git/' --exclude='*.pyc'
 
-    ZNodeEnvSet
+    if [ "$RNODE" == "localhost" ] ; then
+        die "RSyncTo only meant to be used when RNODE is not a local docker" || return 1
+    fi
+
+    if [ "$RNODE" == "" ] ; then
+        die "RNode not specified" || return 1
+    fi
+
+    if [ "$RPORT" == "" ] ; then
+        die "RPORT not specified" || return 1
+    fi
+
     while getopts "s:d:ah" opt; do
         case $opt in
            s  ) rsource=$OPTARG ;;
@@ -52,7 +63,10 @@ RSyncTo() {(
 
 
 
-RSync_bash() {(
+RSync_ZTools() {(
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    RSyncTo  -s "$ZUTILSDIR/bash/" -d "/root/code/jumpscale/bash/"
+    if [ "$RNODE" == "localhost" ] ; then
+        return 0
+    fi
+    RSyncTo  -s "$ZUTILSDIR/bash/" -d "/opt/code/github/jumpscale/bash/"
 )}

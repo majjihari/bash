@@ -50,7 +50,7 @@ ZCodeGetJS() {
         ZCodeGetJS -r lib9 || die || return 1
         ZCodeGetJS -r bash || die || return 1
         ZCodeGetJS -r ays9 || die || return 1
-        ZCodeGetJS -r prefab || die || return 1
+        ZCodeGetJS -r prefab9 || die || return 1
         return
     fi
 

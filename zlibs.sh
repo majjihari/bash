@@ -2,12 +2,13 @@
 
 PS4='(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]} - [${SHLVL},${BASH_SUBSHELL}, $?]'
 
-export ZUTILSDIR=${ZUTILSDIR:-~/code/github/jumpscale}
-export ZLogFile='/tmp/zutils.log'
-export ZINTERACTIVE=1
-echo 'Initialzing environement' > $ZLogFile
+if [ -d "/opt/code/github/jumpscale" ]; then
+    export ZUTILSDIR='/opt/code/github/jumpscale'
+else
+    export ZUTILSDIR=${ZUTILSDIR:-~/code/github/jumpscale}
+fi
 
-[[ $ZINTERACTIVE -eq 1 ]] && echo "[+] interactive interface enabled"
+export ZLogFile='/tmp/zutils.log'
 
 die() {
     echo "[-] something went wrong: $1"

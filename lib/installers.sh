@@ -72,9 +72,35 @@ ZInstaller_js9() {
 
 }
 
+ZInstaller_js9_full() {
+    if doneCheck "ZInstaller_js9_full" ; then
+        echo "[+] install js9 libs full, already done."
+       return 0
+    fi
+
+    ZInstaller_js9
+    echo "[+] install lib9 with dependencies (can take long time)"
+    container 'source ~/.jsenv.sh && cd  /opt/code/github/jumpscale/lib9 && bash install.sh;' || return 1
+
+    ZDockerCommit -b jumpscale/js9_full || die "docker commit" || return 1
+
+    doneSet "ZInstaller_js9_full"
+
+}
+
 ZInstaller_docgenerator() {
-    echo "[+] install docgenerator"
-    container 'ls /' || return 1
+    if doneCheck "ZInstaller_docgenerator" ; then
+        echo "[+] install docgenerator already done."
+       return 0
+    fi
+    ZInstaller_js9_full
+    echo "[+] install docgenerator (can take long time)"
+    container 'python3 -c "from js9 import j;j.tools.docgenerator.installDeps()"' || return 1
+
+    ZDockerCommit -b jumpscale/js9_docgenerator || die "docker commit" || return 1
+
+    # doneSet "ZInstaller_docgenerator"
+
 }
 
 ZInstall_docker() {

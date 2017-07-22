@@ -12,10 +12,10 @@ ZDockerInstall(){
 
 container() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-
     ZDockerConfig
     if [ "$RNODE" = '' ]; then
-        die "rnode cannot be empty"
+        export RNODE=localhost
+        export RPORT=2222
         return 1
     fi
     if [ ! "$RNODE" = 'localhost' ]; then
@@ -68,11 +68,14 @@ EOF
 
 ZDockerCommit() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catcherror
+    # catcherror
 
     ZDockerConfig
     local OPTIND
     local bname=''
+    if [ "$ZDockerName" = "" ]; then
+        export ZDockerName="build"
+    fi
     local iname=$ZDockerName
     while getopts "b:i:hs" opt; do
         case $opt in
@@ -82,8 +85,12 @@ ZDockerCommit() {
            h )  ZDockerCommitUsage ; return 0 ;;
            \? )  ZDockerCommitUsage ; return 1 ;;
         esac
-    done
-    if [ -z "$bname" ]; then ZDockerCommitUsage;return 0; fi
+    done    
+    if [ "$bname" = '' ]; then
+        echo "docker bname needs to be specified"
+        ZDockerCommitUsage
+        return 1
+    fi
     echo "[+] Commit docker: $iname to $bname"
     docker commit $iname $bname > ${ZLogFile} 2>&1 || return 1
     export ZDockerImage=$bname
@@ -228,10 +235,8 @@ EOF
 }
 
 ZDockerRunUbuntu() {
-#    doneClean
+    doneClean
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    # [[ $ZINTERACTIVE -eq 1 ]] && catcherror
-    # catcherror
 
     local OPTIND
     local bname='jumpscale/ubuntu'
@@ -277,6 +282,9 @@ ZDockerBuildJS9() {(
     ZInstaller_code_jumpscale || die "ZInstaller_code_jumpscale" || return 1
     ZInstaller_python || die "ZInstaller_python" || return 1
     ZInstaller_js9 || die "ZInstaller_js9" || return 1
+
+    ZDockerCommit -b jumpscale/js9 -s || die "docker commit" || return 1
+
 )}
 
 ZDockerRunJS9() {

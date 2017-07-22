@@ -3,7 +3,7 @@
 
 ZSSHTEST() {
     echo '' > $ZLogFile
-    ZNodeEnvSet
+    ZNodeEnvDefaults
     ssh root@$RNODE -p $RPORT 'ls /' > $ZLogFile 2>&1 || die "could not connect over ssh to $RNODE:$RPORT"
     #TODO: check and if not connect, ask the params again, till its all ok
 }
@@ -62,50 +62,59 @@ ZEXECUsage() {
    cat <<EOF
 Usage: ZEXEC [-c command to execute] [-b] [-h]
    -c: command to execute
-   -b: execute bash tools remotely before calling this command
+   -z: import ZUtils before calling command
    -i: interactive mode
    -t: tmux mode, the command will be executed in tmux (local or remote), not implemented yet
+   -l: local execution (not over ssh)
    -h: help
 
 executes a command local or over ssh (using variable RNODE & RPORT)
 
-is non interactive !!!
+is non interactive by default.
+to see output: do e.g. 'cat $ZLogFile'
 
 EOF
 }
 ZEXEC() {(
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    set -x
+    # set -x
     local OPTIND
     local cmd=""
     local interactive=0
-    while getopts "c:hbi" opt; do
+    local localcmd=0
+    local iimport=""
+    ZNodeEnvDefaults
+    while getopts "c:hzitl" opt; do
         case $opt in
            c )  cmd=$OPTARG ;;
            i )  interactive=1 ;;
+           l )  localcmd=1 ;;
            h )  ZEXECUsage ; return 0 ;;
-           b )  RSync_bash || die "could not rsync bash" && return 1;;
+           z )  iimport='. /opt/code/github/jumpscale/bash/zlibs.sh;';RSync_ZTools || die "could not rsync bash" || return 1;;
         esac
     done
     if [ "$cmd" = "" ] ; then
-        die "syntax error in ZEXEC: $@" && return 1
+        die "syntax error in ZEXEC, cmd not specified: $@" || return 1
     fi
-    echo '' > $ZLogFile
-    if [ "$RNODE" != "" ] ; then
+
+    if [ $localcmd -eq 0 ] ; then
         if [ $interactive -eq 1 ] ; then
-            ssh -A root@$RNODE -p $RPORT "$cmd" && return 1
+            ssh -qAt root@localhost -p 2222 "TERM=xterm;$iimport$cmd" || return 1
+            # ssh -A root@$RNODE -p $RPORT "$cmd" && return 1
         else
-            ssh -A root@$RNODE -p $RPORT "$cmd" > $ZLogFile 2>&1 || die "could not ssh command: $cmd" && return 1
+            # ssh -A root@$RNODE -p $RPORT "$cmd" > $ZLogFile 2>&1 || die "could not ssh command: $cmd" && return 1
+            ssh -qAt root@localhost -p 2222 "TERM=xterm;$iimport$cmd"  > $ZLogFile 2>&1 || return 1
+            # cat $ZLogFile
         fi
     else
 
         if [ $interactive -eq 1 ] ; then
-            $cmd && return 1
+            $cmd || return 1
         else
-            $cmd  > $ZLogFile 2>&1 || die "error in ZEXEC local execute: $@"  && return 1
+            $cmd  > $ZLogFile 2>&1 || die "error in ZEXEC local execute: $@" || return 1
         fi
     fi
-    cat $ZLogFile
+
 
 )}
 
@@ -114,25 +123,23 @@ ZEXEC() {(
 #goal is to allow people to get into their container without thinking
 ZSSH() {(
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    ZNodeEnvSet
+    ZNodeEnvDefaults
     if [ -n "$1" ]; then
-        ssh -A root@$RNODE -p $RPORT "TERM=xterm;$@" || die "could not ssh command: $@"
+        ssh -At root@localhost -p 2222 "TERM=xterm;. /opt/code/github/jumpscale/bash/zlibs.sh;$@;bash -i"
     else
-        ssh -A root@$RNODE -p $RPORT "bash . ~/code/jumpscale/bash/zlibs.sh"|| die "could not ssh command: $@"
+        ssh -At root@localhost -p 2222 "TERM=xterm;. /opt/code/github/jumpscale/bash/zlibs.sh;bash -i"
     fi
 
 )}
 
 js9() {(
-    echo '' > $ZLogFile
-    ZNodeEnvSet
-    ssh -A root@$RNODE -p $RPORT TERM=xterm;js9 "$@" || die "could not ssh command: $@"
-
+    echo 'js9' > $ZLogFile
+    ZEXEC -c "js9 '$@'" -i
 )}
 
 ZNodeUbuntuPrepare() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    ZNodeEnvSet
+    ZNodeEnvDefaults
     ZSSH 'apt-get update;apt-get upgrade -y'
     ZDockerInstall
     ZSSH "curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;sh /tmp/install.sh"
@@ -160,13 +167,10 @@ ZNodeSet() {
     export RNODE
 }
 
-ZNodeEnvSet() {
+ZNodeEnvDefaults() {
     echo '' > $ZLogFile
-    export RPORT=${RPORT:-22}
-    if [ ! -n "$RNODE" ]; then
-        read -p "ssh node (ip addr or hostname): " RNODE
-    fi
-    export RNODE
+    export RPORT=${RPORT:-2222}
+    export RNODE=${RNODE:-'localhost'}
 }
 
 ZNodeEnv() {
