@@ -4,13 +4,13 @@ bash utilities
 # to install
 
 ```
-curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;sh /tmp/install.sh
+curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
 ```
 
 # to use
 
 ```
-. ~/code/github/jumpscale/bash/zlibs.sh
+. /opt/code/github/jumpscale/bash/zlibs.sh || . ~/code/github/jumpscale/bash/zlibs.sh
 ```
 
 this will source all methods, codecompletion will now work.
@@ -45,6 +45,7 @@ ZEXEC -b ls /
 
 ```bash
 ~/code/jumpscale/bash/zlibs.sh
+ZDockerBuildJS9 # -f to build full js9 not the minimal
 ZDockerRunJS9
 ```
 
