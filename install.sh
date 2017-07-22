@@ -1,8 +1,14 @@
 #!/bin/bash
 set -x
 
+#first check is in home
+if [ -e ~/code/github/jumpscale ]; then
+    export ZUTILSDIR=~/code/github/jumpscale
+fi
 
-export ZUTILSDIR=${ZUTILSDIR:-~/code/github/jumpscale}
+#if not exist then do in /opt/code...
+export ZUTILSDIR=${ZUTILSDIR:-/opt/code/github/jumpscale}
+
 export ZLogFile='/tmp/zutils.log'
 
 die() {
