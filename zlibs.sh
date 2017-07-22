@@ -84,5 +84,6 @@ pushd $ZUTILSDIR/bash > /dev/null 2>&1
 . lib/tmux.sh
 . lib/rsync.sh
 . lib/lede.sh
+. lib/js9.sh
 
 popd > /dev/null 2>&1

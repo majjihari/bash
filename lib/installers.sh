@@ -1,6 +1,8 @@
 
 
 ZInstaller_code_jumpscale() {
+    ZDockerRunUbuntu || die || return 1
+    ZInstaller_python
     if doneCheck "ZInstaller_code_jumpscale" ; then
         echo "[+] update jumpscale code was already done."
        return 0
@@ -17,11 +19,14 @@ ZInstaller_code_jumpscale() {
 }
 
 ZInstaller_python() {
+    ZDockerRunUbuntu || die || return 1
     if doneCheck "ZInstaller_python" ; then
         echo "[+] install python & deps already done."
        return 0
     fi
     echo "[+]   installing python"
+    container 'apt-get update' || return 1
+    container 'apt-get install -y curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet' || return 1
     if [[ $1 == "full" ]]; then
         container 'apt-get install -y python3' || return 1
     else
@@ -43,10 +48,12 @@ ZInstaller_python() {
 
 
 ZInstaller_js9() {
+    ZDockerRunUbuntu || die || return 1
     if doneCheck "ZInstaller_js9" ; then
         echo "[+] install js9 already done."
        return 0
     fi
+    ZInstaller_code_jumpscale
     echo "[+] install js9"
     # ZSSH "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
     echo "[+]   synchronizing developer files"
@@ -85,6 +92,7 @@ ZInstaller_js9() {
 }
 
 ZInstaller_js9_full() {
+    ZDockerRunUbuntu || die || return 1
     if doneCheck "ZInstaller_js9_full" ; then
         echo "[+] install js9 libs full, already done."
        return 0
@@ -101,12 +109,14 @@ ZInstaller_js9_full() {
 }
 
 ZInstaller_docgenerator() {
+    ZDockerRunUbuntu || die || return 1
     if doneCheck "ZInstaller_docgenerator" ; then
         echo "[+] install docgenerator already done."
        return 0
     fi
     ZInstaller_js9_full
     echo "[+] install docgenerator (can take long time)"
+    container 'python3 -c "from js9 import j;j.tools.jsloader.generate()"' || return 1
     container 'python3 -c "from js9 import j;j.tools.docgenerator.installDeps()"' || return 1
 
     ZDockerCommit -b jumpscale/js9_docgenerator || die "docker commit" || return 1
@@ -116,6 +126,7 @@ ZInstaller_docgenerator() {
 }
 
 ZInstaller_ays9() {
+    ZDockerRunUbuntu || die || return 1
     if doneCheck "ZInstaller_ays9" ; then
         echo "[+] install ays9 already done."
        return 0
@@ -135,6 +146,7 @@ ZInstaller_ays9() {
 }
 
 ZInstaller_portal9() {
+    ZDockerRunUbuntu || die || return 1
     if doneCheck "ZInstaller_portal9" ; then
         echo "[+] install portal9 already done."
        return 0
@@ -169,6 +181,7 @@ ZInstall_docker() {
 }
 
 ZInstall_zerotier() {
+    ZDockerRunUbuntu || die || return 1
     container "apt-get install gpgv2 -y"
     container "curl -s 'https://pgp.mit.edu/pks/lookup?op=get&search=0x1657198823E52A61' | gpg --import"
     container "curl -s https://install.zerotier.com/ | bash || true"

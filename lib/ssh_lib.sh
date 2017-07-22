@@ -1,6 +1,4 @@
 
-
-
 ZSSHTEST() {
     echo '' > $ZLogFile
     ZNodeEnvDefaults
@@ -46,7 +44,6 @@ ZSSH_RFORWARD() {(
         esac
         # shift
     done
-    set -x
     if [ "$raddress" != "" ] ; then
         ssh -R $rport:$laddress:$lport $user@$raddress || die "could not to remote portforward: $@"
     else
@@ -77,7 +74,6 @@ EOF
 }
 ZEXEC() {(
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    # set -x
     local OPTIND
     local cmd=""
     local interactive=0
@@ -130,11 +126,6 @@ ZSSH() {(
         ssh -At root@localhost -p 2222 "TERM=xterm;. /opt/code/github/jumpscale/bash/zlibs.sh;bash -i"
     fi
 
-)}
-
-js9() {(
-    echo 'js9' > $ZLogFile
-    ZEXEC -c "js9 '$@'" -i
 )}
 
 ZNodeUbuntuPrepare() {

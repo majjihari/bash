@@ -13,20 +13,26 @@ ZDockerInstall(){
 container() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
 
+    if ! doneCheck "ZDockerRunUbuntu" ; then
+        ZDockerRunUbuntu || die || return 1
+    fi
+
     ZDockerConfig
     if [ "$RNODE" = '' ]; then
-        die "rnode cannot be empty"
+        die "rnode cannot be empty" || return 1
         return 1
     fi
     if [ ! "$RNODE" = 'localhost' ]; then
-        die "rnode needs to be localhost"
+        die "rnode needs to be localhost" || return 1
         return 1
     fi
 
     if [[ -z "$RPORT" ]]; then
-        die "rnode port to exist"
+        die "rnode port to exist" || return 1
         return 1
     fi
+
+    # ssh -A root@$RNODE -p $RPORT "ls / > /dev/null" > $ZLogFile 2>&1 || ZDockerRunUbuntu || die "docker could not be run" || return 1
 
     ssh -A root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@" || return 1
     # ssh -A root@localhost -p $RPORT "$@" > ${ZLogFile} 2>&1 || die "could not ssh command: $@" || return 1
@@ -49,7 +55,7 @@ dockerdie() {
 
 ZDockerConfig() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catcherror
+    ZNodeEnvDefaults
     ZCodeConfig
     export CONTAINERDIR=~/docker
     mkdir -p ${CONTAINERDIR}/private
@@ -170,6 +176,9 @@ ZDockerRemoveImage(){
 }
 
 ZDockerBuildUbuntu() {
+    if doneCheck "ZDocker_BuildUbuntu" ; then
+       return 0
+    fi
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     catcherror
 
@@ -214,6 +223,8 @@ ZDockerBuildUbuntu() {
     ZDockerCommit -b jumpscale/ubuntu -s || die "docker commit" || return 1
 
     echo "[+] DOCKER UBUNTU OK"
+
+    doneSet "ZDocker_BuildUbuntu"
 }
 
 ZDockerRunSomethingUsage() {
@@ -228,6 +239,10 @@ EOF
 }
 
 ZDockerRunUbuntu() {
+    ZDockerBuildUbuntu || die "could not build ubuntu" || return 1
+    if doneCheck "ZDocker_RunUbuntu" ; then
+       return 0
+    fi
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     # [[ $ZINTERACTIVE -eq 1 ]] && catcherror
     # catcherror
@@ -238,7 +253,7 @@ ZDockerRunUbuntu() {
     local port=2222
     local addarg=''
 
-    while getopts "b:i:p:a:h" opt; do
+    while getopts "i:p:a:h" opt; do
         case $opt in
            i )  iname=$OPTARG ;;
            p )  port=$OPTARG ;;
@@ -261,64 +276,10 @@ ZDockerRunUbuntu() {
     fi
 
     echo '[+] Ubuntu Docker Is Active (OK)'
+
+    doneSet "ZDocker_RunUbuntu"
 }
 
-ZDockerBuildJS9() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    local i=0
-    local full=""
-    run_args=()
-    for arg in $@;
-    do
-        if [[ $arg == "-f" ]]; then
-            full="full"
-        else
-            run_args+=($arg)
-        fi
-    done
-    ZDockerRunUbuntu ${run_args[@]} || die "could not build ubuntu docker" || return 1
-
-    echo "[+]   installing basic dependencies"
-    container 'apt-get update' > ${ZLogFile} 2>&1 || die "apt update" || return 1
-    container 'apt-get install -y curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet'  > ${ZLogFile} 2>&1 || die "js9 linux deps" || return 1
-
-    echo "[+] JS9 BUILD"
-    ZInstaller_code_jumpscale || die "ZInstaller_code_jumpscale" || return 1
-    ZInstaller_python $full || die "ZInstaller_python" || return 1
-    ZInstaller_js9 $full || die "ZInstaller_js9" || return 1
-}
-
-ZDockerRunJS9() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    ZDockerRunUbuntu $@
-
-    local OPTIND
-    local bname='jumpscale/ubuntu'
-    local iname='build'
-    local port=2222
-    local addarg=''
-    while getopts "b:i:p:a:h" opt; do
-        case $opt in
-           i )  iname=$OPTARG ;;
-           p )  port=$OPTARG ;;
-           a )  addarg=$OPTARG ;;
-           h )  ZDockerRunSomethingUsage ; return 0 ;;
-           \? )  ZDockerRunSomethingUsage ; return 1 ;;
-        esac
-    done
-
-    existing="$(docker images ${bname} -q)"
-
-    if [[ -z "$existing" ]]; then
-        ZDockerBuildUbuntu
-    fi
-
-    if [[ ! -z "$addarg" ]]; then
-        ZDockerRun -b $bname -i $iname -p $port -a $addarg || return 1
-    else
-        ZDockerRun -b $bname -i $iname -p $port || return 1
-    fi
-}
 
 ZDockerRunUsage() {
    cat <<EOF

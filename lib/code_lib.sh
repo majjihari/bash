@@ -3,7 +3,12 @@
 ############ CODE
 
 ZCodeConfig() {
-    export ZCODEDIR=~/code
+    if [ -e /opt/code ]; then
+        export ZCODEDIR=/opt/code
+    else
+        export ZCODEDIR=~/code
+    fi
+
 }
 
 
