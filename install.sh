@@ -1,7 +1,7 @@
 #!/bin/bash
 set -x
 
-apt-get install git -y
+apt-get install git wget -y
 
 #first check is in home
 if [ -e ~/code/github/jumpscale ]; then
