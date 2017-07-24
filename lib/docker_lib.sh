@@ -150,13 +150,10 @@ ZDockerEnableSSH(){
     echo "[+]   regen ssh keys"
     docker exec -t $ZDockerName  rm -f /etc/service/sshd/down
     docker exec -t $ZDockerName  /etc/my_init.d/00_regen_ssh_host_keys.sh
-    #
+    docker exec -t $ZDockerName  echo "export LC_ALL=C.UTF-8" >> /root/.profile
+    docker exec -t $ZDockerName  echo "export LANG=C.UTF-8" >> /root/.profile
 
     ZDockerSSHAuthorize $ZDockerName
-
-    container 'echo export "LC_ALL=C.UTF-8" >> /root/.profile'
-    container 'echo "export LANG=C.UTF-8" >> /root/.profile'
-
     echo "[+] SSH enabled OK"
 
 }
@@ -221,12 +218,11 @@ ZDockerBuildUbuntu() {
     docker exec -t $ZDockerName apt-get upgrade -y > ${ZLogFile} 2>&1 || die "apt-get upgrade" || return 1
     docker exec -t $ZDockerName apt-get install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync -y > ${ZLogFile} 2>&1 || die "basic linux deps" || return 1
 
-    ZDockerEnableSSH
-
     echo "[+]   setting up default environment"
-    container 'echo "" > /etc/motd'
-    container touch /root/.iscontainer
+    docker exec -t $ZDockerName echo "" > /etc/motd
+    docker exec -t $ZDockerName touch /root/.iscontainer
 
+    ZDockerEnableSSH
     ZDockerCommit -b jumpscale/ubuntu -s || die "docker commit" || return 1
 
     echo "[+] DOCKER UBUNTU OK"
