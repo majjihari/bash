@@ -2,13 +2,20 @@
 
 ######### DOCKER
 
-ZDockerInstall(){
+ZDockerInstallSSH(){
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catcherror
     echo "[+] install docker on remote machine."
-    ssh -A root@$RNODE -p $RPORT "wget -qO- https://get.docker.com/ | sh" > ${ZLogFile} 2>&1 || die "could install docker"
+    ZEXEC -c "wget -qO- https://get.docker.com/ | sh" > ${ZLogFile} 2>&1 || die "could install docker"
 
 }
+
+ZDockerInstallLocal(){
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo "[+] install docker on local machine."
+    wget -qO- https://get.docker.com/ | sh > ${ZLogFile} 2>&1 || die "could install docker"
+
+}
+
 
 container() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
