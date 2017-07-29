@@ -160,9 +160,23 @@ ZInstaller_portal9() {
     echo "[+]   installing jumpscale portal9"
     ZNodeSet $addarg
     ZNodePortSet $port
-    container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/portal9" || return 1
+    container "source ~/.jsenv.sh && cd  /opt/code/github/jumpscale/portal9 && bash install.sh;" || return 1
     container "js9_init"
     doneSet "ZInstaller_portal9"
+}
+
+ZInstall_issuemanager() {
+    ZDockerRunUbuntu || die || return 1
+    if doneCheck "ZInstall_issuemanager" ; then
+        echo "Issue Manager already installed"
+       return 0
+    fi
+    ZInstaller_js9_full
+    ZInstaller_portal9
+    echo "[+] Installing IssueManager"
+    container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.install()"' || return 1
+    container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.start()"' || return 1
+    doneSet "ZInstall_issuemanager"
 }
 
 ZInstall_docker() {
