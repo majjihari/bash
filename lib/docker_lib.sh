@@ -5,14 +5,14 @@
 ZDockerInstallSSH(){
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     echo "[+] install docker on remote machine."
-    ZEXEC -c "wget -qO- https://get.docker.com/ | sh" > ${ZLogFile} 2>&1 || die "could install docker"
+    ZEXEC -c "wget -qO- https://get.docker.com/ | sh" > ${ZLogFile} 2>&1 || die "could install docker" || return 1
 
 }
 
 ZDockerInstallLocal(){
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     echo "[+] install docker on local machine."
-    wget -qO- https://get.docker.com/ | sh > ${ZLogFile} 2>&1 || die "could install docker"
+    wget -qO- https://get.docker.com/ | sh > ${ZLogFile} 2>&1 || die "could not install docker" || return 1
 
 }
 
@@ -20,15 +20,8 @@ ZDockerInstallLocal(){
 container() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
 
-    if ! doneCheck "ZDockerRunUbuntu" ; then
-        ZDockerRunUbuntu || die || return 1
-    fi
-
     ZDockerConfig
-    if [ "$RNODE" = '' ]; then
-        die "rnode cannot be empty" || return 1
-        return 1
-    fi
+
     if [ ! "$RNODE" = 'localhost' ]; then
         die "rnode needs to be localhost" || return 1
         return 1
@@ -39,26 +32,24 @@ container() {
         return 1
     fi
 
-    # ssh -A root@$RNODE -p $RPORT "ls / > /dev/null" > $ZLogFile 2>&1 || ZDockerRunUbuntu || die "docker could not be run" || return 1
-
     ssh -A root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@" || return 1
-    # ssh -A root@localhost -p $RPORT "$@" > ${ZLogFile} 2>&1 || die "could not ssh command: $@" || return 1
+
 }
 
-# die and get docker log back to host
-# $1 = docker container name, $2 = ZLogFile name, $3 = optional message
-dockerdie() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    if [ "$3" != "" ]; then
-        echo "[-] something went wrong in docker $1: $3"
-        exit 1
-    fi
+# # die and get docker log back to host
+# # $1 = docker container name, $2 = ZLogFile name, $3 = optional message
+# dockerdie() {
+#     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+#     if [ "$3" != "" ]; then
+#         echo "[-] something went wrong in docker $1: $3"
+#         exit 1
+#     fi
 
-    echo "[-] something went wrong in docker: $1"
-    docker exec -t $iname cat "$2"
+#     echo "[-] something went wrong in docker: $1"
+#     docker exec -t $iname cat "$2"
 
-    exit 1
-}
+#     exit 1
+# }
 
 ZDockerConfig() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
@@ -81,7 +72,6 @@ EOF
 
 ZDockerCommit() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catcherror
 
     ZDockerConfig
     local OPTIND
@@ -98,7 +88,7 @@ ZDockerCommit() {
     done
     if [ -z "$bname" ]; then ZDockerCommitUsage;return 0; fi
     echo "[+] Commit docker: $iname to $bname"
-    docker commit $iname $bname > ${ZLogFile} 2>&1 || return 1
+    docker commit $iname $bname > ${ZLogFile} 2>&1 || die "cannot commit docker" || return 1
     export ZDockerImage=$bname
     if [ "$stop" == "1" ]; then
         ZDockerRemove $iname
@@ -107,15 +97,14 @@ ZDockerCommit() {
 
 ZDockerSSHAuthorize() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catcherror
 
     local ZDockerName="${1:-$ZDockerName}"
     echo "[+] authorizing local ssh keys on docker: $ZDockerName"
 
     echo "[+]   start ssh"
-    docker exec -t "${ZDockerName}" rm -f /etc/service/sshd/down
-    docker exec -t "${ZDockerName}" /etc/my_init.d/00_regen_ssh_host_keys.sh
-    docker exec -t "${ZDockerName}" sv start sshd > ${ZLogFile} 2>&1
+    container 'rm -f /etc/service/sshd/down' || return 1
+    container '/etc/my_init.d/00_regen_ssh_host_keys.sh' || return 1
+    container 'sv start sshd' || return 1
 
     echo "[+]   Waiting for ssh to allow connections"
     while ! ssh-keyscan -p $RPORT localhost 2>&1 | grep -q "OpenSSH"; do
@@ -128,51 +117,46 @@ ZDockerSSHAuthorize() {
 
     # authorizing keys
     ssh-add -L | while read key; do
-        docker exec -t "${ZDockerName}" /bin/sh -c "echo $key >> /root/.ssh/authorized_keys"
+        container '/bin/sh -c "echo $key >> /root/.ssh/authorized_keys"' || return 1
     done
 
-    ZNodeSet 'localhost'
-    ZNodePortSet $RPORT
+    ZNodeSet 'localhost' || return 1
+    ZNodePortSet $RPORT || return 1
 
     echo "[+] SSH authorized"
 }
 
 ZDockerEnableSSH(){
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catcherror
 
     local ZDockerName="${1:-$ZDockerName}"
 
     echo "[+]   configuring services"
-    docker exec -t $ZDockerName mkdir -p /var/run/sshd
-    docker exec -t $ZDockerName  rm -f /etc/service/sshd/down
+    container 'mkdir -p /var/run/sshd' || return 1
+    container 'rm -f /etc/service/sshd/down' || return 1
     #
     echo "[+]   regen ssh keys"
-    docker exec -t $ZDockerName  rm -f /etc/service/sshd/down
-    docker exec -t $ZDockerName  /etc/my_init.d/00_regen_ssh_host_keys.sh
-    docker exec -t $ZDockerName  echo "export LC_ALL=C.UTF-8" >> /root/.profile
-    docker exec -t $ZDockerName  echo "export LANG=C.UTF-8" >> /root/.profile
+    container 'rm -f /etc/service/sshd/down' || return 1
+    container '/etc/my_init.d/00_regen_ssh_host_keys.sh' || return 1
+    container 'echo "export LC_ALL=C.UTF-8" >> /root/.profile' || return 1
+    container 'echo "export LANG=C.UTF-8" >> /root/.profile' || return 1
 
-    ZDockerSSHAuthorize $ZDockerName
+    ZDockerSSHAuthorize $ZDockerName || return 1
     echo "[+] SSH enabled OK"
 
 }
 
 ZDockerRemove(){
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catcherror
 
     ZDockerConfig
     local ZDockerName="${1:-$ZDockerName}"
     echo "[+] remove docker $ZDockerName"
     docker rm  -f "$ZDockerName" || true
-    # docker inspect $iname >  /dev/null 2>&1 &&  docker rm  -f "$iname" > /dev/null 2>&1
 }
 
 ZDockerRemoveImage(){
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catcherror
-
     ZDockerConfig
     local ZDockerImage="${1:-$ZDockerImage}"
     echo "[+] remove docker image $ZDockerImage"
@@ -184,9 +168,8 @@ ZDockerBuildUbuntu() {
        return 0
     fi
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catcherror
 
-    ZDockerConfig
+    ZDockerConfig || die || return
     local OPTIND
     local bname='phusion/baseimage'
     local iname='build'
@@ -206,23 +189,23 @@ ZDockerBuildUbuntu() {
     export SSHNOAUTH=1
 
     if [[ ! -z "$addarg" ]]; then
-        ZDockerRun -b $bname -i $iname -p $port -a $addarg || return 1
+        ZDockerRun -b $bname -i $iname -p $port -a $addarg || die || return 1
     else
-        ZDockerRun -b $bname -i $iname -p $port || return 1
+        ZDockerRun -b $bname -i $iname -p $port || die || return 1
     fi
 
     unset SSHNOAUTH
 
     #basic deps
-    docker exec -t $ZDockerName apt-get update > ${ZLogFile} 2>&1 || die "apt-get update"  || return 1
-    docker exec -t $ZDockerName apt-get upgrade -y > ${ZLogFile} 2>&1 || die "apt-get upgrade" || return 1
-    docker exec -t $ZDockerName apt-get install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync -y > ${ZLogFile} 2>&1 || die "basic linux deps" || return 1
+    container 'apt-get update' || die "apt-get update"  || return 1
+    container 'apt-get upgrade -y' || die "apt-get upgrade" || return 1
+    container 'apt-get install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync -y' || die "basic linux deps" || return 1
 
-    echo "[+]   setting up default environment"
-    docker exec -t $ZDockerName echo "" > /etc/motd
-    docker exec -t $ZDockerName touch /root/.iscontainer
+    echo "[+]   setting up default environment" || die || return 1
+    container 'echo "" > /etc/motd' || die || return 1
+    container 'touch /root/.iscontainer' || die || return 1
 
-    ZDockerEnableSSH
+    ZDockerEnableSSH || die || return 1
     ZDockerCommit -b jumpscale/ubuntu -s || die "docker commit" || return 1
 
     echo "[+] DOCKER UBUNTU OK"
@@ -247,8 +230,6 @@ ZDockerRunUbuntu() {
        return 0
     fi
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    # [[ $ZINTERACTIVE -eq 1 ]] && catcherror
-    # catcherror
 
     local OPTIND
     local bname='jumpscale/ubuntu'
@@ -298,9 +279,8 @@ EOF
 
 ZDockerRun() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    catcherror
 
-    ZDockerConfig
+    ZDockerConfig || return 1
     local OPTIND
     local bname='jumpscale/js9_base'
     local iname='build'
@@ -316,16 +296,16 @@ ZDockerRun() {
            \? )  ZDockerRunUsage ; return 1 ;;
         esac
     done
-    ZNodePortSet $port
-    ZNodeSet localhost
+    ZNodePortSet $port || return 1
+    ZNodeSet localhost || return 1
     export ZDockerName=$iname
 
     echo "[+] start docker $bname -> $iname (port:$port)"
 
-    existing="$(docker ps -aq -f name=^/${iname}$)"
+    existing="$(docker ps -aq -f name=^/${iname}$)" || return 1
 
     if [[ ! -z "$existing" ]]; then
-        ZDockerRemove $iname
+        ZDockerRemove $iname || return 1
     fi
 
     mounted_volumes="\
@@ -351,13 +331,13 @@ ZDockerRun() {
         --cap-add=NET_ADMIN --cap-add=SYS_ADMIN \
         --cap-add=DAC_OVERRIDE --cap-add=DAC_READ_SEARCH \
         ${mounted_volumes} \
-        $bname > ${ZLogFile} 2>&1 || die "docker could not start, please check ${ZLogFile}"
+        $bname > ${ZLogFile} 2>&1 || die "docker could not start, please check ${ZLogFile}" || return 1
 
     sleep 1
 
     #only authorize when var not set
     if [[ -z "$SSHNOAUTH" ]]; then
-        ZDockerSSHAuthorize || die
+        ZDockerSSHAuthorize || die || return 1
     fi
 
 

@@ -17,16 +17,16 @@ die() {
     return 1
 }
 
-catcherror_handler() {
-    if [ "${ZLogFile}" != "" ]; then
-        echo "[-] line $1: script error, backlog from ${ZLogFile}:"
-        cat ${ZLogFile}
-        return 1
-    fi
+# catcherror_handler() {
+#     if [ "${ZLogFile}" != "" ]; then
+#         echo "[-] line $1: script error, backlog from ${ZLogFile}:"
+#         cat ${ZLogFile}
+#         return 1
+#     fi
 
-    echo "[-] line $1: script error, no logging file defined"
-    return 1
-}
+#     echo "[-] line $1: script error, no logging file defined"
+#     return 1
+# }
 
 doneSet() {
     mkdir -p /tmp/zutils_done
@@ -57,15 +57,6 @@ doneReset() {
 #     exit 1
 # }
 
-catcherror() {
-    trap 'catcherror_handler $LINENO' ERR
-}
-
-# catchfatal() {
-#     trap 'catchfatal_handler $LINENO' ERR
-# }
-#
-# catcherror
 
 echo "init" > $ZLogFile
 
@@ -85,5 +76,8 @@ pushd $ZUTILSDIR/bash > /dev/null 2>&1
 . lib/rsync.sh
 . lib/lede.sh
 . lib/js9.sh
+. lib/code_editor.sh
+. lib/installers_host.sh
+. lib/base_lib.sh
 
 popd > /dev/null 2>&1

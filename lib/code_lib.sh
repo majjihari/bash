@@ -19,7 +19,7 @@ Usage: ZCodeGet [-r reponame] [-g giturl] [-a account] [-b branch]
    -b branchname: defaults to master
    -h: help
 
-check's out jumpscale repo to ~/code/jumpscale/$reponame
+check's out jumpscale repo to ~/code/github/jumpscale/$reponame
 branchname can optionally be specified.
 
 if specified but repo exists then a pull will be done & branch will be ignored !!!
@@ -36,6 +36,7 @@ EOF
 
 
 ZCodeGetJS() {
+    set -x
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     ZCodeConfig
     local OPTIND
@@ -52,17 +53,17 @@ ZCodeGetJS() {
     done
 
     if [ -z "$reponame" ]; then
-        ZCodeGetJS -r core9 || die || return 1
-        ZCodeGetJS -r lib9 || die || return 1
-        ZCodeGetJS -r bash || die || return 1
-        ZCodeGetJS -r ays9 || die || return 1
-        ZCodeGetJS -r prefab9 || die || return 1
+        ZCodeGetJS -r core9  -b $branch || die || return 1
+        ZCodeGetJS -r lib9 -b $branch || die || return 1
+        ZCodeGetJS -r bash -b $branch || die || return 1
+        ZCodeGetJS -r ays9 -b $branch || die || return 1
+        ZCodeGetJS -r prefab9 -b $branch || die || return 1
         return
     fi
 
     local giturl="git@github.com:Jumpscale/$reponame.git"
 
-    ZCodeGet -r $reponame -a $account -u $giturl -b $branch
+    ZCodeGet -r $reponame -a $account -u $giturl -b $branch  || die || return 1
 
 }
 

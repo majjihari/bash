@@ -1,22 +1,6 @@
 
 
-ZInstaller_code_jumpscale() {
-    ZDockerRunUbuntu || die || return 1
-    ZInstaller_python
-    if doneCheck "ZInstaller_code_jumpscale" ; then
-        echo "[+] update jumpscale code was already done."
-       return 0
-    fi
-    local branch="${1:-master}"
-    echo "[+] loading or updating jumpscale source code (branch:$branch)"
-    ZCodeGetJS -r core9 -b $branch > ${ZLogFile} 2>&1 || die || return 1
-    ZCodeGetJS -r lib9 -b $branch > ${ZLogFile} 2>&1 || die || return 1
-    ZCodeGetJS -r prefab9 -b $branch > ${ZLogFile} 2>&1 || die || return 1
-    # ZCodeGetJS -r builder_bootstrap -b $branch > ${ZLogFile} 2>&1 || die || return 1
-    ZCodeGetJS -r developer -b $branch > ${ZLogFile} 2>&1 || die || return 1
-    echo "[+] update jumpscale code done"
-    doneSet "ZInstaller_code_jumpscale"
-}
+
 
 ZInstaller_python() {
     ZDockerRunUbuntu || die || return 1
@@ -53,9 +37,10 @@ ZInstaller_js9() {
         echo "[+] install js9 already done."
        return 0
     fi
-    ZInstaller_code_jumpscale
+    ZInstaller_code_jumpscale_host
     echo "[+] install js9"
-    # ZSSH "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
+    ZSSH "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
+
     echo "[+]   synchronizing developer files"
     container 'rsync -rv /opt/code/github/jumpscale/developer/files_guest/ /' || return 1
     if [[ $1 == "full" ]]; then
@@ -92,6 +77,7 @@ ZInstaller_js9() {
 }
 
 ZInstaller_js9_full() {
+
     ZDockerRunUbuntu || die || return 1
     if doneCheck "ZInstaller_js9_full" ; then
         echo "[+] install js9 libs full, already done."
@@ -179,28 +165,9 @@ ZInstall_issuemanager() {
     doneSet "ZInstall_issuemanager"
 }
 
-ZInstall_docker() {
-    echo '[${FUNCNAME[0]}]' > $ZLogFile
-    catcherror
-
-    if [ "$(expr substr $(uname -s) 1 5)" = "Linux" ]; then
-        dist=$(grep DISTRIB_ID /etc/*-release | awk -F '=' '{print $2}' || true)
-        if [ "$dist" = "Ubuntu" ]; then
-            apt-get update
-            apt-get install -y docker.io
-        fi
-    fi
-
-    echo "[-] plateforme not supported"
-}
-
 ZInstall_zerotier() {
     ZDockerRunUbuntu || die || return 1
     container "apt-get install gpgv2 -y"
     container "curl -s 'https://pgp.mit.edu/pks/lookup?op=get&search=0x1657198823E52A61' | gpg --import"
     container "curl -s https://install.zerotier.com/ | bash || true"
-}
-
-ZInstaller_ipfs {
-    container "cd tmp; mkdir -p ipfs; cd ipfs; wget --inet4-only https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_linux-amd64.tar.gz"
 }
