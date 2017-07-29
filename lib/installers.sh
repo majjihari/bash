@@ -186,3 +186,7 @@ ZInstall_zerotier() {
     container "curl -s 'https://pgp.mit.edu/pks/lookup?op=get&search=0x1657198823E52A61' | gpg --import"
     container "curl -s https://install.zerotier.com/ | bash || true"
 }
+
+ZInstaller_ipfs {
+    container "cd tmp; mkdir -p ipfs; cd ipfs; wget --inet4-only https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_linux-amd64.tar.gz"
+}

@@ -95,11 +95,11 @@ ZEXEC() {(
 
     if [ $localcmd -eq 0 ] ; then
         if [ $interactive -eq 1 ] ; then
-            ssh -qAt root@localhost -p 2222 "TERM=xterm;$iimport$cmd" || return 1
+            ssh -qAt root@$RNODE -p $RPORT "TERM=xterm;$iimport$cmd" || return 1
             # ssh -A root@$RNODE -p $RPORT "$cmd" && return 1
         else
             # ssh -A root@$RNODE -p $RPORT "$cmd" > $ZLogFile 2>&1 || die "could not ssh command: $cmd" && return 1
-            ssh -qAt root@localhost -p 2222 "TERM=xterm;$iimport$cmd"  > $ZLogFile 2>&1 || return 1
+            ssh -qAt root@$RNODE -p $RPORT "TERM=xterm;$iimport$cmd"  > $ZLogFile 2>&1 || return 1
             # cat $ZLogFile
         fi
     else
