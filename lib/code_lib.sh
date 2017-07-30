@@ -6,7 +6,7 @@ ZCodeConfig() {
     if [ -e /opt/code ]; then
         export ZCODEDIR=/opt/code
     else
-        export ZCODEDIR=~/code
+        export ZCODEDIR=$ZCODEDIR
     fi
 
 }
@@ -19,7 +19,7 @@ Usage: ZCodeGet [-r reponame] [-g giturl] [-a account] [-b branch]
    -b branchname: defaults to master
    -h: help
 
-check's out jumpscale repo to ~/code/github/jumpscale/$reponame
+check's out jumpscale repo to $ZCODEDIR/github/jumpscale/$reponame
 branchname can optionally be specified.
 
 if specified but repo exists then a pull will be done & branch will be ignored !!!
@@ -36,7 +36,6 @@ EOF
 
 
 ZCodeGetJS() {
-    set -x
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     ZCodeConfig
     local OPTIND
@@ -58,7 +57,7 @@ ZCodeGetJS() {
         ZCodeGetJS -r bash -b $branch || die || return 1
         ZCodeGetJS -r ays9 -b $branch || die || return 1
         ZCodeGetJS -r prefab9 -b $branch || die || return 1
-        return
+        return 0
     fi
 
     local giturl="git@github.com:Jumpscale/$reponame.git"
@@ -77,7 +76,7 @@ Usage: ZCodeGet [-r reponame] [-g giturl] [-a account] [-b branch]
    -b branchname: defaults to master
    -h: help
 
-check's out any git repo repo to ~/code/$type/$account/$reponame
+check's out any git repo repo to $ZCODEDIR/$type/$account/$reponame
 branchname can optionally be specified.
 
 if specified but repo exists then a pull will be done & branch will be ignored !!!
@@ -130,7 +129,7 @@ ZCodeGet() {
     else
         pushd $ZCODEDIR/$type/$account/$reponame > /dev/null 2>&1
         echo " [+] pull"
-        git pull  2>&1 > $ZLogFile || die || return 1
+        git pull  2>&1 > $ZLogFile || die "could not git pull" || return 1
         popd > /dev/null 2>&1
     fi
     popd > /dev/null 2>&1

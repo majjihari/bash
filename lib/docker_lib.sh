@@ -88,7 +88,7 @@ ZDockerCommit() {
     done
     if [ -z "$bname" ]; then ZDockerCommitUsage;return 0; fi
     echo "[+] Commit docker: $iname to $bname"
-    docker commit $iname $bname > ${ZLogFile} 2>&1 || die "cannot commit docker" || return 1
+    docker commit $iname $bname
     export ZDockerImage=$bname
     if [ "$stop" == "1" ]; then
         ZDockerRemove $iname

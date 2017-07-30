@@ -33,13 +33,16 @@ ZInstaller_python() {
 
 ZInstaller_js9() {
     ZDockerRunUbuntu || die || return 1
+
     if doneCheck "ZInstaller_js9" ; then
         echo "[+] install js9 already done."
        return 0
     fi
+
     ZInstaller_code_jumpscale_host
+
     echo "[+] install js9"
-    ZSSH "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
+    container "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts" || return 1
 
     echo "[+]   synchronizing developer files"
     container 'rsync -rv /opt/code/github/jumpscale/developer/files_guest/ /' || return 1

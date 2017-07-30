@@ -1,6 +1,8 @@
 
-cd ~/code/jumpscale/bash
+. ~/code/github/jumpscale/bash/zlibs.sh || exit 1
 
-. ~/code/jumpscale/bash/zlibs.sh
+# ZCodePushJS -m "installers"
+# ZCodeGetJS
 
-ZCodePushJS -m "installers"
+ZInstaller_js9_full
+

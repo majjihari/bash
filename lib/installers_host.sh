@@ -20,6 +20,8 @@ ZInstaller_code_jumpscale_host() {
 
 ZInstaller_js9_host() {
 
+    ZCodeConfig
+
     ZInstaller_base_host
 
     ZInstaller_code_jumpscale_host
@@ -27,15 +29,16 @@ ZInstaller_js9_host() {
     ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
     echo "[+] install js9"
-    pip3 install -e ~/code/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
-    # echo "[+]   installing jumpscale prefab9"
-    # container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/prefab9" || return 1
+    pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
+    
     echo "[+]   installing jumpscale lib9"
-    pip3 install --no-deps -e ~/code/github/jumpscale/lib9 || die "could not install lib9 of js9" || return 1
+    pip3 install --no-deps -e $ZCODEDIR/github/jumpscale/lib9 || die "could not install lib9 of js9" || return 1
 
+    echo "[+]   installing jumpscale prefab9"
+    pip3 install -e $ZCODEDIR/github/jumpscale/prefab9 || return 1
 
     echo "[+]   installing binaries files"
-    find  ~/code/github/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \; || return 1
+    find  $ZCODEDIR/github/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \; || return 1
 
     rm -rf /usr/local/bin/cmds || return 1
     rm -rf /usr/local/bin/cmds_guest || return 1
@@ -92,8 +95,6 @@ ZInstaller_base_host(){
         echo "[+]   installing pip system"
         curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py || die "could not download pip" || return 1
         python3 /tmp/get-pip.py || return 1
-
-
 
         echo "[+]   installing some pip dependencies"
         

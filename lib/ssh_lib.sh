@@ -2,7 +2,7 @@
 ZSSHTEST() {
     echo '' > $ZLogFile
     ZNodeEnvDefaults
-    ssh root@$RNODE -p $RPORT 'ls /' > $ZLogFile 2>&1 || die "could not connect over ssh to $RNODE:$RPORT"
+    ssh root@$RNODE -p $RPORT 'ls /' > $ZLogFile 2>&1 || die "could not connect over ssh to $RNODE:$RPORT" || return 1
     #TODO: check and if not connect, ask the params again, till its all ok
 }
 
@@ -45,7 +45,7 @@ ZSSH_RFORWARD() {(
         # shift
     done
     if [ "$raddress" != "" ] ; then
-        ssh -R $rport:$laddress:$lport $user@$raddress || die "could not to remote portforward: $@"
+        ssh -R $rport:$laddress:$lport $user@$raddress || die "could not to remote portforward: $@" || return 1
     else
         die "could not forward remote port to local, check syntax: $@"
     fi
@@ -121,19 +121,19 @@ ZSSH() {(
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     ZNodeEnvDefaults
     if [ -n "$1" ]; then
-        ssh -At root@localhost -p 2222 "TERM=xterm;. /opt/code/github/jumpscale/bash/zlibs.sh;$@;bash -i"
+        ssh -At root@localhost -p 2222 "TERM=xterm;. /opt/code/github/jumpscale/bash/zlibs.sh;$@;bash -i"  || return 1
     else
-        ssh -At root@localhost -p 2222 "TERM=xterm;. /opt/code/github/jumpscale/bash/zlibs.sh;bash -i"
+        ssh -At root@localhost -p 2222 "TERM=xterm;. /opt/code/github/jumpscale/bash/zlibs.sh;bash -i"  || return 1
     fi
 
 )}
 
 ZNodeUbuntuPrepare() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    ZNodeEnvDefaults
-    ZSSH 'apt-get update;apt-get upgrade -y'
-    ZDockerInstall
-    ZSSH "curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;sh /tmp/install.sh"
+    ZNodeEnvDefaults  || return 1
+    ZSSH 'apt-get update;apt-get upgrade -y'  || return 1
+    ZDockerInstall  || return 1
+    ZSSH "curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;sh /tmp/install.sh"  || return 1
 }
 
 
