@@ -1,5 +1,5 @@
 #!/bin/bash
-# set -x
+set -x
 
 apt-get install git wget -y
 
@@ -13,8 +13,14 @@ if [ -e /opt/code/github/jumpscale ]; then
     export ZUTILSDIR=/opt/code/github/jumpscale
 fi
 
+if [ "$(uname)" == "Darwin" ]; then     
+    export ZUTILSDIR=${ZUTILSDIR:-~/code/github/jumpscale}
+else
+    export ZUTILSDIR=${ZUTILSDIR:-/opt/code/github/jumpscale}
+fi
+
 #if not exist then do in /opt/code...
-export ZUTILSDIR=${ZUTILSDIR:-/opt/code/github/jumpscale}
+
 
 export ZLogFile='/tmp/zutils.log'
 
