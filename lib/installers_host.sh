@@ -79,7 +79,7 @@ ZInstaller_base_host(){
         brew upgrade  > ${ZLogFile} 2>&1 || die "could not upgrade all brew installed components" || return 1
 
         echo "[+]   installing git, python, mc, tmux, curl, sshfs, curl, ipfs"
-        brew install mc wget python3 git pdf2svg unzip rsync graphviz sshfs tmux curl phantomjs ipfs > ${ZLogFile} 2>&1 || die "could not install git, graphiz, sshfs, tmux or curl" || return 1
+        brew install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs ipfs > ${ZLogFile} 2>&1 || die "could not install git, graphiz, sshfs, tmux or curl" || return 1
  
         echo "[+]   installing node"
         brew install node  > ${ZLogFile} 2>&1 || die "could not install nodejs" || return 1
@@ -149,7 +149,7 @@ ZInstaller_base_host(){
 
 ZInstaller_editor_host() {
 
-    ZInstaller_base_host
+    ZInstaller_base_host || return 1
 
     if [ ! "$(uname)" == "Darwin" ]; then    
         die "only osx supported for now"
