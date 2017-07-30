@@ -1,5 +1,5 @@
 #!/bin/bash
-set -x
+# set -x
 
 apt-get install git wget -y
 
@@ -31,21 +31,22 @@ ZUtilsGetCode() {
     mkdir -p $ZUTILSDIR
     #giturl like: git@github.com:mathieuancelin/duplicates.git
     local giturl=git@github.com:Jumpscale/bash.git
+    local giturl=https://github.com/Jumpscale/bash.git
     local branch=master
     echo "[+] get code $giturl ($branch)"
-    pushd $ZUTILSDIR
+    pushd $ZUTILSDIR 2>&1 > $ZLogFile
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
-        ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 > $ZLogFile || die
+        ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 > $ZLogFile || die || return 1
     fi
 
     if [ ! -e $ZUTILSDIR/bash ]; then
         echo " [+] clone zutils"
-        git clone -b ${branch} $giturl bash 2>&1 > $ZLogFile || die
+        git clone -b ${branch} $giturl bash 2>&1 > $ZLogFile || die || return 1
     else
         pushd $ZUTILSDIR/bash
         echo " [+] pull"
-        git pull  2>&1 > $ZLogFile || die
+        git pull  2>&1 > $ZLogFile || die || return 1
         popd > /dev/null 2>&1
     fi
     popd > /dev/null 2>&1
