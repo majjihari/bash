@@ -78,9 +78,13 @@ ZInstaller_base_host(){
         echo "[+]   upgrade brew"  
         brew upgrade  > ${ZLogFile} 2>&1 || die "could not upgrade all brew installed components" || return 1
 
-        echo "[+]   installing git, python, mc, tmux, curl, sshfs, curl, ipfs"
+        echo "[+]   installing git, python, mc, tmux, curl, curl, ipfs"
         brew install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs ipfs > ${ZLogFile} 2>&1 || die "could not install git, graphiz, sshfs, tmux or curl" || return 1
- 
+
+        echo "[+]   start ipfs"
+        ipfs init > /dev/null 2>&1 
+        brew services start ipfs  > ${ZLogFile} 2>&1 || die "could not autostart ipfs" || return 1
+
         echo "[+]   installing node"
         brew install node  > ${ZLogFile} 2>&1 || die "could not install nodejs" || return 1
 
@@ -91,12 +95,10 @@ ZInstaller_base_host(){
         echo "[+]   installing cakebrew"
         IPFS_get_install_dmg QmbCWrGrRL8aaZYMxSym4H9mhFbuUbFhfKT3uZnxPGvhoe cakebrew  || return 1
 
-        echo "[+]   start ipfs"
-        brew services start ipfs  > ${ZLogFile} 2>&1 || die "could not autostart ipfs" || return 1
 
         echo "[+]   installing pip system"
         curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py || die "could not download pip" || return 1
-        python3 /tmp/get-pip.py || return 1
+        python3 /tmp/get-pip.py  > ${ZLogFile} 2>&1 || return 1
 
         echo "[+] upgrade pip"
         pip3 install --upgrade pip > ${ZLogFile} 2>&1 || die || return 1      
@@ -171,7 +173,7 @@ ZInstaller_editor_host() {
     mkdir -p '/Applications/Visual Studio Code.app'
     rsync -rav --delete-after  'Visual Studio Code.app/' '/Applications/Visual Studio Code.app/' > ${ZLogFile} 2>&1 || die "could not sync" || return 1
     rm -rf 'Visual Studio Code.app' > ${ZLogFile} 2>&1 || return 1
-    popd
+    popd > /dev/null 2>&1
     # fi
 
     #DOES NOT WORK !
@@ -243,7 +245,7 @@ ZInstaller_editor_host() {
     echo "[+] copy sourcetree"
     mkdir -p /Applications/SourceTree.app
     rsync -rav --delete-after SourceTree.app/ /Applications/SourceTree.app/ > ${ZLogFile} 2>&1 || die || return 1         
-    popd    
+    popd    > /dev/null 2>&1 
 
     echo "[*] Get Java JDK"
     IPFS_get_mount_dmg QmPqvfiX1aUj9Nyo74qa47j9kPgEtKMbQLBaxTyT9F1fTV  java_jdk > ${ZLogFile} 2>&1 || die "could not get java dmg from ipfs" || return 1
