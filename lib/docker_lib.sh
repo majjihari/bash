@@ -164,7 +164,7 @@ ZDockerRemoveImage(){
 }
 
 ZDockerBuildUbuntu() {
-    if doneCheck "ZDocker_BuildUbuntu" ; then
+    if ZDoneCheck "ZDocker_BuildUbuntu" ; then
        return 0
     fi
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
@@ -210,7 +210,7 @@ ZDockerBuildUbuntu() {
 
     echo "[+] DOCKER UBUNTU OK"
 
-    doneSet "ZDocker_BuildUbuntu"
+    ZDoneSet "ZDocker_BuildUbuntu"
 }
 
 ZDockerRunSomethingUsage() {
@@ -226,7 +226,7 @@ EOF
 
 ZDockerRunUbuntu() {
     ZDockerBuildUbuntu || die "could not build ubuntu" || return 1
-    if doneCheck "ZDocker_RunUbuntu" ; then
+    if ZDoneCheck "ZDocker_RunUbuntu" ; then
        return 0
     fi
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
@@ -261,7 +261,7 @@ ZDockerRunUbuntu() {
 
     echo '[+] Ubuntu Docker Is Active (OK)'
 
-    doneSet "ZDocker_RunUbuntu"
+    ZDoneSet "ZDocker_RunUbuntu"
 }
 
 

@@ -4,7 +4,7 @@
 
 ZInstaller_python() {
     ZDockerRunUbuntu || die || return 1
-    if doneCheck "ZInstaller_python" ; then
+    if ZDoneCheck "ZInstaller_python" ; then
         echo "[+] install python & deps already done."
        return 0
     fi
@@ -26,7 +26,7 @@ ZInstaller_python() {
     container 'pip3 install tmuxp' || return 1
     container 'pip3 install gitpython' || return 1
 
-    doneSet "ZInstaller_python"
+    ZDoneSet "ZInstaller_python"
 
 }
 
@@ -34,7 +34,7 @@ ZInstaller_python() {
 ZInstaller_js9() {
     ZDockerRunUbuntu || die || return 1
 
-    if doneCheck "ZInstaller_js9" ; then
+    if ZDoneCheck "ZInstaller_js9" ; then
         echo "[+] install js9 already done."
        return 0
     fi
@@ -75,31 +75,31 @@ ZInstaller_js9() {
     container 'js9_init' || return 1
     echo "[+] js9 installed (OK)"
 
-    doneSet "ZInstaller_js9"
+    ZDoneSet "ZInstaller_js9"
 
 }
 
 ZInstaller_js9_full() {
 
     ZDockerRunUbuntu || die || return 1
-    if doneCheck "ZInstaller_js9_full" ; then
+    if ZDoneCheck "ZInstaller_js9_full" ; then
         echo "[+] install js9 libs full, already done."
        return 0
     fi
 
-    ZInstaller_js9
+    ZInstaller_js9 full
     echo "[+] install lib9 with dependencies (can take long time)"
     container 'source ~/.jsenv.sh && cd  /opt/code/github/jumpscale/lib9 && bash install.sh;' || return 1
 
     ZDockerCommit -b jumpscale/js9_full || die "docker commit" || return 1
 
-    doneSet "ZInstaller_js9_full"
+    ZDoneSet "ZInstaller_js9_full"
 
 }
 
 ZInstaller_docgenerator() {
     ZDockerRunUbuntu || die || return 1
-    if doneCheck "ZInstaller_docgenerator" ; then
+    if ZDoneCheck "ZInstaller_docgenerator" ; then
         echo "[+] install docgenerator already done."
        return 0
     fi
@@ -110,13 +110,13 @@ ZInstaller_docgenerator() {
 
     ZDockerCommit -b jumpscale/js9_docgenerator || die "docker commit" || return 1
 
-    # doneSet "ZInstaller_docgenerator"
+    # ZDoneSet "ZInstaller_docgenerator"
 
 }
 
 ZInstaller_ays9() {
     ZDockerRunUbuntu || die || return 1
-    if doneCheck "ZInstaller_ays9" ; then
+    if ZDoneCheck "ZInstaller_ays9" ; then
         echo "[+] install ays9 already done."
        return 0
     fi
@@ -131,12 +131,12 @@ ZInstaller_ays9() {
     ZNodePortSet $port
     container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/ays9" || return 1
     container "js9_init"
-    doneSet "ZInstaller_ays9"
+    ZDoneSet "ZInstaller_ays9"
 }
 
 ZInstaller_portal9() {
     ZDockerRunUbuntu || die || return 1
-    if doneCheck "ZInstaller_portal9" ; then
+    if ZDoneCheck "ZInstaller_portal9" ; then
         echo "[+] install portal9 already done."
        return 0
     fi
@@ -151,13 +151,13 @@ ZInstaller_portal9() {
     ZNodePortSet $port
     container "source ~/.jsenv.sh && cd  /opt/code/github/jumpscale/portal9 && bash install.sh;" || return 1
     container "js9_init"
-    doneSet "ZInstaller_portal9"
+    ZDoneSet "ZInstaller_portal9"
 }
 
 ZInstall_issuemanager() {
     ZDockerRunUbuntu || die || return 1
-    if doneCheck "ZInstall_issuemanager" ; then
-        echo "Issue Manager already installed"
+    if ZDoneCheck "ZInstall_issuemanager" ; then
+        echo "[+] Issue Manager already installed"
        return 0
     fi
     ZInstaller_js9_full
@@ -165,7 +165,7 @@ ZInstall_issuemanager() {
     echo "[+] Installing IssueManager"
     container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.install()"' || return 1
     container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.start()"' || return 1
-    doneSet "ZInstall_issuemanager"
+    ZDoneSet "ZInstall_issuemanager"
 }
 
 ZInstall_zerotier() {

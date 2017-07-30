@@ -178,7 +178,7 @@ ZCodePush() {
     fi
 
     if [ -z "$reponame" ]; then
-        echo "walk over directories: $ZCODEDIR/$type/$account"
+        echo "[+] walk over directories: $ZCODEDIR/$type/$account"
 
         ls -d $ZCODEDIR/$type/$account/*/ | {
             while read DIRPATH ; do

@@ -1,7 +1,7 @@
 
 
 # js9() {(
-#     if ! doneCheck "ZInstaller_js9_local" ; then
+#     if ! ZDoneCheck "ZInstaller_js9_local" ; then
 #         # echo 'js9' > $ZLogFile
 #         # echo "x$@"
 #         if [ "x$@" = "x" ] ; then
@@ -11,7 +11,7 @@
 #         fi    
 #         return 0
 #     fi
-#     if ! doneCheck "ZInstaller_js9" ; then
+#     if ! ZDoneCheck "ZInstaller_js9" ; then
 #         ZInstaller_js9
 #     fi
 #     echo 'js9' > $ZLogFile

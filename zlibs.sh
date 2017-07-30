@@ -28,19 +28,19 @@ die() {
 #     return 1
 # }
 
-doneSet() {
+ZDoneSet() {
     mkdir -p /tmp/zutils_done
     touch /tmp/zutils_done/$1
 }
 
-doneCheck() {
+ZDoneCheck() {
     if [ -f /tmp/zutils_done/$1 ]; then
        return 0
     fi
     return 1
 }
 
-doneReset() {
+ZDoneReset() {
     rm -rf /tmp/zutils_done
     mkdir -p /tmp/zutils_done
 }
@@ -76,7 +76,6 @@ pushd $ZUTILSDIR/bash > /dev/null 2>&1
 . lib/rsync.sh
 . lib/lede.sh
 . lib/js9.sh
-. lib/code_editor.sh
 . lib/installers_host.sh
 . lib/base_lib.sh
 
