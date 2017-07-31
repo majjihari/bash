@@ -31,19 +31,19 @@ ZInstaller_js9_host() {
     echo "[+] install js9"
     pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
     
-    echo "[+]   installing jumpscale lib9"
+    echo "[+] installing jumpscale lib9"
     pip3 install --no-deps -e $ZCODEDIR/github/jumpscale/lib9 || die "could not install lib9 of js9" || return 1
 
-    echo "[+]   installing jumpscale prefab9"
+    echo "[+] installing jumpscale prefab9"
     pip3 install -e $ZCODEDIR/github/jumpscale/prefab9 || return 1
 
-    echo "[+]   installing binaries files"
+    echo "[+] installing binaries files"
     find  $ZCODEDIR/github/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \; || return 1
 
     rm -rf /usr/local/bin/cmds || return 1
     rm -rf /usr/local/bin/cmds_guest || return 1
 
-    echo "[+]   initializing jumpscale"
+    echo "[+] initializing jumpscale"
     python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()' || return 1
     
     echo "[+] js9 installed (OK)"
@@ -75,35 +75,35 @@ ZInstaller_base_host(){
     fi    
 
     if [ "$(uname)" == "Darwin" ]; then      
-        echo "[+]   upgrade brew"  
+        echo "[+] upgrade brew"  
         brew upgrade  > ${ZLogFile} 2>&1 || die "could not upgrade all brew installed components" || return 1
 
-        echo "[+]   installing git, python, mc, tmux, curl, curl, ipfs"
+        echo "[+] installing git, python, mc, tmux, curl, curl, ipfs"
         brew install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs ipfs > ${ZLogFile} 2>&1 || die "could not install git, graphiz, sshfs, tmux or curl" || return 1
 
-        echo "[+]   start ipfs"
+        echo "[+] start ipfs"
         ipfs init > /dev/null 2>&1 
         brew services start ipfs  > ${ZLogFile} 2>&1 || die "could not autostart ipfs" || return 1
 
-        echo "[+]   installing node"
+        echo "[+] installing node"
         brew install node  > ${ZLogFile} 2>&1 || die "could not install nodejs" || return 1
 
-        echo "[+]   installing mermaid"
+        echo "[+] installing mermaid"
         sudo npm install -g mermaid  > ${ZLogFile} 2>&1 || die "could not install mermaid" || return 1
 
 
-        echo "[+]   installing cakebrew"
+        echo "[+] installing cakebrew"
         IPFS_get_install_dmg QmbCWrGrRL8aaZYMxSym4H9mhFbuUbFhfKT3uZnxPGvhoe cakebrew  || return 1
 
 
-        echo "[+]   installing pip system"
+        echo "[+] installing pip system"
         curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py || die "could not download pip" || return 1
         python3 /tmp/get-pip.py  > ${ZLogFile} 2>&1 || return 1
 
         echo "[+] upgrade pip"
         pip3 install --upgrade pip > ${ZLogFile} 2>&1 || die || return 1      
 
-        echo "[+]   installing some python pips (pylint, flake, ...)"
+        echo "[+] installing some python pips (pylint, flake, ...)"
         pip3 install --upgrade pylint autopep8 flake8 tmuxp gitpython > ${ZLogFile} 2>&1 || die || return 1
         
 
@@ -208,7 +208,7 @@ ZInstaller_editor_host() {
     code --install-extension PeterJausovec.vscode-docker > ${ZLogFile} 2>&1 || die || return 1
     code --install-extension waderyan.gitblame > ${ZLogFile} 2>&1 || die || return 1
     code --install-extension christian-kohler.npm-intellisense > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension DavidAnson.vscode-markdownlint > ${ZLogFile} 2>&1 || die || return 1
+    # code --install-extension DavidAnson.vscode-markdownlint > ${ZLogFile} 2>&1 || die || return 1
     code --install-extension felipecaputo.git-project-manager > ${ZLogFile} 2>&1 || die || return 1
     code --install-extension christian-kohler.path-intellisense > ${ZLogFile} 2>&1 || die || return 1
     code --install-extension wayou.vscode-todo-highlight > ${ZLogFile} 2>&1 || die || return 1
@@ -229,6 +229,12 @@ ZInstaller_editor_host() {
     code --install-extension lamartire.git-indicators > ${ZLogFile} 2>&1 || die || return 1
     code --install-extension eamodio.gitlens > ${ZLogFile} 2>&1 || die || return 1
     code --install-extension KnisterPeter.vscode-github > ${ZLogFile} 2>&1 || die || return 1
+    code --install-extension streetsidesoftware.code-spell-checker > ${ZLogFile} 2>&1 || die || return 1
+    code --install-extension yzhang.markdown-all-in-one > ${ZLogFile} 2>&1 || die || return 1
+    code --install-extension mdickin.markdown-shortcuts > ${ZLogFile} 2>&1 || die || return 1
+    
+    
+ 
 
     echo "[+] set system config params"
     echo kern.maxfiles=65536 | sudo tee -a /etc/sysctl.conf > ${ZLogFile} 2>&1 || die || return 1

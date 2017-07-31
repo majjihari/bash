@@ -101,12 +101,12 @@ ZDockerSSHAuthorize() {
     local ZDockerName="${1:-$ZDockerName}"
     echo "[+] authorizing local ssh keys on docker: $ZDockerName"
 
-    echo "[+]   start ssh"
+    echo "[+] start ssh"
     container 'rm -f /etc/service/sshd/down' || return 1
     container '/etc/my_init.d/00_regen_ssh_host_keys.sh' || return 1
     container 'sv start sshd' || return 1
 
-    echo "[+]   Waiting for ssh to allow connections"
+    echo "[+] Waiting for ssh to allow connections"
     while ! ssh-keyscan -p $RPORT localhost 2>&1 | grep -q "OpenSSH"; do
         sleep 0.2
     done
@@ -131,11 +131,11 @@ ZDockerEnableSSH(){
 
     local ZDockerName="${1:-$ZDockerName}"
 
-    echo "[+]   configuring services"
+    echo "[+] configuring services"
     container 'mkdir -p /var/run/sshd' || return 1
     container 'rm -f /etc/service/sshd/down' || return 1
     #
-    echo "[+]   regen ssh keys"
+    echo "[+] regen ssh keys"
     container 'rm -f /etc/service/sshd/down' || return 1
     container '/etc/my_init.d/00_regen_ssh_host_keys.sh' || return 1
     container 'echo "export LC_ALL=C.UTF-8" >> /root/.profile' || return 1
@@ -201,7 +201,7 @@ ZDockerBuildUbuntu() {
     container 'apt-get upgrade -y' || die "apt-get upgrade" || return 1
     container 'apt-get install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync -y' || die "basic linux deps" || return 1
 
-    echo "[+]   setting up default environment" || die || return 1
+    echo "[+] setting up default environment" || die || return 1
     container 'echo "" > /etc/motd' || die || return 1
     container 'touch /root/.iscontainer' || die || return 1
 
