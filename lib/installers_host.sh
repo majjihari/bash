@@ -239,5 +239,8 @@ ZInstaller_editor_host() {
     echo "[*] install iterm"
     IPFS_get_install_zip QmddU7hgKMMsZbCHKiNgQrHyGRRbahGNNeJuo2r89CZE1z iterm || return 1
 
+    echo "[*] install onlyoffice"
+    IPFS_get_install_dmg QmQTVVtY2c2GvYRXkgW1z2kgYHfaLRDBjc13qoAS7DimNp ONLYOFFICE
+
 }
 
