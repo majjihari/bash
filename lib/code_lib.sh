@@ -6,7 +6,7 @@ ZCodeConfig() {
     if [ -e /opt/code ]; then
         export ZCODEDIR=/opt/code
     else
-        export ZCODEDIR="${ZCODEDIR:-~/code}"
+        export ZCODEDIR=${ZCODEDIR:-~/code}
     fi
 
 }
@@ -175,18 +175,17 @@ ZCodePush() {
         ZCodePushUsage
         return
     fi
-
     if [ -z "$reponame" ]; then
         echo "[+] walk over directories: $ZCODEDIR/$type/$account"
-        Z_pushd $ZCODEDIR/$type/$account || return 1
-        ls -d . | {        
+        # Z_pushd $ZCODEDIR/$type/$account || return 1
+        ls -d $ZCODEDIR/$type/$account/*/ | {        
         # find . -mindepth 1 -maxdepth 1 -type d | {
             while read DIRPATH ; do
                 DIRNAME=$(basename $DIRPATH) || die "basename" || return 1
                 ZCodePush -a $account -r $DIRNAME -m $message || return 1
             done
         }
-        Z_popd || return 1
+        # Z_popd || return 1
         return
     fi
 
@@ -201,7 +200,7 @@ ZCodePush() {
         echo " [+] add"
         git add . -A  2>&1 > $ZLogFile #|| die "ZCodePush (add) $@" || return 1
         echo " [+] commit"
-        git commit -m '$message'  2>&1 > $ZLogFile || die "ZCodePush (commit) $@" || return 1
+        git commit -m '$message'  2>&1 > $ZLogFile #|| die "ZCodePush (commit) $@" || return 1
         echo " [+] pull"
         git pull  2>&1 > $ZLogFile || die "ZCodePush (pull) $@" || return 1
         echo " [+] push"
