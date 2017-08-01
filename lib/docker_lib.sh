@@ -5,7 +5,7 @@
 ZDockerInstallSSH(){
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     echo "[+] install docker on remote machine."
-    ZEXEC -c "wget -qO- https://get.docker.com/ | sh" > ${ZLogFile} 2>&1 || die "could install docker" || return 1
+    ZEXEC -c "wget -qO- https://get.docker.com/ | sh" || return 1
 
 }
 
@@ -20,7 +20,7 @@ ZDockerInstallLocal(){
 container() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
 
-    ZDockerConfig
+    ZDockerConfig || return 1
 
     if [ ! "$RNODE" = 'localhost' ]; then
         die "rnode needs to be localhost" || return 1
@@ -53,11 +53,11 @@ container() {
 
 ZDockerConfig() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-    ZNodeEnvDefaults
-    ZCodeConfig
+    ZNodeEnvDefaults || return 1
+    ZCodeConfig || return 1
     export CONTAINERDIR=~/docker
-    mkdir -p ${CONTAINERDIR}/private
-    mkdir -p ${CONTAINERDIR}/.cache/pip
+    Z_mkdir ${CONTAINERDIR}/private || return 1
+    Z_mkdir ${CONTAINERDIR}/.cache/pip || return 1
 }
 
 ZDockerCommitUsage() {
@@ -88,7 +88,7 @@ ZDockerCommit() {
     done
     if [ -z "$bname" ]; then ZDockerCommitUsage;return 0; fi
     echo "[+] Commit docker: $iname to $bname"
-    docker commit $iname $bname
+    docker commit $iname $bname || "cannot docker commit $iname $bname" || return 1
     export ZDockerImage=$bname
     if [ "$stop" == "1" ]; then
         ZDockerRemove $iname
@@ -111,9 +111,9 @@ ZDockerSSHAuthorize() {
         sleep 0.2
     done
 
-    sed -i.bak /localhost.:$RPORT/d ~/.ssh/known_hosts
-    rm -f ~/.ssh/known_hosts.bak
-    ssh-keyscan -p $RPORT localhost 2>&1 | grep -v '^#' >> ~/.ssh/known_hosts
+    sed -i.bak /localhost.:$RPORT/d ~/.ssh/known_hosts || die "sed" || return 1
+    rm -f ~/.ssh/known_hosts.bak 
+    ssh-keyscan -p $RPORT localhost 2>&1 | grep -v '^#' >> ~/.ssh/known_hosts || die || return 1
 
     # authorizing keys
     ssh-add -L | while read key; do
@@ -189,24 +189,24 @@ ZDockerBuildUbuntu() {
     export SSHNOAUTH=1
 
     if [[ ! -z "$addarg" ]]; then
-        ZDockerRun -b $bname -i $iname -p $port -a $addarg || die || return 1
+        ZDockerRun -b $bname -i $iname -p $port -a $addarg || return 1
     else
-        ZDockerRun -b $bname -i $iname -p $port || die || return 1
+        ZDockerRun -b $bname -i $iname -p $port || return 1
     fi
 
     unset SSHNOAUTH
 
     #basic deps
-    container 'apt-get update' || die "apt-get update"  || return 1
-    container 'apt-get upgrade -y' || die "apt-get upgrade" || return 1
-    container 'apt-get install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync -y' || die "basic linux deps" || return 1
+    container 'apt-get update'  || return 1
+    container 'apt-get upgrade -y' || return 1
+    container 'apt-get install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync -y' || return 1
 
-    echo "[+] setting up default environment" || die || return 1
-    container 'echo "" > /etc/motd' || die || return 1
-    container 'touch /root/.iscontainer' || die || return 1
+    echo "[+] setting up default environment" || return 1
+    container 'echo "" > /etc/motd' || return 1
+    container 'touch /root/.iscontainer' || return 1
 
-    ZDockerEnableSSH || die || return 1
-    ZDockerCommit -b jumpscale/ubuntu -s || die "docker commit" || return 1
+    ZDockerEnableSSH || return 1
+    ZDockerCommit -b jumpscale/ubuntu -s || return 1
 
     echo "[+] DOCKER UBUNTU OK"
 
@@ -250,13 +250,13 @@ ZDockerRunUbuntu() {
     existing="$(docker images ${bname} -q)"
 
     if [[ -z "$existing" ]]; then
-        ZDockerBuildUbuntu || die "could not build ubuntu docker" || return 1
+        ZDockerBuildUbuntu || return 1
     fi
 
     if [[ ! -z "$addarg" ]]; then
-        ZDockerRun -b $bname -i $iname -p $port -a $addarg || die "could not do zdockerun" || return 1
+        ZDockerRun -b $bname -i $iname -p $port -a $addarg || return 1
     else
-        ZDockerRun -b $bname -i $iname -p $port || die "could not do zdockerun" || return 1
+        ZDockerRun -b $bname -i $iname -p $port || return 1
     fi
 
     echo '[+] Ubuntu Docker Is Active (OK)'
@@ -337,7 +337,7 @@ ZDockerRun() {
 
     #only authorize when var not set
     if [[ -z "$SSHNOAUTH" ]]; then
-        ZDockerSSHAuthorize || die || return 1
+        ZDockerSSHAuthorize || return 1
     fi
 
 

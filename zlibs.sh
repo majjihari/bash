@@ -67,7 +67,6 @@ fi
 
 pushd $ZUTILSDIR/bash > /dev/null 2>&1
 . lib/code_lib.sh
-. lib/config_lib.sh
 . lib/docker_lib.sh
 . lib/restic_lib.sh
 . lib/ssh_lib.sh

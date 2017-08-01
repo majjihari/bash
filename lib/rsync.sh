@@ -49,17 +49,17 @@ RSyncTo() {(
 
     if [ "$rsource" != "" ] && [ "$rdest" != "" ] ; then
         if [ $all -eq 1 ] ; then
-            rsync -rav -e "ssh -p $RPORT" $rsource root@$RNODE:$rdest > $ZLogFile 2>&1 || die "could not rsync: $@" && return 1
+            rsync -rav -e "ssh -p $RPORT" '$rsource' root@$RNODE:$rdest > $ZLogFile 2>&1 || die "could not rsync: $@" || return 1
         else
             n=0
             until [ $n -ge 10 ]
             do
-                rsync --progress -rav --exclude='.git/' --exclude='*.pyc' -e "ssh -p $RPORT" '$rsource' root@$RNODE:$rdest && break  # substitute your command here
+                rsync --progress -rav --exclude='.git/' --exclude='*.pyc' -e "ssh -p $RPORT" '$rsource' root@$RNODE:$rdest && break  
                 n=$[$n+1]
             done
             return $?
         fi
-
+        die "could not rsync to node: $rdest of '$rsource'" || return 1
     else
         $@ || die "could not rsync to node, check syntax: $@"
     fi
@@ -73,5 +73,15 @@ RSync_ZTools() {(
     if [ "$RNODE" == "localhost" ] ; then
         return 0
     fi
-    RSyncTo  -s "$ZUTILSDIR/bash/" -d "/opt/code/github/jumpscale/bash/"
+    RSyncTo  -s "$ZUTILSDIR/bash/" -d "/opt/code/github/jumpscale/bash/" || return 1
 )}
+
+RSync() {
+    Z_mkdir $2 || return 1
+    rsync -rav  --delete-after  $1 $2  > ${ZLogFile} 2>&1 || die "rsync $1 $2" || return 1
+}
+
+RSync_move() {
+    RSync $1 $2 || return 1
+    rm -rf $1
+}

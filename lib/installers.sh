@@ -3,7 +3,7 @@
 
 
 ZInstaller_python() {
-    ZDockerRunUbuntu || die || return 1
+    ZDockerRunUbuntu || return 1
     if ZDoneCheck "ZInstaller_python" ; then
         echo "[+] install python & deps already done."
        return 0
@@ -32,14 +32,14 @@ ZInstaller_python() {
 
 
 ZInstaller_js9() {
-    ZDockerRunUbuntu || die || return 1
+    ZDockerRunUbuntu ||  return 1
 
     if ZDoneCheck "ZInstaller_js9" ; then
         echo "[+] install js9 already done."
        return 0
     fi
 
-    ZInstaller_code_jumpscale_host
+    ZInstaller_code_jumpscale_host || return 1
 
     echo "[+] install js9"
     container "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts" || return 1
@@ -81,7 +81,7 @@ ZInstaller_js9() {
 
 ZInstaller_js9_full() {
 
-    ZDockerRunUbuntu || die || return 1
+    ZDockerRunUbuntu || return 1
     if ZDoneCheck "ZInstaller_js9_full" ; then
         echo "[+] install js9 libs full, already done."
        return 0
@@ -98,7 +98,7 @@ ZInstaller_js9_full() {
 }
 
 ZInstaller_docgenerator() {
-    ZDockerRunUbuntu || die || return 1
+    ZDockerRunUbuntu || return 1
     if ZDoneCheck "ZInstaller_docgenerator" ; then
         echo "[+] install docgenerator already done."
        return 0
@@ -115,7 +115,7 @@ ZInstaller_docgenerator() {
 }
 
 ZInstaller_ays9() {
-    ZDockerRunUbuntu || die || return 1
+    ZDockerRunUbuntu || return 1
     if ZDoneCheck "ZInstaller_ays9" ; then
         echo "[+] install ays9 already done."
        return 0
@@ -125,17 +125,17 @@ ZInstaller_ays9() {
     echo "[+] install AYS9"
     local branch="${1:-master}"
     echo "[+] loading or updating AYS source code (branch:$branch)"
-    ZCodeGetJS -r ays9 -b $branch > ${ZLogFile} 2>&1 || die || return 1
+    ZCodeGetJS -r ays9 -b $branch || return 1
     echo "[+] installing jumpscale ays9"
-    ZNodeSet $addarg
-    ZNodePortSet $port
+    ZNodeSet $addarg  || return 1
+    ZNodePortSet $port || return 1
     container "source ~/.jsenv.sh && pip3 install -e /opt/code/github/jumpscale/ays9" || return 1
-    container "js9_init"
+    container "js9_init" || return 1
     ZDoneSet "ZInstaller_ays9"
 }
 
 ZInstaller_portal9() {
-    ZDockerRunUbuntu || die || return 1
+    ZDockerRunUbuntu || return 1
     if ZDoneCheck "ZInstaller_portal9" ; then
         echo "[+] install portal9 already done."
        return 0
@@ -145,23 +145,23 @@ ZInstaller_portal9() {
     echo "[+] install Portal9"
     local branch="${1:-master}"
     echo "[+] loading or updating Portal source code (branch:$branch)"
-    ZCodeGetJS -r portal9 -b $branch > ${ZLogFile} 2>&1 || die || return 1
+    ZCodeGetJS -r portal9 -b $branch  || return 1
     echo "[+] installing jumpscale portal9"
-    ZNodeSet $addarg
-    ZNodePortSet $port
+    ZNodeSet $addarg || return 1
+    ZNodePortSet $port || return 1
     container "source ~/.jsenv.sh && cd  /opt/code/github/jumpscale/portal9 && bash install.sh;" || return 1
-    container "js9_init"
+    container "js9_init" || return 1
     ZDoneSet "ZInstaller_portal9"
 }
 
 ZInstall_issuemanager() {
-    ZDockerRunUbuntu || die || return 1
+    ZDockerRunUbuntu  || return 1
     if ZDoneCheck "ZInstall_issuemanager" ; then
         echo "[+] Issue Manager already installed"
        return 0
     fi
-    ZInstaller_js9_full
-    ZInstaller_portal9
+    ZInstaller_js9_full || return 1
+    ZInstaller_portal9 || return 1
     echo "[+] Installing IssueManager"
     container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.install()"' || return 1
     container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.start()"' || return 1
@@ -169,8 +169,8 @@ ZInstall_issuemanager() {
 }
 
 ZInstall_zerotier() {
-    ZDockerRunUbuntu || die || return 1
-    container "apt-get install gpgv2 -y"
-    container "curl -s 'https://pgp.mit.edu/pks/lookup?op=get&search=0x1657198823E52A61' | gpg --import"
-    container "curl -s https://install.zerotier.com/ | bash || true"
+    ZDockerRunUbuntu ||  return 1
+    container "apt-get install gpgv2 -y" || return 1
+    container "curl -s 'https://pgp.mit.edu/pks/lookup?op=get&search=0x1657198823E52A61' | gpg --import" || return 1
+    container "curl -s https://install.zerotier.com/ | bash || true" || return 1
 }

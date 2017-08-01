@@ -79,7 +79,7 @@ ZEXEC() {(
     local interactive=0
     local localcmd=0
     local iimport=""
-    ZNodeEnvDefaults
+    ZNodeEnvDefaults || return 1
     while getopts "c:hzitl" opt; do
         case $opt in
            c )  cmd=$OPTARG ;;
@@ -95,11 +95,11 @@ ZEXEC() {(
 
     if [ $localcmd -eq 0 ] ; then
         if [ $interactive -eq 1 ] ; then
-            ssh -qAt root@$RNODE -p $RPORT "TERM=xterm;$iimport$cmd" || return 1
+            ssh -qAt root@$RNODE -p $RPORT "TERM=xterm;$iimport$cmd" > $ZLogFile 2>&1 || die "ssh $@" || return 1
             # ssh -A root@$RNODE -p $RPORT "$cmd" && return 1
         else
             # ssh -A root@$RNODE -p $RPORT "$cmd" > $ZLogFile 2>&1 || die "could not ssh command: $cmd" && return 1
-            ssh -qAt root@$RNODE -p $RPORT "TERM=xterm;$iimport$cmd"  > $ZLogFile 2>&1 || return 1
+            ssh -qAt root@$RNODE -p $RPORT "TERM=xterm;$iimport$cmd"  > $ZLogFile 2>&1 || die "ssh $@" || return 1
             # cat $ZLogFile
         fi
     else
