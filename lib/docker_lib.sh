@@ -36,21 +36,6 @@ container() {
 
 }
 
-# # die and get docker log back to host
-# # $1 = docker container name, $2 = ZLogFile name, $3 = optional message
-# dockerdie() {
-#     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
-#     if [ "$3" != "" ]; then
-#         echo "[-] something went wrong in docker $1: $3"
-#         exit 1
-#     fi
-
-#     echo "[-] something went wrong in docker: $1"
-#     docker exec -t $iname cat "$2"
-
-#     exit 1
-# }
-
 ZDockerConfig() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     ZNodeEnvDefaults || return 1

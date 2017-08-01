@@ -71,6 +71,13 @@ ZInstaller_base_host(){
         echo "[+] installing git, python, mc, tmux, curl, curl, ipfs"
         Z_brew_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs ipfs || return 1
 
+        echo "[+] set system config params"
+        echo kern.maxfiles=65536 | sudo tee -a /etc/sysctl.conf > ${ZLogFile} 2>&1 || die || return 1
+        echo kern.maxfilesperproc=65536 | sudo tee -a /etc/sysctl.conf > ${ZLogFile} 2>&1 || die || return 1
+        sudo sysctl -w kern.maxfiles=65536 > ${ZLogFile} 2>&1 || die || return 1
+        sudo sysctl -w kern.maxfilesperproc=65536 > ${ZLogFile} 2>&1 || die || return 1
+        ulimit -n 65536 > ${ZLogFile} 2>&1 || die || return 1        
+
         echo "[+] start ipfs"
         ipfs init > /dev/null 2>&1 
         brew services start ipfs  > ${ZLogFile} 2>&1 || die "could not autostart ipfs" || return 1
@@ -82,8 +89,7 @@ ZInstaller_base_host(){
         sudo npm install -g mermaid  > ${ZLogFile} 2>&1 || die "could not install mermaid" || return 1
 
         echo "[+] installing cakebrew"
-        IPFS_get_install_dmg QmbCWrGrRL8aaZYMxSym4H9mhFbuUbFhfKT3uZnxPGvhoe cakebrew  || return 1
-
+        IPFS_get_install_dmg QmbCWrGrRL8aaZYMxSym4H9mhFbuUbFhfKT3uZnxPGvhoe Cakebrew  || return 1
 
         echo "[+] installing pip system"
         curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py || die "could not download pip" || return 1
@@ -136,7 +142,10 @@ ZInstaller_base_host(){
 # }
 
 
-
+ZCodePluginInstall(){
+    Z_mkdir ~/.code_data_dir || return 1
+    code --install-extension $1 --user-data-dir=~/.code_data_dir > ${ZLogFile} 2>&1 || die  "could not code install extension $1" || return 1
+}
 
 ZInstaller_editor_host() {
 
@@ -153,18 +162,9 @@ ZInstaller_editor_host() {
     # elif [  -d "/Applications/Visual Studio Code.app" ]; then
     #     echo "[+] no need to install visual studio code, already exists"
     # else
-    echo "[+] download visual studio code"
-    IPFS_get Qmd4d6Keiis5Br1XZckrA1SHWfhgBag3MDwbjxCM7wbuba vscode.zip   > ${ZLogFile} 2>&1 || die || return 1
-    Z_pushd /tmp/zdownloads || return 1
-    echo "[+] install visual studio code"
-    rm -rf Visual Studio Code.app
-    unzip -o vscode.zip  > ${ZLogFile} 2>&1 || die "could not unzip" || return 1
-    RSync_move 'Visual Studio Code.app/' '/Applications/Visual Studio Code.app/' || return 1
-    Z_popd || return 1
-    # fi
 
-    #DOES NOT WORK & should not work!
-    # IPFS_get_dir QmXgtrmZneNvhUYMMDqkrJEJEqMNVkWSH9GZkvRMq8rXXj vscode_extensions  ~/.vscode/extensions || die || return 1
+    echo "[+] download visual studio code"
+    IPFS_get_install_zip Qmd4d6Keiis5Br1XZckrA1SHWfhgBag3MDwbjxCM7wbuba 'Visual Studio Code' || return 1
 
     rm -f /usr/local/bin/code
     ln -s '/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code' /usr/local/bin/code || die "could not link vscode" || return 1
@@ -172,63 +172,53 @@ ZInstaller_editor_host() {
     echo "[+] Code Editor Installed"
 
     echo "[+] Installing Code Editor Extensions"
-    code --install-extension donjayamanne.python > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension tushortz.python-extended-snippets > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension himanoa.python-autopep8 > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension magicstack.magicpython > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension abronan.capnproto-syntax > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension eriklynd.json-tools > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension MariusAlchimavicius.json-to-ts > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension tuxtina.json2yaml > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension adamvoss.yaml > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension kosz78.nim > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension lukehoban.go > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension shd101wyy.markdown-preview-enhanced > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension josa.markdown-table-formatter > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension telesoho.vscode-markdown-paste-image > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension darkriszty.markdown-table-prettify > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension johnpapa.angular2 > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension rbbit.typescript-hero > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension esbenp.prettier-vscode > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension msjsdiag.debugger-for-chrome > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension donjayamanne.githistory > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension PeterJausovec.vscode-docker > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension waderyan.gitblame > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension christian-kohler.npm-intellisense > ${ZLogFile} 2>&1 || die || return 1
-    # code --install-extension DavidAnson.vscode-markdownlint > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension felipecaputo.git-project-manager > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension christian-kohler.path-intellisense > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension wayou.vscode-todo-highlight > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension bungcip.better-toml > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension webfreak.debug > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension ms-vscode.node-debug2 > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension rogalmic.bash-debug > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension actboy168.lua-debug > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension keyring.lua > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension gccfeli.vscode-lua > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension trixnz.vscode-lua > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension vitorsalgado.vscode-redis > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension blzjns.vscode-raml > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension donjayamanne.git-extension-pack > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension alefragnani.project-manager > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension Shan.code-settings-sync > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension liximomo.sftp > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension lamartire.git-indicators > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension eamodio.gitlens > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension KnisterPeter.vscode-github > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension streetsidesoftware.code-spell-checker > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension yzhang.markdown-all-in-one > ${ZLogFile} 2>&1 || die || return 1
-    code --install-extension mdickin.markdown-shortcuts > ${ZLogFile} 2>&1 || die || return 1
-    
-    
- 
-
-    echo "[+] set system config params"
-    echo kern.maxfiles=65536 | sudo tee -a /etc/sysctl.conf > ${ZLogFile} 2>&1 || die || return 1
-    echo kern.maxfilesperproc=65536 | sudo tee -a /etc/sysctl.conf > ${ZLogFile} 2>&1 || die || return 1
-    sudo sysctl -w kern.maxfiles=65536 > ${ZLogFile} 2>&1 || die || return 1
-    sudo sysctl -w kern.maxfilesperproc=65536 > ${ZLogFile} 2>&1 || die || return 1
-    ulimit -n 65536 > ${ZLogFile} 2>&1 || die || return 1
+    ZCodePluginInstall donjayamanne.python || return 1
+    ZCodePluginInstall tushortz.python-extended-snippets  || return 1
+    ZCodePluginInstall himanoa.python-autopep8 || return 1
+    ZCodePluginInstall magicstack.magicpython || return 1
+    ZCodePluginInstall abronan.capnproto-syntax || return 1
+    ZCodePluginInstall eriklynd.json-tools || return 1
+    ZCodePluginInstall MariusAlchimavicius.json-to-ts || return 1
+    ZCodePluginInstall tuxtina.json2yaml || return 1
+    ZCodePluginInstall adamvoss.yaml || return 1
+    ZCodePluginInstall kosz78.nim || return 1
+    ZCodePluginInstall lukehoban.go || return 1
+    ZCodePluginInstall shd101wyy.markdown-preview-enhanced || return 1
+    ZCodePluginInstall josa.markdown-table-formatter || return 1
+    ZCodePluginInstall telesoho.vscode-markdown-paste-image || return 1
+    ZCodePluginInstall darkriszty.markdown-table-prettify || return 1
+    ZCodePluginInstall johnpapa.angular2 || return 1
+    ZCodePluginInstall rbbit.typescript-hero || return 1
+    ZCodePluginInstall esbenp.prettier-vscode || return 1
+    ZCodePluginInstall msjsdiag.debugger-for-chrome || return 1
+    ZCodePluginInstall donjayamanne.githistory || return 1
+    ZCodePluginInstall PeterJausovec.vscode-docker || return 1
+    ZCodePluginInstall waderyan.gitblame || return 1
+    ZCodePluginInstall christian-kohler.npm-intellisense || return 1
+    # ZCodePluginInstall DavidAnson.vscode-markdownlint || return 1
+    ZCodePluginInstall felipecaputo.git-project-manager || return 1
+    ZCodePluginInstall christian-kohler.path-intellisense || return 1
+    ZCodePluginInstall wayou.vscode-todo-highlight || return 1
+    ZCodePluginInstall bungcip.better-toml || return 1
+    ZCodePluginInstall webfreak.debug || return 1
+    ZCodePluginInstall ms-vscode.node-debug2 || return 1
+    ZCodePluginInstall rogalmic.bash-debug || return 1
+    ZCodePluginInstall actboy168.lua-debug || return 1
+    ZCodePluginInstall keyring.lua || return 1
+    ZCodePluginInstall gccfeli.vscode-lua || return 1
+    ZCodePluginInstall trixnz.vscode-lua || return 1
+    ZCodePluginInstall vitorsalgado.vscode-redis || return 1
+    ZCodePluginInstall blzjns.vscode-raml || return 1
+    ZCodePluginInstall donjayamanne.git-extension-pack || return 1
+    ZCodePluginInstall alefragnani.project-manager || return 1
+    ZCodePluginInstall Shan.code-settings-sync || return 1
+    ZCodePluginInstall liximomo.sftp || return 1
+    ZCodePluginInstall lamartire.git-indicators || return 1
+    ZCodePluginInstall eamodio.gitlens || return 1
+    ZCodePluginInstall KnisterPeter.vscode-github || return 1
+    ZCodePluginInstall streetsidesoftware.code-spell-checker || return 1
+    ZCodePluginInstall yzhang.markdown-all-in-one || return 1
+    ZCodePluginInstall mdickin.markdown-shortcuts || return 1
 
     echo "[+] download sourcetree"
     IPFS_get_install_zip QmYtc2oowycqNXeedNbu9jLyDba4okTmnK5b1MoMuaNj6C sourcetree || return 1   

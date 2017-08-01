@@ -20,6 +20,12 @@ curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM 
 
 this will source all methods, codecompletion will now work.
 
+# to install all editor tools for local machine
+
+```bash
+ZInstaller_editor_host
+```
+
 # to get docker on ubuntu
 
 ```bash

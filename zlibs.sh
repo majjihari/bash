@@ -11,9 +11,16 @@ fi
 export ZLogFile='/tmp/zutils.log'
 
 die() {
-    echo "[-] something went wrong: $1"
+    set +x
     rm -f /tmp/sdwfa #to remove temp passwd for restic, just to be sure
+    echo 
+    echo "**** ERRORLOG ****"
     cat $ZLogFile
+    echo
+    echo "[-] something went wrong: $1"
+    echo
+    echo
+    set -x
     return 1
 }
 
@@ -65,6 +72,8 @@ if [ ! -d "${ZUTILSDIR}/bash" ]; then
     return 1
 fi
 
+set +e
+
 pushd $ZUTILSDIR/bash > /dev/null 2>&1
 . lib/code_lib.sh
 . lib/docker_lib.sh
@@ -77,5 +86,7 @@ pushd $ZUTILSDIR/bash > /dev/null 2>&1
 . lib/js9.sh
 . lib/installers_host.sh
 . lib/base_lib.sh
+
+set +e
 
 popd > /dev/null 2>&1
