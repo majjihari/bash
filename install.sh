@@ -14,6 +14,7 @@ if [ -e /opt/code/github/jumpscale ]; then
 fi
 
 if [ "$(uname)" == "Darwin" ]; then     
+    brew install curl
     export ZUTILSDIR=${ZUTILSDIR:-~/code/github/jumpscale}
 else
     export ZUTILSDIR=${ZUTILSDIR:-/opt/code/github/jumpscale}
