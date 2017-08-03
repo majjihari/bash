@@ -14,6 +14,8 @@ if [ -e /opt/code/github/jumpscale ]; then
 fi
 
 if [ "$(uname)" == "Darwin" ]; then     
+    xcode-select --install
+    /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     brew install curl
     export ZUTILSDIR=${ZUTILSDIR:-~/code/github/jumpscale}
 else
