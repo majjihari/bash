@@ -1,9 +1,19 @@
 # bash
 bash utilities
 
-# to install
+# to install OSX
+
+make sure brew is installed:
+- https://brew.sh/
 
 ```
+brew install curl
+curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
+```
+# to install Linux
+
+```
+#if linux
 apt-get install curl -y
 curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
 ```
