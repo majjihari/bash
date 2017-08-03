@@ -19,6 +19,8 @@ if [ "$(uname)" == "Darwin" ]; then
     brew install curl
     export ZUTILSDIR=${ZUTILSDIR:-~/code/github/jumpscale}
 else
+    #TODO: *2 need to support windows as well
+    apt-get install curl -y
     export ZUTILSDIR=${ZUTILSDIR:-/opt/code/github/jumpscale}
 fi
 
