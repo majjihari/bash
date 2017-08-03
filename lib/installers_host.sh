@@ -82,25 +82,12 @@ ZInstaller_base_host(){
         ipfs init > /dev/null 2>&1 
         brew services start ipfs  > ${ZLogFile} 2>&1 || die "could not autostart ipfs" || return 1
 
-        echo "[+] installing node"
-        Z_brew_install node || return 1
-
-        echo "[+] installing mermaid"
-        sudo npm install -g mermaid  > ${ZLogFile} 2>&1 || die "could not install mermaid" || return 1
-
-        echo "[+] installing cakebrew"
-        IPFS_get_install_dmg QmbCWrGrRL8aaZYMxSym4H9mhFbuUbFhfKT3uZnxPGvhoe Cakebrew  || return 1
-
         echo "[+] installing pip system"
         curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py || die "could not download pip" || return 1
         python3 /tmp/get-pip.py  > ${ZLogFile} 2>&1 || die "pip install" || return 1
 
         echo "[+] upgrade pip"
-        pip3 install --upgrade pip > ${ZLogFile} 2>&1 || die || return 1      
-
-        echo "[+] installing some python pips (pylint, flake, ...)"
-        pip3 install --upgrade pylint autopep8 flake8 tmuxp gitpython > ${ZLogFile} 2>&1 || die || return 1
-        
+        pip3 install --upgrade pip > ${ZLogFile} 2>&1 || die || return 1              
 
     elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         dist=''
@@ -162,6 +149,19 @@ ZInstaller_editor_host() {
     # elif [  -d "/Applications/Visual Studio Code.app" ]; then
     #     echo "[+] no need to install visual studio code, already exists"
     # else
+    
+    echo "[+] installing some python pips (pylint, flake, ...)"
+    pip3 install --upgrade pylint autopep8 flake8 tmuxp gitpython > ${ZLogFile} 2>&1 || die || return 1
+    
+    
+    echo "[+] installing node"
+    Z_brew_install node || return 1
+
+    echo "[+] installing mermaid"
+    sudo npm install -g mermaid  > ${ZLogFile} 2>&1 || die "could not install mermaid" || return 1
+
+    echo "[+] installing cakebrew"
+    IPFS_get_install_dmg QmbCWrGrRL8aaZYMxSym4H9mhFbuUbFhfKT3uZnxPGvhoe Cakebrew  || return 1    
 
     echo "[+] download visual studio code"
     IPFS_get_install_zip Qmd4d6Keiis5Br1XZckrA1SHWfhgBag3MDwbjxCM7wbuba 'Visual Studio Code' || return 1
