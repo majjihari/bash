@@ -3,13 +3,17 @@ bash utilities
 
 # to install OSX
 
-make sure brew is installed:
-- https://brew.sh/
-
 ```
-brew install curl
 curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
 ```
+
+what happens
+- xcode-tools will be installed & then brew (https://brew.sh/)
+- python & jumpscale will be installed all in basic version
+- ipfs will be installed to make sure all files can be retrieved locally from peer2peer network
+- ssh-key will be looked for & created if it doesn't exist yet
+
+
 # to install Linux
 
 ```
