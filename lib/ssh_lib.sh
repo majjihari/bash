@@ -168,3 +168,80 @@ ZNodeEnv() {
     echo "node          :  $RNODE"
     echo "sshport       :  $RPORT"
 }
+
+
+ZKeysLoad() {
+    
+    pgrep ssh-agent > /dev/null 2>&1
+    if [ $? -ne 0 ]; then
+        #start ssh-agent if not running yet
+        echo "[+] did not find ssh-agent will start"
+        eval `ssh-agent`
+    fi
+
+    if [ -z "$SSH_AUTH_SOCK" ] ; then
+        #start ssh-agent if not running yet
+        echo "[-] could not find SSH_AUTH_SOCK, please load ssh-agent"
+        return 1
+    fi
+
+    local KEYPATH="$HOME/.ssh/$SSHKEYNAME"
+
+    ssh-add -l > /dev/null 2>&1 
+    if [ $? -ne 0 ]; then
+        echo "[?] ssh-key not loaded or ssh-agent not loaded."
+
+        export SSHKEYNAME=`echo $SSHKEYNAME | xargs`        
+        local KEYPATH="$HOME/.ssh/$SSHKEYNAME"
+
+        while [ ! -f $KEYPATH ] ; do
+            echo "[+] Found following keys on filesystem (select one if relevant):"
+            cd ~/.ssh;find . -type f -print -o -name . -o -prune| grep -v .pub|grep -v known_hosts| sed s/"\/"//| sed s/\./" - "/
+            echo
+            echo "    . Please give name of ssh key to load, if empty (press enter) will ask to generate"
+            echo
+            if [[ "$SHELL" == *"zsh" ]];then
+                read 'SSHKEYNAME?SSHKEYNAME: '
+            else
+                read -p 'SSHKEYNAME: ' SSHKEYNAME
+            fi
+
+            local KEYPATH="$HOME/.ssh/$SSHKEYNAME"
+
+            if [ $SSHKEYNAME = "" ]; then
+                echo "    . Key name not given, should we generate a sshkey name? press 'y'"
+                read -n 1 answer
+                if [ "$answer" = "y" ]; then
+                    read -p '    . Please specify name of key you want to generate: ' SSHKEYNAME
+                    read -p '    . Please specify email addr: ' EMAILADDR
+                    if [ -z $SSHKEYNAME ] || [ -z $EMAILADDR ] ; then
+                        echo "[-] Please specify sshkeyname & emailaddr, cannot continue."
+                        return 1
+                    fi
+                    ssh-keygen -t rsa -b 4096 -f KEYPATH -C "$EMAILADDR"
+                fi
+            else
+                if [ ! -f KEYPATH ]; then
+                    echo "[-] did not find the sshkeyname: $KEYPATH, please try again"
+                fi
+            fi
+
+            #remove old
+            sed -i.bak '/export SSHKEYNAME/d' $HOMEDIR/.bash_profile
+            sed -i.bak '/.*zlibs.sh/d' $HOMEDIR/.bash_profile
+
+            echo "export SSHKEYNAME=$SSHKEYNAME" >> $HOMEDIR/.bash_profile
+            #re-insert source of zlibs.sh            
+            echo ". ${ZUTILSDIR}/bash/zlibs.sh" >> $HOMEDIR/.bash_profile
+            
+
+        done
+    fi
+
+    if ! ssh-add -l | grep -q $SSHKEYNAME; then
+        echo "[+] Will now try to load sshkey: $HOMEDIR/.ssh/$SSHKEYNAME"
+        ssh-add $HOMEDIR/.ssh/$SSHKEYNAME
+        echo "ssh key $SSHKEYNAME loaded"
+    fi
+
+}

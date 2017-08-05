@@ -89,4 +89,15 @@ pushd $ZUTILSDIR/bash > /dev/null 2>&1
 
 set +e
 
+if [ -z "$HOMEDIR" ] ; then
+    export HOMEDIR="$HOME"
+fi
+
+if [ -z "$HOMEDIR" ] || [ ! -d "$HOMEDIR" ]; then
+    echo "[-] ERROR, could not find homedir $HOMEDIR"
+    return 1
+fi
+
+ZKeysLoad
+
 popd > /dev/null 2>&1
