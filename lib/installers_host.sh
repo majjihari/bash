@@ -80,6 +80,7 @@ ZInstaller_base_host(){
 
         echo "[+] start ipfs"
         ipfs init > /dev/null 2>&1 
+        ipfs config --json API.HTTPHeaders '{"Access-Control-Allow-Origin": ["*"]}'
         brew services start ipfs  > ${ZLogFile} 2>&1 || die "could not autostart ipfs" || return 1
 
         echo "[+] installing pip system"
