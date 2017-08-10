@@ -194,7 +194,7 @@ ZInstaller_editor_host() {
       IPFS_get_install_deb QmYWKEEzyDTjrA4LTDVUukLkzd51JdvYtLyFqwAyYfdeJm vscode || return 1
 
       echo "[+] installing Java JDK"
-      Z_apt_install default-jdk
+      Z_apt_install default-jdk || apt-get -fy install && Z_apt_install default-jdk
 
       echo "[+] installing node"
       IPFS_get_install_deb QmSWXLZZVbHtBsUH4ja6x1UXd5EzVv5gTKYMz9RzDyPJR6 node || return 1
