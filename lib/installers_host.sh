@@ -30,7 +30,7 @@ ZInstaller_js9_host() {
 
     echo "[+] install js9"
     pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
-    
+
     echo "[+] installing jumpscale lib9"
     pip3 install --no-deps -e $ZCODEDIR/github/jumpscale/lib9 || die "could not install lib9 of js9" || return 1
 
@@ -40,12 +40,12 @@ ZInstaller_js9_host() {
     echo "[+] installing binaries files"
     find  $ZCODEDIR/github/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \; || die || return 1
 
-    rm -rf /usr/local/bin/cmds 
+    rm -rf /usr/local/bin/cmds
     rm -rf /usr/local/bin/cmds_guest
 
     echo "[+] initializing jumpscale"
     python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()' || die "js9 generate" || return 1
-    
+
     echo "[+] js9 installed (OK)"
 
 }
@@ -62,13 +62,13 @@ ZInstaller_base_host(){
     if ZDoneCheck "ZInstaller_base_host" ; then
         echo "[+] ZInstaller_base_host already installed"
        return 0
-    fi    
+    fi
 
-    if [ "$(uname)" == "Darwin" ]; then      
-        echo "[+] upgrade brew"  
+    if [ "$(uname)" == "Darwin" ]; then
+        echo "[+] upgrade brew"
         brew upgrade  > ${ZLogFile} 2>&1 || die "could not upgrade all brew installed components" || return 1
 
-        echo "[+] installing git, python, mc, tmux, curl, curl, ipfs"
+        echo "[+] installing git, python, mc, tmux, curl, ipfs"
         Z_brew_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs ipfs || return 1
 
         echo "[+] set system config params"
@@ -76,58 +76,72 @@ ZInstaller_base_host(){
         echo kern.maxfilesperproc=65536 | sudo tee -a /etc/sysctl.conf > ${ZLogFile} 2>&1 || die || return 1
         sudo sysctl -w kern.maxfiles=65536 > ${ZLogFile} 2>&1 || die || return 1
         sudo sysctl -w kern.maxfilesperproc=65536 > ${ZLogFile} 2>&1 || die || return 1
-        ulimit -n 65536 > ${ZLogFile} 2>&1 || die || return 1        
+        ulimit -n 65536 > ${ZLogFile} 2>&1 || die || return 1
 
         echo "[+] start ipfs"
-        ipfs init > /dev/null 2>&1 
+        ipfs init > /dev/null 2>&1
         ipfs config --json API.HTTPHeaders '{"Access-Control-Allow-Origin": ["*"]}'
         brew services start ipfs  > ${ZLogFile} 2>&1 || die "could not autostart ipfs" || return 1
-
-        echo "[+] installing pip system"
-        curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py || die "could not download pip" || return 1
-        python3 /tmp/get-pip.py  > ${ZLogFile} 2>&1 || die "pip install" || return 1
-
-        echo "[+] upgrade pip"
-        pip3 install --upgrade pip > ${ZLogFile} 2>&1 || die || return 1              
 
     elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         dist=''
         dist=`grep DISTRIB_ID /etc/*-release | awk -F '=' '{print $2}'`
         if [ "$dist" == "Ubuntu" ]; then
-            echo "found ubuntu"
-            die "not implemented yet"
+            echo "[+] updating packages"
+            apt-get update > ${ZLogFile} 2>&1 || die "could not update packages" || return 1
+
+            echo "[+] installing git, python, mc, tmux, curl"
+            Z_apt_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs || return 1
+
+            echo "[+] installing and starting ipfs"
+            ZInstaller_ipfs_host
         fi
     else
         die "platform not supported"
-    fi  
+    fi
+
+    echo "[+] installing pip system"
+    curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py || die "could not download pip" || return 1
+    python3 /tmp/get-pip.py  > ${ZLogFile} 2>&1 || die "pip install" || return 1
+
+    echo "[+] upgrade pip"
+    pip3 install --upgrade pip > ${ZLogFile} 2>&1 || die || return 1
 
     ZDoneSet "ZInstaller_base_host"
 }
 
 
 
-# ZInstaller_ipfs_host() {
-#     # container "cd tmp; mkdir -p ipfs; cd ipfs; wget --inet4-only https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_linux-amd64.tar.gz"
-#     if [ "$(uname)" == "Darwin" ]; then
-#         rm -rf /tmp/ipfs
-#         mkdir -p /tmp/ipfs
-#         Z_pushd /tmp/ipfs
-#         wget --inet4-only https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_darwin-amd64.tar.gz
+ZInstaller_ipfs_host() {
+    # container "cd tmp; mkdir -p ipfs; cd ipfs; wget --inet4-only https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_linux-amd64.tar.gz"
+    if [ "$(uname)" == "Darwin" ]; then
+        rm -rf /tmp/ipfs
+        mkdir -p /tmp/ipfs
+        Z_pushd /tmp/ipfs
+        wget --inet4-only https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_darwin-amd64.tar.gz
 
-#         Z_popd || return 1
+        Z_popd || return 1
 
-#     elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-#         dist=''
-#         dist=`grep DISTRIB_ID /etc/*-release | awk -F '=' '{print $2}'`
-#         if [ "$dist" == "Ubuntu" ]; then
-#             echo "found ubuntu"
-#             die "not implemented yet"
-#         fi
-#     else
-#         die "platform not supported"
-#     fi    
+    elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+        dist=''
+        dist=`grep DISTRIB_ID /etc/*-release | awk -F '=' '{print $2}'`
+        if [ "$dist" == "Ubuntu" ]; then
+            rm -rf /tmp/ipfs
+            mkdir -p /tmp/ipfs
+            Z_pushd /tmp/ipfs
+            wget https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_linux-amd64.tar.gz --output-document go-ipfs.tar.gz
+            tar xvfz go-ipfs.tar.gz
+            mv go-ipfs/ipfs /usr/local/bin/ipfs
+            ipfs daemon --init &
 
-# }
+            Z_popd || return 1
+
+        fi
+    else
+        die "platform not supported"
+    fi
+
+}
 
 
 ZCodePluginInstall(){
@@ -139,8 +153,60 @@ ZInstaller_editor_host() {
 
     ZInstaller_base_host || return 1
 
-    if [ ! "$(uname)" == "Darwin" ]; then    
-        die "only osx supported for now"
+    if [ "$(uname)" == "Darwin" ]; then
+      echo "[+] download visual studio code"
+      IPFS_get_install_zip Qmd4d6Keiis5Br1XZckrA1SHWfhgBag3MDwbjxCM7wbuba 'Visual Studio Code' || return 1
+      rm -f /usr/local/bin/code
+      ln -s '/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code' /usr/local/bin/code || die "could not link vscode" || return 1
+      echo "[+] Code Editor Installed"
+
+      echo "[+] download sourcetree"
+      IPFS_get_install_zip QmYtc2oowycqNXeedNbu9jLyDba4okTmnK5b1MoMuaNj6C sourcetree || return 1
+
+      echo "[+] installing node"
+      Z_brew_install node || return 1
+
+      echo "[+] installing cakebrew"
+      IPFS_get_install_dmg QmbCWrGrRL8aaZYMxSym4H9mhFbuUbFhfKT3uZnxPGvhoe Cakebrew  || return 1
+
+      echo "[*] Get Java JDK"
+      IPFS_get_mount_dmg QmPqvfiX1aUj9Nyo74qa47j9kPgEtKMbQLBaxTyT9F1fTV  java_jdk || return 1
+      echo "[*] Install Java JDK"
+      sudo installer -pkg '/Volumes/Java 8 Update 144/Java 8 Update 144.app/Contents/Resources/JavaAppletPlugin.pkg' -target / > ${ZLogFile} 2>&1 || die "could not install java" || return 1
+      hdiutil detach '/Volumes/Java 8 Update 144'  > ${ZLogFile} 2>&1 || die || return 1
+
+      echo "[*] Install Trolcommander"
+      brew cask install trolcommander  > ${ZLogFile} 2>&1 || die || return 1
+
+      echo "[*] Install Calibre"
+      IPFS_get_install_dmg QmRV3g2Sy49MdKKEDE2m5WUY7CzFPRC7VsGX8jtwfofEEb calibre || return 1
+      sudo ln -s /Applications/calibre.app/Contents/MacOS/ebook-convert /usr/local/bin  > ${ZLogFile} 2>&1
+
+      echo "[*] install iterm"
+      IPFS_get_install_zip QmddU7hgKMMsZbCHKiNgQrHyGRRbahGNNeJuo2r89CZE1z iterm || return 1
+
+      echo "[*] install onlyoffice"
+      IPFS_get_install_dmg QmQTVVtY2c2GvYRXkgW1z2kgYHfaLRDBjc13qoAS7DimNp ONLYOFFICE
+
+    elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+
+      echo "[+] installing visual studio code ubuntu"
+      IPFS_get_install_deb QmYWKEEzyDTjrA4LTDVUukLkzd51JdvYtLyFqwAyYfdeJm vscode || return 1
+
+      echo "[+] installing Java JDK"
+      Z_apt_install default-jdk
+
+      echo "[+] installing node"
+      IPFS_get_install_deb QmSWXLZZVbHtBsUH4ja6x1UXd5EzVv5gTKYMz9RzDyPJR6 node || return 1
+
+      echo "[+] installing Trolcommander"
+      IPFS_get_install_deb QmfEjsjogYER9nijJHWNFSi4uuuuVVE2WszzNwYXXz89Y9 trolcommander || return 1
+
+      echo "[+] installing Calibre"
+      Z_mkdir_pushd /tmp/calibre-installer-cache || return 1
+      IPFS_get QmYj4fqrmyxsaVMDnZ5ZqjgNeVDmA6MZm7z75EYwjXdMp1 calibre-3.6.0-x86_64.txz
+      Z_popd || return 1
+      wget -nv -O- https://download.calibre-ebook.com/linux-installer.py | python3 -c "import sys; main=lambda:sys.stderr.write('Download failed\n'); exec(sys.stdin.read()); main()"
     fi
 
     #TODO: *1 need to make this multi platform
@@ -150,27 +216,15 @@ ZInstaller_editor_host() {
     # elif [  -d "/Applications/Visual Studio Code.app" ]; then
     #     echo "[+] no need to install visual studio code, already exists"
     # else
-    
+
     echo "[+] installing some python pips (pylint, flake, ...)"
     pip3 install --upgrade pylint autopep8 flake8 tmuxp gitpython > ${ZLogFile} 2>&1 || die || return 1
-    
-    
-    echo "[+] installing node"
-    Z_brew_install node || return 1
+
+
 
     echo "[+] installing mermaid"
     sudo npm install -g mermaid  > ${ZLogFile} 2>&1 || die "could not install mermaid" || return 1
 
-    echo "[+] installing cakebrew"
-    IPFS_get_install_dmg QmbCWrGrRL8aaZYMxSym4H9mhFbuUbFhfKT3uZnxPGvhoe Cakebrew  || return 1    
-
-    echo "[+] download visual studio code"
-    IPFS_get_install_zip Qmd4d6Keiis5Br1XZckrA1SHWfhgBag3MDwbjxCM7wbuba 'Visual Studio Code' || return 1
-
-    rm -f /usr/local/bin/code
-    ln -s '/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code' /usr/local/bin/code || die "could not link vscode" || return 1
-
-    echo "[+] Code Editor Installed"
 
     echo "[+] Installing Code Editor Extensions"
     ZCodePluginInstall donjayamanne.python || return 1
@@ -221,27 +275,5 @@ ZInstaller_editor_host() {
     ZCodePluginInstall yzhang.markdown-all-in-one || return 1
     ZCodePluginInstall mdickin.markdown-shortcuts || return 1
 
-    echo "[+] download sourcetree"
-    IPFS_get_install_zip QmYtc2oowycqNXeedNbu9jLyDba4okTmnK5b1MoMuaNj6C sourcetree || return 1   
-
-    echo "[*] Get Java JDK"
-    IPFS_get_mount_dmg QmPqvfiX1aUj9Nyo74qa47j9kPgEtKMbQLBaxTyT9F1fTV  java_jdk || return 1
-    echo "[*] Install Java JDK"
-    sudo installer -pkg '/Volumes/Java 8 Update 144/Java 8 Update 144.app/Contents/Resources/JavaAppletPlugin.pkg' -target / > ${ZLogFile} 2>&1 || die "could not install java" || return 1
-    hdiutil detach '/Volumes/Java 8 Update 144'  > ${ZLogFile} 2>&1 || die || return 1
-
-    echo "[*] Install Trolcommander"
-    brew cask install trolcommander  > ${ZLogFile} 2>&1 || die || return 1
-
-    echo "[*] Install Calibre"
-    IPFS_get_install_dmg QmRV3g2Sy49MdKKEDE2m5WUY7CzFPRC7VsGX8jtwfofEEb calibre || return 1
-    sudo ln -s /Applications/calibre.app/Contents/MacOS/ebook-convert /usr/local/bin  > ${ZLogFile} 2>&1
-
-    echo "[*] install iterm"
-    IPFS_get_install_zip QmddU7hgKMMsZbCHKiNgQrHyGRRbahGNNeJuo2r89CZE1z iterm || return 1
-
-    echo "[*] install onlyoffice"
-    IPFS_get_install_dmg QmQTVVtY2c2GvYRXkgW1z2kgYHfaLRDBjc13qoAS7DimNp ONLYOFFICE
 
 }
-
