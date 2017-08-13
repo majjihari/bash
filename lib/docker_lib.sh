@@ -38,10 +38,11 @@ container() {
 
 ZDockerConfig() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    if [ -e ~/.iscontainer ] ; then echo "Docker tools cannot be run in container" ; return 0 ; fi
     ZNodeEnvDefaults || return 1
     ZCodeConfig || return 1
+    export ZDockerName=${ZDockerName:-"build"}
     export CONTAINERDIR=~/docker
-    Z_mkdir ${CONTAINERDIR}/private || return 1
     Z_mkdir ${CONTAINERDIR}/.cache/pip || return 1
 }
 
@@ -81,52 +82,57 @@ ZDockerCommit() {
 }
 
 ZDockerSSHAuthorize() {
+    if [ -e ~/.iscontainer ] ; then echo "Docker tools cannot be run in container" ; return 0 ; fi
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
 
     local ZDockerName="${1:-$ZDockerName}"
+    local RPORT="${RPORT:-2222}"
     echo "[+] authorizing local ssh keys on docker: $ZDockerName"
 
-    echo "[+] start ssh"
-    container 'rm -f /etc/service/sshd/down' || return 1
-    container '/etc/my_init.d/00_regen_ssh_host_keys.sh' || return 1
-    container 'sv start sshd' || return 1
+    echo "[+]   start ssh"
+    docker exec -t "${ZDockerName}" rm -f /etc/service/sshd/down
+    docker exec -t "${ZDockerName}" /etc/my_init.d/00_regen_ssh_host_keys.sh
+    docker exec -t "${ZDockerName}" sv start sshd > ${ZLogFile} 2>&1
 
-    echo "[+] Waiting for ssh to allow connections"
+    echo "[+]   Waiting for ssh to allow connections"
     while ! ssh-keyscan -p $RPORT localhost 2>&1 | grep -q "OpenSSH"; do
         sleep 0.2
     done
 
-    sed -i.bak /localhost.:$RPORT/d ~/.ssh/known_hosts || die "sed" || return 1
-    rm -f ~/.ssh/known_hosts.bak 
-    ssh-keyscan -p $RPORT localhost 2>&1 | grep -v '^#' >> ~/.ssh/known_hosts || die || return 1
+    sed -i.bak /localhost.:$RPORT/d ~/.ssh/known_hosts
+    rm -f ~/.ssh/known_hosts.bak
+    ssh-keyscan -p $RPORT localhost 2>&1 | grep -v '^#' >> ~/.ssh/known_hosts
 
     # authorizing keys
     ssh-add -L | while read key; do
-        container '/bin/sh -c "echo $key >> /root/.ssh/authorized_keys"' || return 1
+        docker exec -t "${ZDockerName}" /bin/sh -c "echo $key >> /root/.ssh/authorized_keys"
     done
 
-    ZNodeSet 'localhost' || return 1
-    ZNodePortSet $RPORT || return 1
+    ZNodeSet 'localhost'
+    ZNodePortSet $RPORT
 
     echo "[+] SSH authorized"
 }
 
 ZDockerEnableSSH(){
+    
+    export ZDockerName="${1:-build}"
+
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
 
     local ZDockerName="${1:-$ZDockerName}"
 
-    echo "[+] configuring services"
-    container 'mkdir -p /var/run/sshd' || return 1
-    container 'rm -f /etc/service/sshd/down' || return 1
+    echo "[+]   configuring services"
+    docker exec -t $ZDockerName mkdir -p /var/run/sshd > ${ZLogFile} 2>&1 || die || return 1
+    docker exec -t $ZDockerName  rm -f /etc/service/sshd/down
+    docker exec -t $ZDockerName  /etc/my_init.d/00_regen_ssh_host_keys.sh
     #
-    echo "[+] regen ssh keys"
-    container 'rm -f /etc/service/sshd/down' || return 1
-    container '/etc/my_init.d/00_regen_ssh_host_keys.sh' || return 1
-    container 'echo "export LC_ALL=C.UTF-8" >> /root/.profile' || return 1
-    container 'echo "export LANG=C.UTF-8" >> /root/.profile' || return 1
 
     ZDockerSSHAuthorize $ZDockerName || return 1
+
+    container 'echo export "LC_ALL=C.UTF-8" >> /root/.profile' || return 1
+    container 'echo "export LANG=C.UTF-8" >> /root/.profile' || return 1
+
     echo "[+] SSH enabled OK"
 
 }
@@ -149,15 +155,28 @@ ZDockerRemoveImage(){
 }
 
 ZDockerBuildUbuntu() {
-    if ZDoneCheck "ZDocker_BuildUbuntu" ; then
-       return 0
+
+    local OPTIND
+    local force=0
+
+    while getopts "f" opt; do
+        case $opt in
+           f )  force=1 ;;
+        esac
+    done
+
+    if [ $force -eq 0 ] && ZDoneCheck "ZDocker_BuildUbuntu" && ZDockerImageExist "jumpscale/ubuntu" ; then
+        echo "[+] no need to build ubuntu, already done"
+        return 0
     fi
+    ZDoneReset #reset all done state, need to restart from scratch
+
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
 
     ZDockerConfig || die || return
     local OPTIND
     local bname='phusion/baseimage'
-    local iname='build'
+    local iname='build' 
     local port=2222
     local addarg=''
     while getopts "b:i:p:a:h" opt; do
@@ -182,15 +201,19 @@ ZDockerBuildUbuntu() {
     unset SSHNOAUTH
 
     #basic deps
-    container 'apt-get update'  || return 1
-    container 'apt-get upgrade -y' || return 1
-    container 'apt-get install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync -y' || return 1
+    echo "[+] apt update"
+    docker exec -t $ZDockerName apt-get update > ${ZLogFile} 2>&1 || die "apt-get update"  || return 1
+    echo "[+] apt upgrade"
+    docker exec -t $ZDockerName apt-get upgrade -y > ${ZLogFile} 2>&1 || die "apt-get upgrade" || return 1
+    echo "[+] setting up basic tools (aptget install)"
+    docker exec -t $ZDockerName apt-get install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync -y > ${ZLogFile} 2>&1 || die "basic linux deps" || return 1
 
-    echo "[+] setting up default environment" || return 1
+    ZDockerEnableSSH || return 1
+
+    echo "[+] setting up default environment"
     container 'echo "" > /etc/motd' || return 1
     container 'touch /root/.iscontainer' || return 1
 
-    ZDockerEnableSSH || return 1
     ZDockerCommit -b jumpscale/ubuntu -s || return 1
 
     echo "[+] DOCKER UBUNTU OK"
@@ -210,10 +233,10 @@ EOF
 }
 
 ZDockerRunUbuntu() {
-    ZDockerBuildUbuntu || die "could not build ubuntu" || return 1
-    if ZDoneCheck "ZDocker_RunUbuntu" ; then
-       return 0
-    fi
+    if [ -e ~/.iscontainer ] ; then echo "Docker tools cannot be run in container" ; return 0 ; fi
+    
+    ZDockerBuildUbuntu || die "could not build ubuntu." || return 1
+
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
 
     local OPTIND
@@ -235,7 +258,7 @@ ZDockerRunUbuntu() {
     existing="$(docker images ${bname} -q)"
 
     if [[ -z "$existing" ]]; then
-        ZDockerBuildUbuntu || return 1
+        ZDockerBuildUbuntu -f || return 1
     fi
 
     if [[ ! -z "$addarg" ]]; then
@@ -246,7 +269,6 @@ ZDockerRunUbuntu() {
 
     echo '[+] Ubuntu Docker Is Active (OK)'
 
-    ZDoneSet "ZDocker_RunUbuntu"
 }
 
 
@@ -265,9 +287,11 @@ EOF
 ZDockerRun() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
 
+    mkdir -p ${HOME}/.cfg/
+
     ZDockerConfig || return 1
     local OPTIND
-    local bname='jumpscale/js9_base'
+    local bname='jumpscale/js9'
     local iname='build'
     local port=2222
     local addarg=''
@@ -294,9 +318,9 @@ ZDockerRun() {
     fi
 
     mounted_volumes="\
-        -v ${CONTAINERDIR}/:/root/host \
+        -v ${CONTAINERDIR}/:/host \
         -v ${ZCODEDIR}/:/opt/code \
-        -v ${CONTAINERDIR}/private/:/optvar/private \
+        -v ${HOME}/.cfg/:/hostcfg \
         -v ${CONTAINERDIR}/.cache/pip/:/root/.cache/pip/ \
     "
 
@@ -327,4 +351,66 @@ ZDockerRun() {
 
 
 
+}
+
+ZDockerActiveUsage() {
+   cat <<EOF
+Usage: ZDockerRun [-b $bname] [-c command] [-i $iname] [-p port]
+   -b bname: name of base image, defaults to jumpscale/jsbase (which is ubuntu with some basic tools)
+   -c cmd: name of command to execute when bname not found as image on docker
+   -i iname: name of docker which will be spawned, default to 'build'
+   -p port: ssh port for docker defaults to 2222
+   -a addarg: is additional arguments for docker e.g. -p 10700-10800:10700-10800
+   -h: help
+
+will see if that docker is alreay up & if yes will use that docker if not will create it
+
+EOF
+}
+
+ZDockerActive()
+{
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+
+    ZDockerConfig || return 1
+
+    local OPTIND
+    local bname='jumpscale/js9'
+    local iname='build'
+    local port=2222
+    local addarg=''
+    while getopts "b:c:i:p:a:h" opt; do
+        case $opt in
+           b )  bname=$OPTARG ;;
+           c )  cmd=$OPTARG ;;
+           i )  iname=$OPTARG ;;
+           p )  port=$OPTARG ;;
+           a )  addarg=$OPTARG ;;
+           h )  ZDockerActiveUsage ; return 0 ;;
+           \? )  ZDockerActiveUsage ; return 1 ;;
+        esac
+    done
+
+    if ! ZDockerImageExist "$bname " ; then
+        #means docker image does not exist yet
+        echo "[+] need to build the docker with command: $cmd"
+        `$cmd`
+    fi
+    container "ls /"
+    if [ !  $? -eq 0 ]; then
+        #so is not up & running
+        ZDockerRun -b "$bname" -i "$iname" -p $port  || return 1
+    fi
+
+    echo "[+] docker from image $bname is active, access it through 'ZSSH'"
+
+}
+
+ZDockerImageExist() {
+    docker images | grep "$1 " > /dev/null
+    if [ !  $? -eq 0 ]; then
+        #means docker image does not exist yet
+        return 1
+    fi
+    return 0
 }

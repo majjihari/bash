@@ -50,12 +50,9 @@ ZInstaller_js9_host() {
 
 }
 
-
-
 ZInstall_docker_host() {
     ZDockerInstallLocal
 }
-
 
 ZInstaller_base_host(){
 
@@ -101,6 +98,8 @@ ZInstaller_base_host(){
         die "platform not supported"
     fi  
 
+    
+
     ZDoneSet "ZInstaller_base_host"
 }
 
@@ -133,6 +132,17 @@ ZInstaller_base_host(){
 ZCodePluginInstall(){
     Z_mkdir ~/.code_data_dir || return 1
     code --install-extension $1 --user-data-dir=~/.code_data_dir > ${ZLogFile} 2>&1 || die  "could not code install extension $1" || return 1
+}
+
+ZInstaller_docgenerator_host() {
+
+    # ZInstaller_base_host || return 1
+
+    if [ ! "$(uname)" == "Darwin" ]; then    
+        die "only osx supported for now"
+    fi
+
+    js9 'j.tools.docgenerator.install()'
 }
 
 ZInstaller_editor_host() {
@@ -220,6 +230,10 @@ ZInstaller_editor_host() {
     ZCodePluginInstall streetsidesoftware.code-spell-checker || return 1
     ZCodePluginInstall yzhang.markdown-all-in-one || return 1
     ZCodePluginInstall mdickin.markdown-shortcuts || return 1
+
+    echo "[+] install jumpscale python snippets"
+    ZCodeGetJS -r python-snippets -b master || return 1
+    RSync ~/code/github/jumpscale/python-snippets/ ~/.vscode/extensions/python-snippets-js9 || return 1
 
     echo "[+] download sourcetree"
     IPFS_get_install_zip QmYtc2oowycqNXeedNbu9jLyDba4okTmnK5b1MoMuaNj6C sourcetree || return 1   
