@@ -79,7 +79,7 @@ RSync_ZTools() {(
 RSync() {
     Z_exists_dir "$1" || return 1
     Z_mkdir "$2" || return 1
-    rsync -rav  --delete-after  "$1" "$2"  > ${ZLogFile} 2>&1 || die "rsync $1 $2" || return 1
+    rsync -rav  --exclude='.git/' --exclude='*.pyc' --delete-after  "$1" "$2"  > ${ZLogFile} 2>&1 || die "rsync $1 $2" || return 1
 }
 
 RSync_move() {

@@ -40,6 +40,10 @@ ZDoneSet() {
     touch /tmp/zutils_done/$1
 }
 
+ZDoneUnset() {
+    rm -f /tmp/zutils_done/$1*
+}
+
 ZDoneCheck() {
     if [ -f /tmp/zutils_done/$1 ]; then
        return 0
@@ -98,6 +102,18 @@ if [ -z "$HOMEDIR" ] || [ ! -d "$HOMEDIR" ]; then
     return 1
 fi
 
-ZKeysLoad
+if [ -d "/opt/bin" ]; then
+    export PATH=/opt/bin:$PATH
+fi
+
+if [ -d "/opt/go/bin" ]; then
+    export PATH=/opt/go/bin:$PATH
+fi
+
+# if [ ! -e ~/.iscontainer ]; then
+#     ZKeysLoad
+# fi
+
+echo "[+] zlibs enabled."
 
 popd > /dev/null 2>&1

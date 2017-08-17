@@ -50,12 +50,9 @@ ZInstaller_js9_host() {
 
 }
 
-
-
 ZInstall_docker_host() {
     ZDockerInstallLocal
 }
-
 
 ZInstaller_base_host(){
 
@@ -107,6 +104,8 @@ ZInstaller_base_host(){
     echo "[+] upgrade pip"
     pip3 install --upgrade pip > ${ZLogFile} 2>&1 || die || return 1
 
+    
+
     ZDoneSet "ZInstaller_base_host"
 }
 
@@ -149,6 +148,17 @@ ZCodePluginInstall(){
     code --install-extension $1 --user-data-dir=~/.code_data_dir > ${ZLogFile} 2>&1 || die  "could not code install extension $1" || return 1
 }
 
+ZInstaller_docgenerator_host() {
+
+    # ZInstaller_base_host || return 1
+
+    if [ ! "$(uname)" == "Darwin" ]; then    
+        die "only osx supported for now"
+    fi
+
+    js9 'j.tools.docgenerator.install()'
+}
+
 ZInstaller_editor_host() {
 
     ZInstaller_base_host || return 1
@@ -159,6 +169,10 @@ ZInstaller_editor_host() {
       rm -f /usr/local/bin/code
       ln -s '/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code' /usr/local/bin/code || die "could not link vscode" || return 1
       echo "[+] Code Editor Installed"
+      
+      echo "[+] install jumpscale python snippets"
+      ZCodeGetJS -r python-snippets -b master || return 1
+      RSync ~/code/github/jumpscale/python-snippets/ ~/.vscode/extensions/python-snippets-js9 || return 1
 
       echo "[+] download sourcetree"
       IPFS_get_install_zip QmYtc2oowycqNXeedNbu9jLyDba4okTmnK5b1MoMuaNj6C sourcetree || return 1
@@ -274,6 +288,5 @@ ZInstaller_editor_host() {
     ZCodePluginInstall streetsidesoftware.code-spell-checker || return 1
     ZCodePluginInstall yzhang.markdown-all-in-one || return 1
     ZCodePluginInstall mdickin.markdown-shortcuts || return 1
-
 
 }

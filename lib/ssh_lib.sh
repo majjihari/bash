@@ -188,7 +188,7 @@ ZKeysLoad() {
     local KEYPATH="$HOME/.ssh/$SSHKEYNAME"
 
     ssh-add -l > /dev/null 2>&1 
-    if [ $? -ne 0 ]; then
+    if  [ $? -ne 0 ] || [ "$SSHKEYNAME" = "" ] || [ -z "$SSHKEYNAME" ] ; then
         echo "[?] ssh-key not loaded or ssh-agent not loaded."
 
         export SSHKEYNAME=`echo $SSHKEYNAME | xargs`        
