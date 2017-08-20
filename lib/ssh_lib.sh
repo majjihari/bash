@@ -121,9 +121,9 @@ ZSSH() {(
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     ZNodeEnvDefaults
     if [ -n "$1" ]; then
-        ssh -At root@localhost -p 2222 "TERM=xterm;. /opt/code/github/jumpscale/bash/zlibs.sh;$@;bash -i"  || return 1
+        ssh -At root@$RNODE -p $RPORT "TERM=xterm;. /opt/code/github/jumpscale/bash/zlibs.sh;$@;bash -i"  || return 1
     else
-        ssh -At root@localhost -p 2222 "TERM=xterm;. /opt/code/github/jumpscale/bash/zlibs.sh;bash -i"  || return 1
+        ssh -At root@$RNODE -p $RPORT "TERM=xterm;. /opt/code/github/jumpscale/bash/zlibs.sh;bash -i"  || return 1
     fi
 
 )}
@@ -160,8 +160,14 @@ ZNodeSet() {
 
 ZNodeEnvDefaults() {
     echo '' > $ZLogFile
-    export RPORT=${RPORT:-2222}
     export RNODE=${RNODE:-'localhost'}
+    if [ "$RNODE" == "localhost" ] ; then
+        export RPORT=${RPORT:-2222}
+    else
+        export RPORT=${RPORT:-22}
+    fi    
+    
+
 }
 
 ZNodeEnv() {

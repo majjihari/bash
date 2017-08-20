@@ -230,3 +230,14 @@ ZInstall_zerotier() {
     container "curl -s 'https://pgp.mit.edu/pks/lookup?op=get&search=0x1657198823E52A61' | gpg --import" || return 1
     container "curl -s https://install.zerotier.com/ | bash || true" || return 1
 }
+
+ZInstall_openvpn() {
+    echo "[+] install openvpn docker"
+    mkdir -p /etc/ovpn
+    docker run --name=openvpn-as -p 8081:80 -v /etc/ovpn:/config -e INTERFACE=eth0 --net=host --privileged linuxserver/openvpn-as 
+# -e PGID=<gid> -e PUID=<uid> \
+# -e TZ=<timezone> \
+# -e INTERFACE=<interface> \
+# --net=host --privileged \
+# linuxserver/openvpn-as
+}

@@ -126,3 +126,10 @@ Z_exists_file(){
         die "file $1 not found" || return 1
     fi
 }
+
+Z_transcode_mp4(){
+    local pathbase="${1%.*}"
+    local extension="${1##*.}"
+    ffmpeg -i "$1" -movflags faststart -acodec copy -vcodec copy "$pathbase_.$extension"  || die || return 1
+    rm -f $1
+}

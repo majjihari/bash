@@ -15,11 +15,22 @@ EOF
 
 RSyncTo() {(
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    local RPORT=${RPORT:-22}
     local OPTIND
     local all=0
     local rsource=""
     local rdest=""
     # local rexclude=--exclude='.git/' --exclude='*.pyc'
+
+    while getopts "s:d:ah" opt; do
+        case $opt in
+           s  ) rsource=$OPTARG ;;
+           d  ) rdest=$OPTARG ;;
+           a  ) all=1 ;;
+           h  ) RSyncToUsage ; return 0 ;;
+           \? )  RSyncToUsage ; return 0 ;;
+        esac
+    done
 
     if [ "$RNODE" == "localhost" ] ; then
         die "RSyncTo only meant to be used when RNODE is not a local docker" || return 1
@@ -31,17 +42,7 @@ RSyncTo() {(
 
     if [ "$RPORT" == "" ] ; then
         die "RPORT not specified" || return 1
-    fi
-
-    while getopts "s:d:ah" opt; do
-        case $opt in
-           s  ) rsource=$OPTARG ;;
-           d  ) rdest=$OPTARG ;;
-           a  ) all=1 ;;
-           h  ) RSyncToUsage ; return 0 ;;
-           \? )  RSyncToUsage ; return 0 ;;
-        esac
-    done
+    fi    
 
     if [ "$rdest" != "" ] ; then
         ZEXEC -c "mkdir -p $rdest" > $ZLogFile 2>&1 || die "could not mkdir $rdest as part of rsync: $@" || return 1
