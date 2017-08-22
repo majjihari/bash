@@ -7,8 +7,10 @@ ZInstaller_code_jumpscale_host() {
        return 0
     fi
     echo "ZBRANCH is ${ZBRANCH}"
-    local branch="${1:ZBRANCH}"
-    if [ -z $branch] ; then
+    local branch=$1
+    if [ -n ${ZBRANCH} ] ; then
+        branch=${ZBRANCH}
+    if [ -z $branch ] ; then
         branch=master
     fi
     echo "[+] loading or updating jumpscale source code (branch:$branch)"
