@@ -6,7 +6,7 @@ ZInstaller_code_jumpscale_host() {
         echo "[+] update jumpscale code was already done."
        return 0
     fi
-    
+
     local branch=$1
     if [ -n ${ZBRANCH} ] ; then
         branch=${ZBRANCH}
@@ -39,6 +39,7 @@ ZInstaller_js9_host() {
     pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
 
     echo "[+] installing jumpscale lib9"
+    pip3 install -U cryptography
     pip3 install --no-deps -e $ZCODEDIR/github/jumpscale/lib9 || die "could not install lib9 of js9" || return 1
 
     echo "[+] installing jumpscale prefab9"
@@ -95,7 +96,7 @@ ZInstaller_base_host(){
             apt-get update > ${ZLogFile} 2>&1 || die "could not update packages" || return 1
 
             echo "[+] installing git, python, mc, tmux, curl"
-            Z_apt_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs build-essential python3-dev || return 1
+            Z_apt_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs build-essential python3-dev pkg-config libvirt-dev || return 1
 
             echo "[+] installing and starting ipfs"
             ZInstaller_ipfs_host

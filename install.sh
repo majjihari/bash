@@ -37,6 +37,7 @@ if [ "$(uname)" == "Darwin" ]; then
     export ZUTILSDIR=${ZUTILSDIR:-~/code/github/jumpscale}
 else
     #TODO: *2 need to support windows as well
+    apt-get update
     apt-get install curl -y
     apt-get install git wget -y
     export ZUTILSDIR=${ZUTILSDIR:-/opt/code/github/jumpscale}
