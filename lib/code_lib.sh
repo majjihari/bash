@@ -41,7 +41,7 @@ ZCodeGetJS() {
     local OPTIND
     local account='jumpscale'
     local reponame=''
-    local branch='master'
+    local branch=${ZBRANCH:master}
     while getopts "r:b:h" opt; do
         case $opt in
            r )  reponame=$OPTARG ;;
@@ -62,6 +62,9 @@ ZCodeGetJS() {
 
     local giturl="git@github.com:Jumpscale/$reponame.git"
     local githttpsurl="https://github.com/jumpscale/$reponame.git"
+
+    # check if specificed branch or $ZBRANCH exist, if not then fallback to master
+    ZBranchExists ${githttpsurl} ${branch} || branch=master
 
     ZCodeGet -r $reponame -a $account -u $giturl -b $branch  || ZCodeGet -r $reponame -a $account -u $githttpsurl -b $branch || return 1
 
@@ -93,7 +96,7 @@ ZCodeGet() {
     local account='varia'
     local reponame=''
     local giturl=''
-    local branch=$ZBRANCH
+    local branch=master
     while getopts "a:r:u:b:t:h" opt; do
         case $opt in
            a )  account=$OPTARG ;;
@@ -116,9 +119,6 @@ ZCodeGet() {
     fi
 
     echo "[+] get code $giturl ($branch)"
-
-    # check if specificed branch or $ZBRANCH exist, if not then fallback to master
-    ZBranchExists ${giturl} ${branch} || branch=master
 
     Z_mkdir_pushd $ZCODEDIR/$type/$account || return 1
 
