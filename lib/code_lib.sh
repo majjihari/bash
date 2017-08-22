@@ -93,7 +93,7 @@ ZCodeGet() {
     local account='varia'
     local reponame=''
     local giturl=''
-    local branch='master'
+    local branch=$ZBRANCH
     while getopts "a:r:u:b:t:h" opt; do
         case $opt in
            a )  account=$OPTARG ;;
@@ -116,6 +116,9 @@ ZCodeGet() {
     fi
 
     echo "[+] get code $giturl ($branch)"
+
+    # check if specificed branch or $ZBRANCH exist, if not then fallback to master
+    ZBranchExists ${giturl} ${branch} || branch=master
 
     Z_mkdir_pushd $ZCODEDIR/$type/$account || return 1
 
@@ -249,16 +252,17 @@ ZCodePushJS(){
     fi
 }
 
-# ZBranchExists() {
-#     local giturl="$1"
-#     local branch=${2:-${ZBRANCH}}
-#
-#     echo "[+] Checking if ${repository}/${ZBRANCH} exists"
-#     httpcode=$(curl -o /dev/null -I -s --write-out '%{http_code}\n' $giturl/tree/${branch})
-#
-#     if [ "$httpcode" = "200" ]; then
-#         return 0
-#     else
-#         return 1
-#     fi
-# }
+ZBranchExists() {
+    local giturl="$1"
+    local branch=${2:-${ZBRANCH}}
+
+    echo "[+] Checking if ${giturl}/tree/${branch} exists"
+    httpcode=$(curl -o /dev/null -I -s --write-out '%{http_code}\n' $giturl/tree/${branch})
+
+    if [ "$httpcode" = "200" ]; then
+        return 0
+    else
+      echo "[+] Error: ${giturl}/tree/${branch} dooes not exist"
+        return 1
+    fi
+}

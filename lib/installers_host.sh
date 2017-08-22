@@ -88,7 +88,7 @@ ZInstaller_base_host(){
             apt-get update > ${ZLogFile} 2>&1 || die "could not update packages" || return 1
 
             echo "[+] installing git, python, mc, tmux, curl"
-            Z_apt_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs || return 1
+            Z_apt_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs x86_64-linux-gnu-gcc python3-dev || return 1
 
             echo "[+] installing and starting ipfs"
             ZInstaller_ipfs_host
@@ -104,7 +104,7 @@ ZInstaller_base_host(){
     echo "[+] upgrade pip"
     pip3 install --upgrade pip > ${ZLogFile} 2>&1 || die || return 1
 
-    
+
 
     ZDoneSet "ZInstaller_base_host"
 }
@@ -152,7 +152,7 @@ ZInstaller_docgenerator_host() {
 
     # ZInstaller_base_host || return 1
 
-    if [ ! "$(uname)" == "Darwin" ]; then    
+    if [ ! "$(uname)" == "Darwin" ]; then
         die "only osx supported for now"
     fi
 
@@ -169,7 +169,7 @@ ZInstaller_editor_host() {
       rm -f /usr/local/bin/code
       ln -s '/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code' /usr/local/bin/code || die "could not link vscode" || return 1
       echo "[+] Code Editor Installed"
-      
+
       echo "[+] install jumpscale python snippets"
       ZCodeGetJS -r python-snippets -b master || return 1
       RSync ~/code/github/jumpscale/python-snippets/ ~/.vscode/extensions/python-snippets-js9 || return 1
