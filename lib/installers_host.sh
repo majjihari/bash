@@ -6,6 +6,7 @@ ZInstaller_code_jumpscale_host() {
         echo "[+] update jumpscale code was already done."
        return 0
     fi
+    echo "ZBRANCH is ${ZBRANCH}"
     local branch="${1:ZBRANCH}"
     if [ -z $branch] ; then
         branch=master
