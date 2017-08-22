@@ -6,7 +6,10 @@ ZInstaller_code_jumpscale_host() {
         echo "[+] update jumpscale code was already done."
        return 0
     fi
-    local branch="${1:-master}"
+    local branch="${1:ZBRANCH}"
+    if [ -z $branch] ; then
+        branch=master
+    fi
     echo "[+] loading or updating jumpscale source code (branch:$branch)"
     ZCodeGetJS -r core9 -b $branch || return 1
     ZCodeGetJS -r lib9 -b $branch  || return 1
@@ -88,7 +91,7 @@ ZInstaller_base_host(){
             apt-get update > ${ZLogFile} 2>&1 || die "could not update packages" || return 1
 
             echo "[+] installing git, python, mc, tmux, curl"
-            Z_apt_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs x86_64-linux-gnu-gcc python3-dev || return 1
+            Z_apt_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs build-essential python3-dev || return 1
 
             echo "[+] installing and starting ipfs"
             ZInstaller_ipfs_host
