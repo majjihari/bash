@@ -21,11 +21,11 @@ if [ -e /opt/code/github/jumpscale ]; then
     export ZUTILSDIR=/opt/code/github/jumpscale
 fi
 
-if [ "$(uname)" == "Darwin" ]; then     
+if [ "$(uname)" == "Darwin" ]; then
     xcode-select -v 2>&1 >> /dev/null
     if [ $? -ne 0 ]; then
         xcode-select --install
-    fi        
+    fi
     brew -v 2>&1 >> /dev/null
     if [ $? -ne 0 ]; then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -61,7 +61,7 @@ ZUtilsGetCode() {
     #giturl like: git@github.com:mathieuancelin/duplicates.git
     # local giturl=git@github.com:Jumpscale/bash.git
     local giturl=https://github.com/Jumpscale/bash.git
-    local branch=master
+    local branch=${ZUTILSBRANCH:master}
     echo "[+] get code $giturl ($branch)"
     pushd $ZUTILSDIR 2>&1 > $ZLogFile
 

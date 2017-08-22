@@ -61,8 +61,9 @@ ZCodeGetJS() {
     fi
 
     local giturl="git@github.com:Jumpscale/$reponame.git"
+    local githttpsurl = "https://github.com/jumpscale/$reponame.git"
 
-    ZCodeGet -r $reponame -a $account -u $giturl -b $branch  || return 1
+    ZCodeGet -r $reponame -a $account -u $giturl -b $branch  || ZCodeGet -r $reponame -a $account -u $githttpsurl -b $branch || return 1
 
 }
 
@@ -178,7 +179,7 @@ ZCodePush() {
     if [ -z "$reponame" ]; then
         echo "[+] walk over directories: $ZCODEDIR/$type/$account"
         # Z_pushd $ZCODEDIR/$type/$account || return 1
-        ls -d $ZCODEDIR/$type/$account/*/ | {        
+        ls -d $ZCODEDIR/$type/$account/*/ | {
         # find . -mindepth 1 -maxdepth 1 -type d | {
             while read DIRPATH ; do
                 DIRNAME=$(basename $DIRPATH) || die "basename" || return 1
