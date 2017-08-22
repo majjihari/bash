@@ -61,7 +61,7 @@ ZCodeGetJS() {
     fi
 
     local giturl="git@github.com:Jumpscale/$reponame.git"
-    local githttpsurl = "https://github.com/jumpscale/$reponame.git"
+    local githttpsurl="https://github.com/jumpscale/$reponame.git"
 
     ZCodeGet -r $reponame -a $account -u $giturl -b $branch  || ZCodeGet -r $reponame -a $account -u $githttpsurl -b $branch || return 1
 
