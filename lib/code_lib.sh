@@ -256,13 +256,16 @@ ZBranchExists() {
     local giturl="$1"
     local branch=${2:-${ZBRANCH}}
 
+    # remove the trailing .git from the giturl if exist
+    giturl=${giturl%.git}
+
     echo "[+] Checking if ${giturl}/tree/${branch} exists"
     httpcode=$(curl -o /dev/null -I -s --write-out '%{http_code}\n' $giturl/tree/${branch})
 
     if [ "$httpcode" = "200" ]; then
         return 0
     else
-      echo "[+] Error: ${giturl}/tree/${branch} dooes not exist"
+      echo "[+] Error: ${giturl}/tree/${branch} does not exist"
         return 1
     fi
 }
