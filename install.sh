@@ -62,7 +62,7 @@ ZUtilsGetCode() {
     #giturl like: git@github.com:mathieuancelin/duplicates.git
     # local giturl=git@github.com:Jumpscale/bash.git
     local giturl=https://github.com/Jumpscale/bash.git
-    local branch=${ZUTILSBRANCH:master}
+    local branch=${ZUTILSBRANCH:-master}
     echo "[+] get code $giturl ($branch)"
     pushd $ZUTILSDIR 2>&1 > $ZLogFile
 

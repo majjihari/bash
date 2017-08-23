@@ -41,7 +41,7 @@ ZCodeGetJS() {
     local OPTIND
     local account='jumpscale'
     local reponame=''
-    local branch=${ZBRANCH:master}
+    local branch=${ZBRANCH:-master}
     while getopts "r:b:h" opt; do
         case $opt in
            r )  reponame=$OPTARG ;;
@@ -96,7 +96,7 @@ ZCodeGet() {
     local account='varia'
     local reponame=''
     local giturl=''
-    local branch=master
+    local branch=${ZBRANCH:-master}
     while getopts "a:r:u:b:t:h" opt; do
         case $opt in
            a )  account=$OPTARG ;;

@@ -39,11 +39,12 @@ ZInstaller_js9_host() {
     pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
 
     echo "[+] installing jumpscale lib9"
-    pip3 install -U cryptography
-    pip3 install --no-deps -e $ZCODEDIR/github/jumpscale/lib9 || die "could not install lib9 of js9" || return 1
+    sh $ZCODEDIR/github/jumpscale/lib9/install.sh || die "Coud not install lib9 of js9" || return 1
+    # pip3 install --no-deps -e $ZCODEDIR/github/jumpscale/lib9 || die "could not install lib9 of js9" || return 1
 
     echo "[+] installing jumpscale prefab9"
-    pip3 install -e $ZCODEDIR/github/jumpscale/prefab9 || die "could not install prefab9" || return 1
+    sh $ZCODEDIR/github/jumpscale/prefab9/install.sh || die "Coud not install prefab9" || return 1
+    # pip3 install -e $ZCODEDIR/github/jumpscale/prefab9 || die "could not install prefab9" || return 1
 
     echo "[+] installing binaries files"
     find  $ZCODEDIR/github/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \; || die || return 1
@@ -96,7 +97,7 @@ ZInstaller_base_host(){
             apt-get update > ${ZLogFile} 2>&1 || die "could not update packages" || return 1
 
             echo "[+] installing git, python, mc, tmux, curl"
-            Z_apt_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs build-essential python3-dev pkg-config libvirt-dev || return 1
+            Z_apt_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs || return 1
 
             echo "[+] installing and starting ipfs"
             ZInstaller_ipfs_host
