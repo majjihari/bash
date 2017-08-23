@@ -123,7 +123,7 @@ ZCodeGet() {
     Z_mkdir_pushd $ZCODEDIR/$type/$account || return 1
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
-        ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 > $ZLogFile || die "ssh keyscan" || return 1
+        ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts 2>&1 > $ZLogFile || die "ssh keyscan" || return 1
     fi
 
     if [ ! -e $ZCODEDIR/$type/$account/$reponame ]; then

@@ -36,7 +36,8 @@ ZInstaller_js9_host() {
     ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
     echo "[+] install js9"
-    pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
+    sh $ZCODEDIR/github/jumpscale/core9/install.sh || die "Could not install core9 of js9" || return 1
+    # pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
 
     echo "[+] installing jumpscale lib9"
     sh $ZCODEDIR/github/jumpscale/lib9/install.sh || die "Coud not install lib9 of js9" || return 1
