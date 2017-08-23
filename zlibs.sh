@@ -13,7 +13,7 @@ export ZLogFile='/tmp/zutils.log'
 die() {
     set +x
     rm -f /tmp/sdwfa #to remove temp passwd for restic, just to be sure
-    echo 
+    echo
     echo "**** ERRORLOG ****"
     cat $ZLogFile
     echo
@@ -114,6 +114,6 @@ fi
 #     ZKeysLoad
 # fi
 
-echo "[+] zlibs enabled."
+echo "[+] zlibs enabled." >>${ZLogFile}
 
 popd > /dev/null 2>&1
