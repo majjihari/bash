@@ -60,13 +60,14 @@ ZCodeGetJS() {
         return 0
     fi
 
-    local giturl="git@github.com:Jumpscale/$reponame.git"
+    # local giturl="git@github.com:Jumpscale/$reponame.git"
     local githttpsurl="https://github.com/jumpscale/$reponame.git"
 
     # check if specificed branch or $ZBRANCH exist, if not then fallback to master
     ZBranchExists ${githttpsurl} ${branch} || branch=master
 
-    ZCodeGet -r $reponame -a $account -u $giturl -b $branch  || ZCodeGet -r $reponame -a $account -u $githttpsurl -b $branch || return 1
+    # ZCodeGet -r $reponame -a $account -u $giturl -b $branch  || ZCodeGet -r $reponame -a $account -u $githttpsurl -b $branch || return 1
+    ZCodeGet -r $reponame -a $account -u $githttpsurl -b $branch || return 1
 
 }
 
