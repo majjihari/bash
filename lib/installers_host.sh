@@ -36,15 +36,21 @@ ZInstaller_js9_host() {
     ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
     echo "[+] install js9"
-    sh $ZCODEDIR/github/jumpscale/core9/install.sh || die "Could not install core9 of js9" || return 1
+    pushd $ZCODEDIR/github/jumpscale/core9
+    sh install.sh || die "Could not install core9 of js9" || return 1
+    popd
     # pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
 
     echo "[+] installing jumpscale lib9"
-    sh $ZCODEDIR/github/jumpscale/lib9/install.sh || die "Coud not install lib9 of js9" || return 1
+    pushd $ZCODEDIR/github/jumpscale/lib9
+    sh install.sh || die "Coud not install lib9 of js9" || return 1
+    popd
     # pip3 install --no-deps -e $ZCODEDIR/github/jumpscale/lib9 || die "could not install lib9 of js9" || return 1
 
     echo "[+] installing jumpscale prefab9"
-    sh $ZCODEDIR/github/jumpscale/prefab9/install.sh || die "Coud not install prefab9" || return 1
+    pushd $ZCODEDIR/github/jumpscale/prefab9
+    sh install.sh || die "Coud not install prefab9" || return 1
+    popd
     # pip3 install -e $ZCODEDIR/github/jumpscale/prefab9 || die "could not install prefab9" || return 1
 
     echo "[+] installing binaries files"
