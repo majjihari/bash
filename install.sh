@@ -96,7 +96,7 @@ sed -i.bak '/jsenv.sh/d' $HOMEDIR/.profile
 sed -i.bak '/.*zlibs.sh/d' $HOMEDIR/.bash_profile
 echo ". ${ZUTILSDIR}/bash/zlibs.sh" >> $HOMEDIR/.bash_profile
 
-if [ ! -e ~/.iscontainer ]; then
+if [ ! -e ~/.iscontainer ] || [ -n $ZHOSTONLY ]; then
     ZUtilsGetCode
     . ${ZUTILSDIR}/bash/zlibs.sh
     ZInstaller_js9_host
