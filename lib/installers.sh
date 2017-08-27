@@ -156,7 +156,7 @@ ZInstaller_docgenerator() {
 
     echo "[+] initializing jumpscale"
     container 'js9_init' || return 1
-    container 'apt update; apt upgrade -y'
+    container 'apt update; apt upgrade -y; apt install bzip2 -y'
 
     echo "[+] install docgenerator (can take long time)"
     container 'python3 -c "from js9 import j;j.tools.docgenerator.install()"' || return 1
