@@ -53,8 +53,8 @@ die() {
     echo "[-] something went wrong: $1"
     rm -f /tmp/sdwfa #to remove temp passwd for restic, just to be sure
     cat $ZLogFile
-    return 1
-    # exit 1
+    # return 1
+    exit 1
 }
 
 ZUtilsGetCode() {

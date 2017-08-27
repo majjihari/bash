@@ -21,7 +21,7 @@ die() {
     echo
     echo
     set -x
-    return 1
+    exit 1
 }
 
 # catcherror_handler() {
