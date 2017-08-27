@@ -6,7 +6,14 @@ ZInstaller_code_jumpscale_host() {
         echo "[+] update jumpscale code was already done."
        return 0
     fi
-    local branch="${1:-master}"
+
+    local branch=$1
+    if [ -n ${ZBRANCH} ] ; then
+        branch=${ZBRANCH}
+    fi
+    if [ -z $branch ] ; then
+        branch=master
+    fi
     echo "[+] loading or updating jumpscale source code (branch:$branch)"
     ZCodeGetJS -r core9 -b $branch || return 1
     ZCodeGetJS -r lib9 -b $branch  || return 1
@@ -29,13 +36,22 @@ ZInstaller_js9_host() {
     ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
     echo "[+] install js9"
-    pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
+    pushd $ZCODEDIR/github/jumpscale/core9
+    sh install.sh || die "Could not install core9 of js9" || return 1
+    popd
+    # pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
 
     echo "[+] installing jumpscale lib9"
-    pip3 install --no-deps -e $ZCODEDIR/github/jumpscale/lib9 || die "could not install lib9 of js9" || return 1
+    pushd $ZCODEDIR/github/jumpscale/lib9
+    sh install.sh || die "Coud not install lib9 of js9" || return 1
+    popd
+    # pip3 install --no-deps -e $ZCODEDIR/github/jumpscale/lib9 || die "could not install lib9 of js9" || return 1
 
     echo "[+] installing jumpscale prefab9"
-    pip3 install -e $ZCODEDIR/github/jumpscale/prefab9 || die "could not install prefab9" || return 1
+    pushd $ZCODEDIR/github/jumpscale/prefab9
+    sh install.sh || die "Coud not install prefab9" || return 1
+    popd
+    # pip3 install -e $ZCODEDIR/github/jumpscale/prefab9 || die "could not install prefab9" || return 1
 
     echo "[+] installing binaries files"
     find  $ZCODEDIR/github/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \; || die || return 1
@@ -104,7 +120,7 @@ ZInstaller_base_host(){
     echo "[+] upgrade pip"
     pip3 install --upgrade pip > ${ZLogFile} 2>&1 || die || return 1
 
-    
+
 
     ZDoneSet "ZInstaller_base_host"
 }
@@ -152,7 +168,7 @@ ZInstaller_docgenerator_host() {
 
     # ZInstaller_base_host || return 1
 
-    if [ ! "$(uname)" == "Darwin" ]; then    
+    if [ ! "$(uname)" == "Darwin" ]; then
         die "only osx supported for now"
     fi
 
@@ -169,7 +185,7 @@ ZInstaller_editor_host() {
       rm -f /usr/local/bin/code
       ln -s '/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code' /usr/local/bin/code || die "could not link vscode" || return 1
       echo "[+] Code Editor Installed"
-      
+
       echo "[+] install jumpscale python snippets"
       ZCodeGetJS -r python-snippets -b master || return 1
       RSync ~/code/github/jumpscale/python-snippets/ ~/.vscode/extensions/python-snippets-js9 || return 1

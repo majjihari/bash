@@ -41,7 +41,7 @@ ZCodeGetJS() {
     local OPTIND
     local account='jumpscale'
     local reponame=''
-    local branch='master'
+    local branch=${ZBRANCH:-master}
     while getopts "r:b:h" opt; do
         case $opt in
            r )  reponame=$OPTARG ;;
@@ -60,9 +60,14 @@ ZCodeGetJS() {
         return 0
     fi
 
-    local giturl="git@github.com:Jumpscale/$reponame.git"
+    # local giturl="git@github.com:Jumpscale/$reponame.git"
+    local githttpsurl="https://github.com/jumpscale/$reponame.git"
 
-    ZCodeGet -r $reponame -a $account -u $giturl -b $branch  || return 1
+    # check if specificed branch or $ZBRANCH exist, if not then fallback to master
+    ZBranchExists ${githttpsurl} ${branch} || branch=master
+
+    # ZCodeGet -r $reponame -a $account -u $giturl -b $branch  || ZCodeGet -r $reponame -a $account -u $githttpsurl -b $branch || return 1
+    ZCodeGet -r $reponame -a $account -u $githttpsurl -b $branch || return 1
 
 }
 
@@ -92,7 +97,7 @@ ZCodeGet() {
     local account='varia'
     local reponame=''
     local giturl=''
-    local branch='master'
+    local branch=${ZBRANCH:-master}
     while getopts "a:r:u:b:t:h" opt; do
         case $opt in
            a )  account=$OPTARG ;;
@@ -119,7 +124,7 @@ ZCodeGet() {
     Z_mkdir_pushd $ZCODEDIR/$type/$account || return 1
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
-        ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 > $ZLogFile || die "ssh keyscan" || return 1
+        ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts 2>&1 > $ZLogFile || die "ssh keyscan" || return 1
     fi
 
     if [ ! -e $ZCODEDIR/$type/$account/$reponame ]; then
@@ -178,7 +183,7 @@ ZCodePush() {
     if [ -z "$reponame" ]; then
         echo "[+] walk over directories: $ZCODEDIR/$type/$account"
         # Z_pushd $ZCODEDIR/$type/$account || return 1
-        ls -d $ZCODEDIR/$type/$account/*/ | {        
+        ls -d $ZCODEDIR/$type/$account/*/ | {
         # find . -mindepth 1 -maxdepth 1 -type d | {
             while read DIRPATH ; do
                 DIRNAME=$(basename $DIRPATH) || die "basename" || return 1
@@ -248,16 +253,20 @@ ZCodePushJS(){
     fi
 }
 
-# ZBranchExists() {
-#     local giturl="$1"
-#     local branch=${2:-${ZBRANCH}}
-#
-#     echo "[+] Checking if ${repository}/${ZBRANCH} exists"
-#     httpcode=$(curl -o /dev/null -I -s --write-out '%{http_code}\n' $giturl/tree/${branch})
-#
-#     if [ "$httpcode" = "200" ]; then
-#         return 0
-#     else
-#         return 1
-#     fi
-# }
+ZBranchExists() {
+    local giturl="$1"
+    local branch=${2:-${ZBRANCH}}
+
+    # remove the trailing .git from the giturl if exist
+    giturl=${giturl%.git}
+
+    echo "[+] Checking if ${giturl}/tree/${branch} exists"
+    httpcode=$(curl -o /dev/null -I -s --write-out '%{http_code}\n' $giturl/tree/${branch})
+
+    if [ "$httpcode" = "200" ]; then
+        return 0
+    else
+      echo "[+] Error: ${giturl}/tree/${branch} does not exist"
+        return 1
+    fi
+}
