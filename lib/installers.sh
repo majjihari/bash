@@ -72,6 +72,8 @@ ZInstaller_js9() {
     ZInstaller_code_jumpscale_host || return 1
 
     echo "[+] install js9"
+    container "cp /opt/code/github/jumpscale/core9/mascot /root/.mascot.txt"
+
     container "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts" || return 1
     container "pip3 install -e /opt/code/github/jumpscale/core9" || return 1
     
@@ -82,13 +84,14 @@ ZInstaller_js9() {
     echo "[+] installing jumpscale prefab9"
     container "pip3 install -e /opt/code/github/jumpscale/prefab9" || return 1
 
+
     echo "[+] installing jumpscale lib9 without deps"
     container "pip3 install --no-deps -e /opt/code/github/jumpscale/lib9" || return 1
-
-    container "cp /opt/code/github/jumpscale/core9/mascot ~/.mascot.txt"
     
     echo "[+] initializing jumpscale"
     container 'js9_init' || return 1
+
+    container 'js9 "j.tools.develop.dockerconfig()"'
 
     ZDockerCommit -b jumpscale/js9 || die "docker commit" || return 1
 

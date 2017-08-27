@@ -154,6 +154,13 @@ ZDockerRemoveImage(){
     docker rmi  -f "$ZDockerImage"  > ${ZLogFile} 2>&1 || true
 }
 
+ZDockerRemoveImagesAll(){
+    docker stop $(docker ps -a -q) 2>&1 > /dev/null
+    docker rm $(docker ps -a -q) 2>&1 > /dev/null
+    docker rmi -f $(docker images -a -q) 2>&1 > /dev/null
+    docker rmi -f $(docker images -f dangling=true -q) 2>&1 > /dev/null
+}
+
 ZDockerBuildUbuntu() {
 
     local OPTIND
