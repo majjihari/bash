@@ -87,12 +87,15 @@ if [ ! -f $HOMEDIR/.bash_profile ]; then
    touch $HOMEDIR/.bash_profile
 fi
 
+if [ ! -f $HOMEDIR/.bash_profile ]; then
+   sed -i.bak '/jsenv.sh/d' $HOMEDIR/.profile
+fi
+
 rm -f ~/jsenv.sh
 rm -f ~/jsinit.sh
 
 sed -i.bak '/export SSHKEYNAME/d' $HOMEDIR/.bash_profile
 sed -i.bak '/jsenv.sh/d' $HOMEDIR/.bash_profile
-sed -i.bak '/jsenv.sh/d' $HOMEDIR/.profile
 sed -i.bak '/.*zlibs.sh/d' $HOMEDIR/.bash_profile
 echo ". ${ZUTILSDIR}/bash/zlibs.sh" >> $HOMEDIR/.bash_profile
 
