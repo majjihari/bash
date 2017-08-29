@@ -3,14 +3,14 @@
 ######### DOCKER
 
 ZDockerInstallSSH(){
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     echo "[+] install docker on remote machine."
     ZEXEC -c "wget -qO- https://get.docker.com/ | sh" || return 1
 
 }
 
 ZDockerInstallLocal(){
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     echo "[+] install docker on local machine."
     wget -qO- https://get.docker.com/ | sh > ${ZLogFile} 2>&1 || die "could not install docker" || return 1
 
@@ -18,7 +18,7 @@ ZDockerInstallLocal(){
 
 
 container() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
 
     ZDockerConfig || return 1
 
@@ -32,12 +32,12 @@ container() {
         return 1
     fi
 
-    ssh -A root@$RNODE -p $RPORT "$@" > $ZLogFile 2>&1 || die "could not ssh command: $@" || return 1
+    ssh -A root@$RNODE -p $RPORT "$@" >> $ZLogFile 2>&1 || die "could not ssh command: $@" || return 1
 
 }
 
 ZDockerConfig() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     if [ -e ~/.iscontainer ] ; then echo "Docker tools cannot be run in container" ; return 0 ; fi
     ZNodeEnvDefaults || return 1
     ZCodeConfig || return 1
@@ -58,7 +58,7 @@ EOF
 }
 
 ZDockerCommit() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
 
     ZDockerConfig
     local OPTIND
@@ -84,7 +84,7 @@ ZDockerCommit() {
 
 ZDockerSSHAuthorize() {
     if [ -e ~/.iscontainer ] ; then echo "Docker tools cannot be run in container" ; return 0 ; fi
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
 
     local ZDockerName="${1:-$ZDockerName}"
     local RPORT="${RPORT:-2222}"
@@ -119,7 +119,7 @@ ZDockerEnableSSH(){
 
     export ZDockerName="${1:-build}"
 
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
 
     local ZDockerName="${1:-$ZDockerName}"
 
@@ -139,7 +139,7 @@ ZDockerEnableSSH(){
 }
 
 ZDockerRemove(){
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
 
     ZDockerConfig
     local ZDockerName="${1:-$ZDockerName}"
@@ -148,7 +148,7 @@ ZDockerRemove(){
 }
 
 ZDockerRemoveImage(){
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     ZDockerConfig
     local ZDockerImage="${1:-$ZDockerImage}"
     echo "[+] remove docker image $ZDockerImage"
@@ -179,7 +179,7 @@ ZDockerBuildUbuntu() {
     fi
     ZDoneReset #reset all done state, need to restart from scratch
 
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
 
     ZDockerConfig || die || return
     local OPTIND
@@ -245,7 +245,7 @@ ZDockerRunUbuntu() {
 
     ZDockerBuildUbuntu || die "could not build ubuntu." || return 1
 
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
 
     local OPTIND
     local bname='jumpscale/ubuntu'
@@ -293,7 +293,7 @@ EOF
 }
 
 ZDockerRun() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
 
     mkdir -p ${HOME}/.cfg/
 
@@ -377,7 +377,7 @@ EOF
 }
 
 ZDockerActive() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
 
     ZDockerConfig || return 1
 

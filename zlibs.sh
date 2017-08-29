@@ -21,7 +21,7 @@ die() {
     echo
     echo
     set -x
-    exit 1
+    return 1
 }
 
 # catcherror_handler() {
@@ -69,7 +69,7 @@ ZDoneReset() {
 # }
 
 
-echo "init" > $ZLogFile
+echo "init" >> $ZLogFile
 
 if [ ! -d "${ZUTILSDIR}/bash" ]; then
     echo "[-] ${ZUTILSDIR}/bash: directory not found"

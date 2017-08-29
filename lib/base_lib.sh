@@ -103,8 +103,8 @@ IPFS_get_dir(){
 }
 
 Z_pushd(){
-    echo "pushd to: $1" >> $ZLogFile
-    pushd "$1" >> $ZLogFile 2>&1 || die "could not pushd to $1" || return 1
+    echo "pushd to: $1" >>> $ZLogFile
+    pushd "$1" >>> $ZLogFile 2>&1 || die "could not pushd to $1" || return 1
 }
 
 Z_popd(){
@@ -112,8 +112,8 @@ Z_popd(){
 }
 
 Z_mkdir(){
-    echo "mkdir: $1" >> $ZLogFile
-    mkdir -p "$1" >> $ZLogFile 2>&1 || die "could not mkdir $1" || return 1
+    echo "mkdir: $1" >>> $ZLogFile
+    mkdir -p "$1" >>> $ZLogFile 2>&1 || die "could not mkdir $1" || return 1
 }
 
 Z_mkdir_pushd(){
@@ -122,13 +122,13 @@ Z_mkdir_pushd(){
 }
 
 Z_brew_install(){
-    echo "brew install: $@" >> $ZLogFile
-    brew install  $@ >> $ZLogFile 2>&1 || die "could not brew install $@" || return 1
+    echo "brew install: $@" >>> $ZLogFile
+    brew install  $@ >>> $ZLogFile 2>&1 || die "could not brew install $@" || return 1
 }
 
 Z_apt_install(){
-  echo "apt-get install: $@" >> $ZLogFile
-  apt-get -y install $@ >> $ZLogFile 2>&1 || die "could not install package $@" || return 1
+  echo "apt-get install: $@" >>> $ZLogFile
+  apt-get -y install $@ >>> $ZLogFile 2>&1 || die "could not install package $@" || return 1
 }
 
 Z_exists_dir(){

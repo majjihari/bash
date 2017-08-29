@@ -87,7 +87,7 @@ ZInstaller_js9() {
     echo "[+] initializing jumpscale"
     container 'js9_init' || return 1
 
-    container 'js9 "j.tools.develop.dockerconfig()"'
+    # container 'js9 "j.tools.develop.dockerconfig()"'
 
     ZDockerCommit -b jumpscale/js9 || die "docker commit" || return 1
 

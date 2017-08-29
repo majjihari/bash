@@ -66,19 +66,19 @@ ZUtilsGetCode() {
     local giturl=https://github.com/Jumpscale/bash.git
     local branch=${ZUTILSBRANCH:-master}
     echo "[+] get code $giturl ($branch)"
-    pushd $ZUTILSDIR 2>&1 > $ZLogFile
+    pushd $ZUTILSDIR 2>&1 >> $ZLogFile
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
-        ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 > $ZLogFile || die || return 1
+        ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 >> $ZLogFile || die || return 1
     fi
 
     if [ ! -e $ZUTILSDIR/bash ]; then
         echo " [+] clone zutils"
-        git clone -b ${branch} $giturl bash 2>&1 > $ZLogFile || die || return 1
+        git clone -b ${branch} $giturl bash 2>&1 >> $ZLogFile || die || return 1
     else
         pushd $ZUTILSDIR/bash
         echo " [+] pull"
-        git pull  2>&1 > $ZLogFile || die || return 1
+        git pull  2>&1 >> $ZLogFile || die || return 1
         popd > /dev/null 2>&1
     fi
     popd > /dev/null 2>&1
