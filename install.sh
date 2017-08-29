@@ -104,7 +104,7 @@ echo ". ${ZUTILSDIR}/bash/zlibs.sh" >> $HOMEDIR/.bash_profile
 if [ ! -e ~/.iscontainer ] || [ -n $ZHOSTONLY ]; then
     ZUtilsGetCode
     . ${ZUTILSDIR}/bash/zlibs.sh
-    ZInstaller_js9_host
+    # ZInstaller_js9_host
 else
     . ${ZUTILSDIR}/bash/zlibs.sh
 fi
