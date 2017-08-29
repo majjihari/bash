@@ -8,11 +8,11 @@ ZInstaller_code_jumpscale_host() {
     fi
 
     local branch=$1
-    if [ -n ${ZBRANCH} ] ; then
+    if [ -n ${ZBRANCH} ] && [ -z $branch ] ; then
         branch=${ZBRANCH}
     fi
     if [ -z $branch ] ; then
-        branch='9.1.1_remove_gigdir'
+        branch='master'
     fi
     echo "[+] loading or updating jumpscale source code (branch:$branch)"
     ZCodeGetJS -r core9 -b $branch || return 1
