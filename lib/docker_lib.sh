@@ -42,8 +42,9 @@ ZDockerConfig() {
     ZNodeEnvDefaults || return 1
     ZCodeConfig || return 1
     export ZDockerName=${ZDockerName:-"build"}
-    export CONTAINERDIR=~/docker
+    export CONTAINERDIR=~/js9host/
     Z_mkdir ${CONTAINERDIR}/.cache/pip || return 1
+    Z_mkdir ${CONTAINERDIR}/cfg || return 1
 }
 
 ZDockerCommitUsage() {
@@ -327,7 +328,7 @@ ZDockerRun() {
     mounted_volumes="\
         -v ${CONTAINERDIR}/:/host \
         -v ${ZCODEDIR}/:/opt/code \
-        -v ${HOME}/.cfg/:/hostcfg \
+        -v ${CONTAINERDIR}/cfg:/hostcfg \
         -v ${CONTAINERDIR}/.cache/pip/:/root/.cache/pip/ \
     "
 
