@@ -1,7 +1,3 @@
-
-
-
-
 ZInstaller_python() {
 
     local OPTIND
@@ -21,7 +17,7 @@ ZInstaller_python() {
     fi
 
     ZDoneUnset "ZInstaller_python"
-    ZDoneUnset "ZInstaller_js9"    
+    ZDoneUnset "ZInstaller_js9"
 
     echo "[+] installing python"
     container 'apt-get update' || return 1
@@ -76,7 +72,7 @@ ZInstaller_js9() {
 
     container "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts" || return 1
     container "pip3 install -e /opt/code/github/jumpscale/core9" || return 1
-    
+
     echo "[+] initializing jumpscale first time."
     #will also install the jumpscale command files
     container 'js9_init' || return 1
@@ -87,7 +83,7 @@ ZInstaller_js9() {
 
     echo "[+] installing jumpscale lib9 without deps"
     container "pip3 install --no-deps -e /opt/code/github/jumpscale/lib9" || return 1
-    
+
     echo "[+] initializing jumpscale"
     container 'js9_init' || return 1
 
@@ -125,7 +121,7 @@ ZInstaller_js9_full() {
     container "apt-get install build-essential python3-dev libvirt-dev libssl-dev libffi-dev libssh-dev -y" || return 1
     echo "[+] installing jumpscale core9"
     container "pip3 install Cython>=0.25.2 asyncssh>=1.9.0 numpy>=1.12.1 tarantool>=0.5.4" || return 1
-    
+
     echo "[+] install lib9 with dependencies (can take long time)"
     container 'cd  /opt/code/github/jumpscale/lib9 && bash install.sh;' || return 1
 
@@ -180,7 +176,7 @@ ZInstaller_ays9() {
     local port=${RPORT:-2222}
     local addarg="${RNODE:-localhost}"
     echo "[+] install AYS9"
-    local branch="${1:-master}"
+    local branch="${1:-$ZBRANCH}"
     echo "[+] loading or updating AYS source code (branch:$branch)"
     ZCodeGetJS -r ays9 -b $branch || return 1
     echo "[+] installing jumpscale ays9"
@@ -201,10 +197,10 @@ ZInstaller_portal9() {
     local port=${RPORT:-2222}
     local addarg="${RNODE:-localhost}"
     echo "[+] install Portal9"
-    local branch="${1:-master}"
+    local branch="${1:-$ZBRANCH}"
     echo "[+] loading or updating Portal source code (branch:$branch)"
-    ZCodeGetJS -r python-snippets -b master  || return 1
-    
+    ZCodeGetJS -r portal9 -b ${branch}  || return 1
+
     echo "[+] installing jumpscale portal9"
     ZNodeSet $addarg || return 1
     ZNodePortSet $port || return 1
@@ -238,7 +234,7 @@ ZInstall_zerotier() {
 ZInstall_openvpn() {
     echo "[+] install openvpn docker"
     mkdir -p /etc/ovpn
-    docker run --name=openvpn-as -p 8081:80 -v /etc/ovpn:/config -e INTERFACE=eth0 --net=host --privileged linuxserver/openvpn-as 
+    docker run --name=openvpn-as -p 8081:80 -v /etc/ovpn:/config -e INTERFACE=eth0 --net=host --privileged linuxserver/openvpn-as
 # -e PGID=<gid> -e PUID=<uid> \
 # -e TZ=<timezone> \
 # -e INTERFACE=<interface> \
