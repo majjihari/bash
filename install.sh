@@ -22,11 +22,12 @@ if [ -e /opt/code/github/jumpscale ]; then
 fi
 
 if [ "$(uname)" == "Darwin" ]; then
-    xcode-select -v 2>&1 >> /dev/null
+    set +e
+    which xcode-select 2>&1 >> /dev/null
     if [ $? -ne 0 ]; then
         xcode-select --install
     fi
-    brew -v 2>&1 >> /dev/null
+    which brew 2>&1 >> /dev/null
     if [ $? -ne 0 ]; then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
@@ -35,6 +36,7 @@ if [ "$(uname)" == "Darwin" ]; then
         brew install curl
     fi
     export ZUTILSDIR=${ZUTILSDIR:-~/code/github/jumpscale}
+    set -e
 else
     #TODO: *2 need to support windows as well
     apt-get update
@@ -87,19 +89,22 @@ if [ ! -f $HOMEDIR/.bash_profile ]; then
    touch $HOMEDIR/.bash_profile
 fi
 
+if [ ! -f $HOMEDIR/.bash_profile ]; then
+   sed -i.bak '/jsenv.sh/d' $HOMEDIR/.profile
+fi
+
 rm -f ~/jsenv.sh
 rm -f ~/jsinit.sh
 
 sed -i.bak '/export SSHKEYNAME/d' $HOMEDIR/.bash_profile
 sed -i.bak '/jsenv.sh/d' $HOMEDIR/.bash_profile
-sed -i.bak '/jsenv.sh/d' $HOMEDIR/.profile
 sed -i.bak '/.*zlibs.sh/d' $HOMEDIR/.bash_profile
 echo ". ${ZUTILSDIR}/bash/zlibs.sh" >> $HOMEDIR/.bash_profile
 
 if [ ! -e ~/.iscontainer ] || [ -n $ZHOSTONLY ]; then
     ZUtilsGetCode
     . ${ZUTILSDIR}/bash/zlibs.sh
-    ZInstaller_js9_host
+    # ZInstaller_js9_host
 else
     . ${ZUTILSDIR}/bash/zlibs.sh
 fi
