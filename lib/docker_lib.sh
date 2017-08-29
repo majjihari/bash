@@ -116,7 +116,7 @@ ZDockerSSHAuthorize() {
 }
 
 ZDockerEnableSSH(){
-    
+
     export ZDockerName="${1:-build}"
 
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
@@ -184,7 +184,7 @@ ZDockerBuildUbuntu() {
     ZDockerConfig || die || return
     local OPTIND
     local bname='phusion/baseimage'
-    local iname='build' 
+    local iname='build'
     local port=2222
     local addarg=''
     while getopts "b:i:p:a:h" opt; do
@@ -242,7 +242,7 @@ EOF
 
 ZDockerRunUbuntu() {
     if [ -e ~/.iscontainer ] ; then echo "Docker tools cannot be run in container" ; return 0 ; fi
-    
+
     ZDockerBuildUbuntu || die "could not build ubuntu." || return 1
 
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
@@ -376,8 +376,7 @@ will see if that docker is alreay up & if yes will use that docker if not will c
 EOF
 }
 
-ZDockerActive()
-{
+ZDockerActive() {
     echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
 
     ZDockerConfig || return 1
