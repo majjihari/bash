@@ -26,7 +26,7 @@ if [ "$(uname)" == "Darwin" ]; then
     if [ $? -ne 0 ]; then
         xcode-select --install
     fi
-    brew -v 2>&1 >> /dev/null
+    which brew 2>&1 >> /dev/null
     if [ $? -ne 0 ]; then
         /usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
     fi
