@@ -7,16 +7,29 @@ bash utilities
 curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
 ```
 
+# install from branch
+
+```
+export ZUTILSBRANCH=<BRANCH>
+export ZBRANCH=<BRANCH>
+curl https://raw.githubusercontent.com/Jumpscale/bash/${ZUTILSBRANCH}/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
+```
+
 what happens
 - xcode-tools will be installed & then brew (https://brew.sh/) (osx only)
 - python & jumpscale will be installed all in basic version
 - ipfs will be installed to make sure all files can be retrieved locally from peer2peer network
 - ssh-key will be looked for & created if it doesn't exist yet
+- ZBRANCH is the target branch for js9 components, default to master
 
 the basic init script will be added to ~/bash_profile
 
 - when you start a new terminal the tools will be available
 
+# to install full jumpscale on host machine
+```bash
+ZInstall_host_js9_full
+```
 
 # to install all editor tools for local machine
 

@@ -12,14 +12,12 @@ ZInstall_host_code_jumpscale() {
         branch=${ZBRANCH}
     fi
     if [ -z $branch ] ; then
-        branch='9.1.1_remove_gigdir'
+        branch='master'
     fi
     echo "[+] loading or updating jumpscale source code (branch:$branch)"
     ZCodeGetJS -r core9 -b $branch || return 1
     ZCodeGetJS -r lib9 -b $branch  || return 1
     ZCodeGetJS -r prefab9 -b $branch || return 1
-    # ZCodeGetJS -r builder_bootstrap -b $branch > ${ZLogFile} 2>&1 || die || return 1
-    #ZCodeGetJS -r developer -b $branch || return 1 #OLD DO NOT USE
     echo "[+] update jumpscale code done"
     ZDoneSet "ZInstall_host_code_jumpscale"
 }
@@ -322,5 +320,47 @@ ZInstall_host_editor() {
     ZCodePluginInstall streetsidesoftware.code-spell-checker || return 1
     ZCodePluginInstall yzhang.markdown-all-in-one || return 1
     ZCodePluginInstall mdickin.markdown-shortcuts || return 1
+
+}
+
+# this will install a full js9 with all required system dependencies
+ZInstall_host_js9_full() {
+
+    if ZDoneCheck "ZInstall_host_js9_full" ; then
+        echo "[+] update jumpscale code was already done."
+       return 0
+    fi
+
+    ZCodeConfig
+
+    ZInstall_host_base
+
+    ZInstall_host_code_jumpscale
+
+    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+
+    echo "[+] install js9"
+    pushd $ZCODEDIR/github/jumpscale/core9
+    /bin/bash install.sh || die "Could not install core9 of js9" || return 1
+    popd
+    # pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
+
+    echo "[+] installing jumpscale lib9"
+    pushd $ZCODEDIR/github/jumpscale/lib9
+    /bin/bash install.sh || die "Coud not install lib9 of js9" || return 1
+    popd
+    # pip3 install --no-deps -e $ZCODEDIR/github/jumpscale/lib9 || die "could not install lib9 of js9" || return 1
+
+    echo "[+] installing jumpscale prefab9"
+    pushd $ZCODEDIR/github/jumpscale/prefab9
+    /bin/bash install.sh || die "Coud not install prefab9" || return 1
+    popd
+
+    echo "[+] initializing jumpscale"
+    python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()' || die "js9 generate" || return 1
+
+    echo "[+] js9 installed (OK)"
+
+    ZDoneSet "ZInstall_host_js9_full"
 
 }
