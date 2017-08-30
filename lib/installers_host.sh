@@ -2,7 +2,7 @@
 
 
 ZInstall_host_code_jumpscale() {
-    if ZDoneCheck "ZInstall_code_jumpscale_host" ; then
+    if ZDoneCheck "ZInstall_host_code_jumpscale" ; then
         echo "[+] update jumpscale code was already done."
        return 0
     fi
@@ -12,7 +12,7 @@ ZInstall_host_code_jumpscale() {
         branch=${ZBRANCH}
     fi
     if [ -z $branch ] ; then
-        branch='master'
+        branch='9.1.1_remove_gigdir'
     fi
     echo "[+] loading or updating jumpscale source code (branch:$branch)"
     ZCodeGetJS -r core9 -b $branch || return 1
@@ -21,48 +21,55 @@ ZInstall_host_code_jumpscale() {
     # ZCodeGetJS -r builder_bootstrap -b $branch > ${ZLogFile} 2>&1 || die || return 1
     #ZCodeGetJS -r developer -b $branch || return 1 #OLD DO NOT USE
     echo "[+] update jumpscale code done"
-    ZDoneSet "ZInstall_code_jumpscale_host"
+    ZDoneSet "ZInstall_host_code_jumpscale"
 }
 
 
 ZInstall_host_js9() {
 
+    if ZDoneCheck "ZInstall_host_js9" ; then
+        echo "[+] update jumpscale code was already done."
+       return 0
+    fi
+
     ZCodeConfig
 
-    ZInstall_base_host
+    ZInstall_host_base
 
-    ZInstall_code_jumpscale_host
+    ZInstall_host_code_jumpscale
 
     ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
     echo "[+] install js9"
     pushd $ZCODEDIR/github/jumpscale/core9
-    sh install.sh || die "Could not install core9 of js9" || return 1
+    pip3 install -e . || die "Could not install core9 of js9" || return 1
     popd
     # pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
 
     echo "[+] installing jumpscale lib9"
     pushd $ZCODEDIR/github/jumpscale/lib9
-    sh install.sh || die "Coud not install lib9 of js9" || return 1
+    pip3 install --no-deps -e . || die "Coud not install lib9 of js9" || return 1
     popd
     # pip3 install --no-deps -e $ZCODEDIR/github/jumpscale/lib9 || die "could not install lib9 of js9" || return 1
 
     echo "[+] installing jumpscale prefab9"
     pushd $ZCODEDIR/github/jumpscale/prefab9
-    sh install.sh || die "Coud not install prefab9" || return 1
+    pip3 install -e . || die "Coud not install prefab9" || return 1
     popd
     # pip3 install -e $ZCODEDIR/github/jumpscale/prefab9 || die "could not install prefab9" || return 1
 
-    echo "[+] installing binaries files"
-    find  $ZCODEDIR/github/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \; || die || return 1
-
-    rm -rf /usr/local/bin/cmds
-    rm -rf /usr/local/bin/cmds_guest
+    # echo "[+] installing binaries files"
+    # find  $ZCODEDIR/github/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \; || die || return 1
+    #
+    # rm -rf /usr/local/bin/cmds
+    # rm -rf /usr/local/bin/cmds_guest
 
     echo "[+] initializing jumpscale"
     python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()' || die "js9 generate" || return 1
 
     echo "[+] js9 installed (OK)"
+
+    ZDoneSet "ZInstall_host_js9"
 
 }
 
@@ -185,13 +192,16 @@ ZInstall_host_docgenerator() {
 
 ZInstall_host_editor() {
 
-    ZInstall_base_host || return 1
+    ZInstall_host_js9 || return 1
+    # ZInstall_host_base || return 1
 
     if [ "$(uname)" == "Darwin" ]; then
       echo "[+] download visual studio code"
       IPFS_get_install_zip Qmd4d6Keiis5Br1XZckrA1SHWfhgBag3MDwbjxCM7wbuba 'Visual Studio Code' || return 1
       rm -f /usr/local/bin/code
       ln -s '/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code' /usr/local/bin/code || die "could not link vscode" || return 1
+      brew install ctags > /dev/null 2>&1
+
       echo "[+] Code Editor Installed"
 
       echo "[+] install jumpscale python snippets"

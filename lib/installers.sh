@@ -66,7 +66,7 @@ ZInstall_js9() {
     fi
     ZDoneUnset "ZInstall_js9"
 
-    ZInstall_code_jumpscale_host || return 1
+    ZInstall_host_code_jumpscale || return 1
 
     echo "[+] install js9"
     container "cp /opt/code/github/jumpscale/core9/mascot /root/.mascot.txt"
