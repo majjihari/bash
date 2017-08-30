@@ -355,19 +355,12 @@ ZInstall_host_js9_full() {
     pushd $ZCODEDIR/github/jumpscale/prefab9
     /bin/bash install.sh || die "Coud not install prefab9" || return 1
     popd
-    # pip3 install -e $ZCODEDIR/github/jumpscale/prefab9 || die "could not install prefab9" || return 1
-
-    # echo "[+] installing binaries files"
-    # find  $ZCODEDIR/github/jumpscale/core9/cmds -exec ln -s {} "/usr/local/bin/" \; || die || return 1
-    #
-    # rm -rf /usr/local/bin/cmds
-    # rm -rf /usr/local/bin/cmds_guest
 
     echo "[+] initializing jumpscale"
     python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()' || die "js9 generate" || return 1
 
     echo "[+] js9 installed (OK)"
 
-    ZDoneSet "ZInstall_host_js9"
+    ZDoneSet "ZInstall_host_js9_full"
 
 }
