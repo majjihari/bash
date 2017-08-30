@@ -2,7 +2,7 @@
 
 
 
-ZInstaller_python() {
+ZInstall_python() {
 
     local OPTIND
     local force=0
@@ -15,13 +15,13 @@ ZInstaller_python() {
 
     ZDockerActive -b "jumpscale/ubuntu" -c "ZDockerBuildUbuntu -f" || return 1
 
-    if [ $force -eq 0 ] && ZDoneCheck "ZInstaller_python" && ZDockerImageExist "jumpscale/ubuntu_python" ; then
+    if [ $force -eq 0 ] && ZDoneCheck "ZInstall_python" && ZDockerImageExist "jumpscale/ubuntu_python" ; then
         echo "[+] install python & deps already done."
        return 0
     fi
 
-    ZDoneUnset "ZInstaller_python"
-    ZDoneUnset "ZInstaller_js9"    
+    ZDoneUnset "ZInstall_python"
+    ZDoneUnset "ZInstall_js9"    
 
     echo "[+] installing python"
     container 'apt-get update' || return 1
@@ -43,14 +43,14 @@ ZInstaller_python() {
 
     ZDockerCommit -b jumpscale/ubuntu_python || die "docker commit" || return 1
 
-    ZDoneSet "ZInstaller_python"
+    ZDoneSet "ZInstall_python"
 
     echo "[+] python installed in container(OK)"
 
 }
 
 
-ZInstaller_js9() {
+ZInstall_js9() {
 
     local OPTIND
     local force=0
@@ -61,15 +61,15 @@ ZInstaller_js9() {
         esac
     done
 
-    ZDockerActive -b "jumpscale/ubuntu_python" -c "ZInstaller_python -f" || return 1
+    ZDockerActive -b "jumpscale/ubuntu_python" -c "ZInstall_python -f" || return 1
 
-    if [ $force -eq 0 ] && ZDoneCheck "ZInstaller_js9" && ZDockerImageExist "jumpscale/js9" ; then
+    if [ $force -eq 0 ] && ZDoneCheck "ZInstall_js9" && ZDockerImageExist "jumpscale/js9" ; then
         echo "[+] install js9 in container already done."
        return 0
     fi
-    ZDoneUnset "ZInstaller_js9"
+    ZDoneUnset "ZInstall_js9"
 
-    ZInstaller_code_jumpscale_host || return 1
+    ZInstall_code_jumpscale_host || return 1
 
     echo "[+] install js9"
     container "cp /opt/code/github/jumpscale/core9/mascot /root/.mascot.txt"
@@ -97,11 +97,11 @@ ZInstaller_js9() {
 
     echo "[+] js9 installed (OK)"
 
-    ZDoneSet "ZInstaller_js9"
+    ZDoneSet "ZInstall_js9"
 
 }
 
-ZInstaller_js9_full() {
+ZInstall_js9_full() {
 
     local OPTIND
     local force=0
@@ -113,13 +113,13 @@ ZInstaller_js9_full() {
     done
 
     #check the docker image is there
-    ZDockerActive -b "jumpscale/js9" -c "ZInstaller_js9 -f" || return 1
+    ZDockerActive -b "jumpscale/js9" -c "ZInstall_js9 -f" || return 1
 
-    if [ $force -eq 0 ] && ZDoneCheck "ZInstaller_js9_full" && ZDockerImageExist "jumpscale/js9_full" ; then
+    if [ $force -eq 0 ] && ZDoneCheck "ZInstall_js9_full" && ZDockerImageExist "jumpscale/js9_full" ; then
         echo "[+] install js9 in container already done."
        return 0
     fi
-    ZDoneUnset "ZInstaller_js9"
+    ZDoneUnset "ZInstall_js9"
 
     echo "[+] installing jumpscale build dependencies"
     container "apt-get install build-essential python3-dev libvirt-dev libssl-dev libffi-dev libssh-dev -y" || return 1
@@ -134,11 +134,11 @@ ZInstaller_js9_full() {
 
     ZDockerCommit -b jumpscale/js9_full || die "docker commit" || return 1
 
-    ZDoneSet "ZInstaller_js9_full"
+    ZDoneSet "ZInstall_js9_full"
 
 }
 
-ZInstaller_docgenerator() {
+ZInstall_docgenerator() {
 
     local OPTIND
     local force=0
@@ -149,13 +149,13 @@ ZInstaller_docgenerator() {
         esac
     done
 
-    ZDockerActive -b "jumpscale/js9" -c "ZInstaller_js9 -f" || return 1
+    ZDockerActive -b "jumpscale/js9" -c "ZInstall_js9 -f" || return 1
 
-    if [ $force -eq 0 ] && ZDoneCheck "ZInstaller_js9_docgenerator" && ZDockerImageExist "jumpscale/js9_docgenerator" ; then
+    if [ $force -eq 0 ] && ZDoneCheck "ZInstall_js9_docgenerator" && ZDockerImageExist "jumpscale/js9_docgenerator" ; then
         echo "[+] install js9 docgenerator in container already done."
        return 0
     fi
-    ZDoneUnset "ZInstaller_js9_docgenerator"
+    ZDoneUnset "ZInstall_js9_docgenerator"
 
     echo "[+] initializing jumpscale"
     container 'js9_init' || return 1
@@ -166,17 +166,17 @@ ZInstaller_docgenerator() {
 
     ZDockerCommit -b jumpscale/js9_docgenerator || die "docker commit" || return 1
 
-    ZDoneSet "ZInstaller_js9_docgenerator"
+    ZDoneSet "ZInstall_js9_docgenerator"
 
 }
 
-ZInstaller_ays9() {
+ZInstall_ays9() {
     ZDockerRunUbuntu || return 1
-    if ZDoneCheck "ZInstaller_js9_ays9" ; then
+    if ZDoneCheck "ZInstall_js9_ays9" ; then
         echo "[+] install ays9 already done."
        return 0
     fi
-    ZDoneUnset "ZInstaller_js9"
+    ZDoneUnset "ZInstall_js9"
     local port=${RPORT:-2222}
     local addarg="${RNODE:-localhost}"
     echo "[+] install AYS9"
@@ -188,16 +188,16 @@ ZInstaller_ays9() {
     ZNodePortSet $port || return 1
     container "pip3 install -e /opt/code/github/jumpscale/ays9" || return 1
     container "js9_init" || return 1
-    ZDoneSet "ZInstaller_js9_ays9"
+    ZDoneSet "ZInstall_js9_ays9"
 }
 
-ZInstaller_portal9() {
+ZInstall_portal9() {
     ZDockerRunUbuntu || return 1
-    if ZDoneCheck "ZInstaller_js9_portal9" ; then
+    if ZDoneCheck "ZInstall_js9_portal9" ; then
         echo "[+] install portal9 already done."
        return 0
     fi
-    ZDoneUnset "ZInstaller_js9"
+    ZDoneUnset "ZInstall_js9"
     local port=${RPORT:-2222}
     local addarg="${RNODE:-localhost}"
     echo "[+] install Portal9"
@@ -210,7 +210,7 @@ ZInstaller_portal9() {
     ZNodePortSet $port || return 1
     container "cd  /opt/code/github/jumpscale/portal9 && bash install.sh;" || return 1
     container "js9_init" || return 1
-    ZDoneSet "ZInstaller_js9_portal9"
+    ZDoneSet "ZInstall_js9_portal9"
 }
 
 ZInstall_issuemanager() {
@@ -219,9 +219,9 @@ ZInstall_issuemanager() {
         echo "[+] Issue Manager already installed"
        return 0
     fi
-    ZDoneUnset "ZInstaller_js9"
-    ZInstaller_js9_full || return 1
-    ZInstaller_portal9 || return 1
+    ZDoneUnset "ZInstall_js9"
+    ZInstall_js9_full || return 1
+    ZInstall_portal9 || return 1
     echo "[+] Installing IssueManager"
     container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.install()"' || return 1
     container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.start()"' || return 1

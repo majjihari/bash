@@ -1,8 +1,8 @@
 
 
 
-ZInstaller_code_jumpscale_host() {
-    if ZDoneCheck "ZInstaller_code_jumpscale_host" ; then
+ZInstall_host_code_jumpscale() {
+    if ZDoneCheck "ZInstall_code_jumpscale_host" ; then
         echo "[+] update jumpscale code was already done."
        return 0
     fi
@@ -21,17 +21,17 @@ ZInstaller_code_jumpscale_host() {
     # ZCodeGetJS -r builder_bootstrap -b $branch > ${ZLogFile} 2>&1 || die || return 1
     ZCodeGetJS -r developer -b $branch || return 1
     echo "[+] update jumpscale code done"
-    ZDoneSet "ZInstaller_code_jumpscale_host"
+    ZDoneSet "ZInstall_code_jumpscale_host"
 }
 
 
-ZInstaller_js9_host() {
+ZInstall_host_js9() {
 
     ZCodeConfig
 
-    ZInstaller_base_host
+    ZInstall_base_host
 
-    ZInstaller_code_jumpscale_host
+    ZInstall_code_jumpscale_host
 
     ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
 
@@ -66,14 +66,14 @@ ZInstaller_js9_host() {
 
 }
 
-ZInstall_docker_host() {
+ZInstall_host_docker() {
     ZDockerInstallLocal
 }
 
-ZInstaller_base_host(){
+ZInstall_host_base(){
 
-    if ZDoneCheck "ZInstaller_base_host" ; then
-        echo "[+] ZInstaller_base_host already installed"
+    if ZDoneCheck "ZInstall_host_base" ; then
+        echo "[+] ZInstall_host_base already installed"
        return 0
     fi
 
@@ -107,7 +107,7 @@ ZInstaller_base_host(){
             Z_apt_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs || return 1
 
             echo "[+] installing and starting ipfs"
-            ZInstaller_ipfs_host
+            ZInstall_ipfs_host
         fi
     else
         die "platform not supported"
@@ -122,41 +122,48 @@ ZInstaller_base_host(){
 
 
 
-    ZDoneSet "ZInstaller_base_host"
+    ZDoneSet "ZInstall_host_base"
 }
 
 
 
-ZInstaller_ipfs_host() {
-    # container "cd tmp; mkdir -p ipfs; cd ipfs; wget --inet4-only https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_linux-amd64.tar.gz"
-    if [ "$(uname)" == "Darwin" ]; then
-        rm -rf /tmp/ipfs
-        mkdir -p /tmp/ipfs
-        Z_pushd /tmp/ipfs
-        wget --inet4-only https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_darwin-amd64.tar.gz
-
-        Z_popd || return 1
-
-    elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
-        dist=''
-        dist=`grep DISTRIB_ID /etc/*-release | awk -F '=' '{print $2}'`
-        if [ "$dist" == "Ubuntu" ]; then
-            rm -rf /tmp/ipfs
-            mkdir -p /tmp/ipfs
-            Z_pushd /tmp/ipfs
-            wget https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_linux-amd64.tar.gz --output-document go-ipfs.tar.gz
-            tar xvfz go-ipfs.tar.gz
-            mv go-ipfs/ipfs /usr/local/bin/ipfs
-            ipfs daemon --init &
-
-            Z_popd || return 1
-
-        fi
-    else
-        die "platform not supported"
-    fi
-
-}
+# ZInstall_host_ipfs() {
+#     if ZDoneCheck "ZInstall_host_ipfs" ; then
+#         echo "[+] ZInstall_host_ipfs already installed"
+#        return 0
+#     fi
+#
+#     # container "cd tmp; mkdir -p ipfs; cd ipfs; wget --inet4-only https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_linux-amd64.tar.gz"
+#     if [ "$(uname)" == "Darwin" ]; then
+#         rm -rf /tmp/ipfs
+#         mkdir -p /tmp/ipfs
+#         Z_pushd /tmp/ipfs
+#         wget --inet4-only https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_darwin-amd64.tar.gz
+#         ipfs daemon --init &
+#         Z_popd || return 1
+#
+#     elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+#         dist=''
+#         dist=`grep DISTRIB_ID /etc/*-release | awk -F '=' '{print $2}'`
+#         if [ "$dist" == "Ubuntu" ]; then
+#             rm -rf /tmp/ipfs
+#             mkdir -p /tmp/ipfs
+#             Z_pushd /tmp/ipfs
+#             wget https://dist.ipfs.io/go-ipfs/v0.4.10/go-ipfs_v0.4.10_linux-amd64.tar.gz --output-document go-ipfs.tar.gz
+#             tar xvfz go-ipfs.tar.gz
+#             mv go-ipfs/ipfs /usr/local/bin/ipfs
+#             ipfs daemon --init &
+#
+#             Z_popd || return 1
+#
+#         fi
+#     else
+#         die "platform not supported"
+#     fi
+#
+#     ZDoneSet "ZInstall_host_ipfs"
+#
+# }
 
 
 ZCodePluginInstall(){
@@ -164,20 +171,21 @@ ZCodePluginInstall(){
     code --install-extension $1 --user-data-dir=~/.code_data_dir > ${ZLogFile} 2>&1 || die  "could not code install extension $1" || return 1
 }
 
-ZInstaller_docgenerator_host() {
+ZInstall_host_docgenerator() {
 
-    # ZInstaller_base_host || return 1
+    # ZInstall_base_host || return 1
 
     if [ ! "$(uname)" == "Darwin" ]; then
         die "only osx supported for now"
     fi
 
-    js9 'j.tools.docgenerator.install()'
+    js9 "j.tools.docgenerator.install()"
+
 }
 
-ZInstaller_editor_host() {
+ZInstall_host_editor() {
 
-    ZInstaller_base_host || return 1
+    ZInstall_base_host || return 1
 
     if [ "$(uname)" == "Darwin" ]; then
       echo "[+] download visual studio code"
