@@ -167,7 +167,7 @@ ZInstaller_docgenerator() {
 }
 
 ZInstaller_ays9() {
-    ZDockerRunUbuntu || return 1
+    ZDockerActive -b "jumpscale/js9_full" -c "ZInstaller_js9_full -f" || return 1
     if ZDoneCheck "ZInstaller_js9_ays9" ; then
         echo "[+] install ays9 already done."
        return 0
@@ -184,6 +184,8 @@ ZInstaller_ays9() {
     ZNodePortSet $port || return 1
     container "pip3 install -e /opt/code/github/jumpscale/ays9" || return 1
     container "js9_init" || return 1
+
+    ZDockerCommit -b jumpscale/ays9 || die "docker commit" || return 1
     ZDoneSet "ZInstaller_js9_ays9"
 }
 

@@ -222,7 +222,7 @@ ZDockerBuildUbuntu() {
     container 'echo "" > /etc/motd' || return 1
     container 'touch /root/.iscontainer' || return 1
 
-    ZDockerCommit -b jumpscale/ubuntu -s || return 1
+    ZDockerCommit -b jumpscale/ubuntu || return 1
 
     echo "[+] DOCKER UBUNTU OK"
 
