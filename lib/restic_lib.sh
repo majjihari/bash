@@ -1,9 +1,9 @@
 
 
 ZResticBuild() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     ZCodeGet restic git@github.com:restic/restic.git || return 1
-    go run build.go 2>&1 > $ZLogFile || die 'could not build restic' || return 1
+    go run build.go 2>&1 >> $ZLogFile || die 'could not build restic' || return 1
     mv restic /usr/local/bin/ || die 'could not build restic (move)' || return 1
     # rm -rf $ZCODEDIR/restic
     Z_popd || return 1
@@ -20,7 +20,7 @@ ZResticEnv() {
 }
 
 ZResticEnvSet() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     #set params for ssh, test connection
     ZSSHTEST || return 1
     if [ ! -n "$RNAME" ]; then
@@ -66,7 +66,7 @@ ZResticInit() {
 
 
 ZResticBackup() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     ZResticEnvSet || return 1
     local RSOURCE=$1
     local RTAG=$2
@@ -81,7 +81,7 @@ ZResticBackup() {
 }
 
 ZResticCheck() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     touch $ZLogFile #to make sure we don't show other error
     echo $RPASSWD > /tmp/sdwfa
     restic -r sftp:root@$RNODE:$RDEST/$RNAME -p /tmp/sdwfa  check 2>&1 | tee $ZLogFile || die || return 1
@@ -91,7 +91,7 @@ ZResticCheck() {
 
 
 ZResticSnapshots() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     touch $ZLogFile #to make sure we don't show other error
     echo $RPASSWD > /tmp/sdwfa
     restic -r sftp:root@$RNODE:$RDEST/$RNAME -p /tmp/sdwfa  snapshots 2>&1 | tee $ZLogFile || die || return 1
@@ -99,9 +99,9 @@ ZResticSnapshots() {
 }
 
 ZResticMount() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     touch $ZLogFile #to make sure we don't show other error
-    mkdir -p ~/restic > $ZLogFile 2>&1  || die || return 1
+    mkdir -p ~/restic >> $ZLogFile 2>&1  || die || return 1
     echo $RPASSWD > /tmp/sdwfa
     restic -r sftp:root@$RNODE:$RDEST/$RNAME -p /tmp/sdwfa  --allow-root mount ~/restic 2>&1 | tee $ZLogFile || die || return 1
     rm -f /tmp/sdwfa

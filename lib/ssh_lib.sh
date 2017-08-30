@@ -1,8 +1,8 @@
 
 ZSSHTEST() {
-    echo '' > $ZLogFile
+    echo '' >> $ZLogFile
     ZNodeEnvDefaults
-    ssh root@$RNODE -p $RPORT 'ls /' > $ZLogFile 2>&1 || die "could not connect over ssh to $RNODE:$RPORT" || return 1
+    ssh root@$RNODE -p $RPORT 'ls /' >> $ZLogFile 2>&1 || die "could not connect over ssh to $RNODE:$RPORT" || return 1
     #TODO: check and if not connect, ask the params again, till its all ok
 }
 
@@ -24,7 +24,7 @@ will std run in background (tmux)
 EOF
 }
 ZSSH_RFORWARD() {(
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     local raddress=""
     local laddress=localhost
     local lport=22
@@ -73,7 +73,7 @@ to see output: do e.g. 'cat $ZLogFile'
 EOF
 }
 ZEXEC() {(
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     local OPTIND
     local cmd=""
     local interactive=0
@@ -95,11 +95,11 @@ ZEXEC() {(
 
     if [ $localcmd -eq 0 ] ; then
         if [ $interactive -eq 1 ] ; then
-            ssh -qAt root@$RNODE -p $RPORT "TERM=xterm;$iimport$cmd" > $ZLogFile 2>&1 || die "ssh $@" || return 1
+            ssh -qAt root@$RNODE -p $RPORT "TERM=xterm;$iimport$cmd" >> $ZLogFile 2>&1 || die "ssh $@" || return 1
             # ssh -A root@$RNODE -p $RPORT "$cmd" && return 1
         else
-            # ssh -A root@$RNODE -p $RPORT "$cmd" > $ZLogFile 2>&1 || die "could not ssh command: $cmd" && return 1
-            ssh -qAt root@$RNODE -p $RPORT "TERM=xterm;$iimport$cmd"  > $ZLogFile 2>&1 || die "ssh $@" || return 1
+            # ssh -A root@$RNODE -p $RPORT "$cmd" >> $ZLogFile 2>&1 || die "could not ssh command: $cmd" && return 1
+            ssh -qAt root@$RNODE -p $RPORT "TERM=xterm;$iimport$cmd"  >> $ZLogFile 2>&1 || die "ssh $@" || return 1
             # cat $ZLogFile
         fi
     else
@@ -107,7 +107,7 @@ ZEXEC() {(
         if [ $interactive -eq 1 ] ; then
             $cmd || return 1
         else
-            $cmd  > $ZLogFile 2>&1 || die "error in ZEXEC local execute: $@" || return 1
+            $cmd  >> $ZLogFile 2>&1 || die "error in ZEXEC local execute: $@" || return 1
         fi
     fi
 
@@ -118,7 +118,7 @@ ZEXEC() {(
 
 #goal is to allow people to get into their container without thinking
 ZSSH() {(
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     ZNodeEnvDefaults
     if [ -n "$1" ]; then
         ssh -At root@$RNODE -p $RPORT "TERM=xterm;. /opt/code/github/jumpscale/bash/zlibs.sh;$@;bash -i"  || return 1
@@ -129,7 +129,7 @@ ZSSH() {(
 )}
 
 ZNodeUbuntuPrepare() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     ZNodeEnvDefaults  || return 1
     ZSSH 'apt-get update;apt-get upgrade -y'  || return 1
     ZDockerInstall  || return 1
@@ -139,7 +139,7 @@ ZNodeUbuntuPrepare() {
 
 
 ZNodePortSet() {
-    echo '' > $ZLogFile
+    echo '' >> $ZLogFile
     if [ ! -n "$1" ]; then
         read -p "port of node: " RPORT
     else
@@ -149,7 +149,7 @@ ZNodePortSet() {
 }
 
 ZNodeSet() {
-    echo '' > $ZLogFile
+    echo '' >> $ZLogFile
     if [ ! -n "$1" ]; then
         read -p "ipaddr or hostname of node: " RNODE
     else
@@ -159,7 +159,7 @@ ZNodeSet() {
 }
 
 ZNodeEnvDefaults() {
-    echo '' > $ZLogFile
+    echo '' >> $ZLogFile
     export RNODE=${RNODE:-'localhost'}
     if [ "$RNODE" == "localhost" ] ; then
         export RPORT=${RPORT:-2222}

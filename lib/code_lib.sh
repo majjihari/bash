@@ -36,7 +36,7 @@ EOF
 
 
 ZCodeGetJS() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     ZCodeConfig || return 1
     local OPTIND
     local account='jumpscale'
@@ -90,7 +90,7 @@ EOF
 }
 #to return to original dir do Z_pushd
 ZCodeGet() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     ZCodeConfig || return 1
     local OPTIND
     local type='github'
@@ -124,16 +124,16 @@ ZCodeGet() {
     Z_mkdir_pushd $ZCODEDIR/$type/$account || return 1
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
-        ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts 2>&1 > $ZLogFile || die "ssh keyscan" || return 1
+        ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts 2>&1 >> $ZLogFile || die "ssh keyscan" || return 1
     fi
 
     if [ ! -e $ZCODEDIR/$type/$account/$reponame ]; then
         echo " [+] clone"
-        git clone -b ${branch} $giturl $reponame 2>&1 > $ZLogFile || die "git clone" || return 1
+        git clone -b ${branch} $giturl $reponame 2>&1 >> $ZLogFile || die "git clone" || return 1
     else
         Z_pushd $ZCODEDIR/$type/$account/$reponame || return 1
         echo " [+] pull"
-        git pull  2>&1 > $ZLogFile || die "could not git pull" || return 1
+        git pull  2>&1 >> $ZLogFile || die "could not git pull" || return 1
         Z_popd || return 1
     fi
     Z_popd || return 1
@@ -154,7 +154,7 @@ EOF
 }
 
 ZCodePush() {
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     ZCodeConfig || return 1
     local OPTIND
     local type='github'
@@ -203,13 +203,13 @@ ZCodePush() {
     else
         Z_pushd $ZCODEDIR/$type/$account/$reponame || return 1
         echo " [+] add"
-        git add . -A  2>&1 > $ZLogFile #|| die "ZCodePush (add) $@" || return 1
+        git add . -A  2>&1 >> $ZLogFile #|| die "ZCodePush (add) $@" || return 1
         echo " [+] commit"
-        git commit -m '$message'  2>&1 > $ZLogFile #|| die "ZCodePush (commit) $@" || return 1
+        git commit -m '$message'  2>&1 >> $ZLogFile #|| die "ZCodePush (commit) $@" || return 1
         echo " [+] pull"
-        git pull  2>&1 > $ZLogFile || die "ZCodePush (pull) $@" || return 1
+        git pull  2>&1 >> $ZLogFile || die "ZCodePush (pull) $@" || return 1
         echo " [+] push"
-        git push  2>&1 > $ZLogFile || die "ZCodePush (push) $@" || return 1
+        git push  2>&1 >> $ZLogFile || die "ZCodePush (push) $@" || return 1
         Z_popd || return 1
     fi
     Z_popd || return 1
@@ -228,7 +228,7 @@ EOF
 }
 
 ZCodePushJS(){
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     ZCodeConfig || return 1
     local OPTIND
     local reponame=''

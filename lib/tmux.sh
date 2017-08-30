@@ -14,7 +14,7 @@ EOF
 }
 
 TMUX_Start() {(
-    echo '' > $ZLogFile
+    echo '' >> $ZLogFile
     if ! which tmux 2>&1 > /dev/null; then
         die "tmux not found"
     fi
@@ -73,7 +73,7 @@ EOF
 }
 
 TMUX_Stop() {(
-    echo '' > $ZLogFile
+    echo '' >> $ZLogFile
     if ! which tmux 2>&1 > /dev/null; then
         die "tmux not found"
     fi

@@ -69,7 +69,7 @@ ZDoneReset() {
 # }
 
 
-echo "init" > $ZLogFile
+echo "init" >> $ZLogFile
 
 if [ ! -d "${ZUTILSDIR}/bash" ]; then
     echo "[-] ${ZUTILSDIR}/bash: directory not found"

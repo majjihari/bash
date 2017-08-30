@@ -14,7 +14,7 @@ EOF
 }
 
 RSyncTo() {(
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     local RPORT=${RPORT:-22}
     local OPTIND
     local all=0
@@ -45,12 +45,12 @@ RSyncTo() {(
     fi    
 
     if [ "$rdest" != "" ] ; then
-        ZEXEC -c "mkdir -p $rdest" > $ZLogFile 2>&1 || die "could not mkdir $rdest as part of rsync: $@" || return 1
+        ZEXEC -c "mkdir -p $rdest" >> $ZLogFile 2>&1 || die "could not mkdir $rdest as part of rsync: $@" || return 1
     fi
 
     if [ "$rsource" != "" ] && [ "$rdest" != "" ] ; then
         if [ $all -eq 1 ] ; then
-            rsync -rav -e "ssh -p $RPORT" "$rsource" root@$RNODE:$rdest > $ZLogFile 2>&1 || die "could not rsync: $@" || return 1
+            rsync -rav -e "ssh -p $RPORT" "$rsource" root@$RNODE:$rdest >> $ZLogFile 2>&1 || die "could not rsync: $@" || return 1
         else
             n=0
             until [ $n -ge 10 ]
@@ -70,7 +70,7 @@ RSyncTo() {(
 
 
 RSync_ZTools() {(
-    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     if [ "$RNODE" == "localhost" ] ; then
         return 0
     fi

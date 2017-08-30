@@ -55,8 +55,8 @@ die() {
     echo "[-] something went wrong: $1"
     rm -f /tmp/sdwfa #to remove temp passwd for restic, just to be sure
     cat $ZLogFile
-    return 1
-    # exit 1
+    # return 1
+    exit 1
 }
 
 ZUtilsGetCode() {
@@ -66,19 +66,19 @@ ZUtilsGetCode() {
     local giturl=https://github.com/Jumpscale/bash.git
     local branch=${ZUTILSBRANCH:-master}
     echo "[+] get code $giturl ($branch)"
-    pushd $ZUTILSDIR 2>&1 > $ZLogFile
+    pushd $ZUTILSDIR 2>&1 >> $ZLogFile
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
-        ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 > $ZLogFile || die || return 1
+        ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 >> $ZLogFile || die || return 1
     fi
 
     if [ ! -e $ZUTILSDIR/bash ]; then
         echo " [+] clone zutils"
-        git clone -b ${branch} $giturl bash 2>&1 > $ZLogFile || die || return 1
+        git clone -b ${branch} $giturl bash 2>&1 >> $ZLogFile || die || return 1
     else
         pushd $ZUTILSDIR/bash
         echo " [+] pull"
-        git pull  2>&1 > $ZLogFile || die || return 1
+        git pull  2>&1 >> $ZLogFile || die || return 1
         popd > /dev/null 2>&1
     fi
     popd > /dev/null 2>&1
@@ -101,10 +101,9 @@ sed -i.bak '/jsenv.sh/d' $HOMEDIR/.bash_profile
 sed -i.bak '/.*zlibs.sh/d' $HOMEDIR/.bash_profile
 echo ". ${ZUTILSDIR}/bash/zlibs.sh" >> $HOMEDIR/.bash_profile
 
-if [ ! -e ~/.iscontainer ] || [ -n $ZHOSTONLY ]; then
+if [ ! -e ~/.iscontainer ] ; then
     ZUtilsGetCode
     . ${ZUTILSDIR}/bash/zlibs.sh
-    # ZInstaller_js9_host
 else
     . ${ZUTILSDIR}/bash/zlibs.sh
 fi
