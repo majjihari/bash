@@ -169,7 +169,7 @@ ZInstall_docgenerator() {
 
 ZInstall_ays9() {
 
-    ZDockerActive -b "jumpscale/js9_full" -c "ZInstaller_js9_full -f" || return 1
+    ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full -f" || return 1
 
     if ZDoneCheck "ZInstall_js9_ays9" ; then
         echo "[+] install ays9 already done."
