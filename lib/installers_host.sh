@@ -12,14 +12,14 @@ ZInstall_host_code_jumpscale() {
         branch=${ZBRANCH}
     fi
     if [ -z $branch ] ; then
-        branch=master
+        branch='9.1.1_remove_gigdir'
     fi
     echo "[+] loading or updating jumpscale source code (branch:$branch)"
     ZCodeGetJS -r core9 -b $branch || return 1
     ZCodeGetJS -r lib9 -b $branch  || return 1
     ZCodeGetJS -r prefab9 -b $branch || return 1
     # ZCodeGetJS -r builder_bootstrap -b $branch > ${ZLogFile} 2>&1 || die || return 1
-    ZCodeGetJS -r developer -b $branch || return 1
+    #ZCodeGetJS -r developer -b $branch || return 1 #OLD DO NOT USE
     echo "[+] update jumpscale code done"
     ZDoneSet "ZInstall_code_jumpscale_host"
 }
