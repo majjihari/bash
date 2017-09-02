@@ -386,6 +386,7 @@ ZDockerActive() {
     local iname='build'
     local port=2222
     local addarg=''
+    local cmd=''
     while getopts "b:c:i:p:a:h" opt; do
         case $opt in
            b )  bname=$OPTARG ;;
@@ -400,21 +401,38 @@ ZDockerActive() {
 
     if ! ZDockerImageExist "$bname " ; then
         #means docker image does not exist yet
-        echo "[+] need to build the docker with command: $cmd"
-        `$cmd`
-    fi
-    container "ls /"
-    if [ !  $? -eq 0 ]; then
-        #so is not up & running
-        ZDockerRun -b "$bname" -i "$iname" -p $port  || return 1
+        if [ ! "$cmd" = "" ]; then
+            echo "[+] need to build the docker with command: $cmd"
+            `$cmd`
+        else
+            ZDockerRemove $iname
+            return 1
+        fi
     fi
 
-    echo "[+] docker from image $bname is active, access it through 'ZSSH'"
+    # container "ls /"
+    local res=`docker inspect -f '{{.State.Running}}' $iname`
+    if [ ! "$res" = "true" ]; then
+        #so is not up & running
+        echo "[+] docker from image $bname is not active, will try to start"
+        ZDockerRun -b "$bname" -i "$iname" -p $port  || return 1
+        echo "[+] docker from image $bname is active, access it through 'ZSSH'"
+        return 0
+    fi
+
+    return 1
+
+    
 
 }
 
+ZDockerRemove(){
+    docker stop $1 > /dev/null 2>&1 
+    docker rm -f $1 > /dev/null  2>&1 
+}
+
 ZDockerImageExist() {
-    docker images | grep "$1 " > /dev/null
+    docker images | grep "$1 "> /dev/null 2>&1 
     if [ !  $? -eq 0 ]; then
         #means docker image does not exist yet
         return 1

@@ -10,15 +10,9 @@ ZInstall_python() {
         esac
     done
 
-    ZDockerActive -b "jumpscale/ubuntu" -c "ZDockerBuildUbuntu -f" || return 1
+    ZDockerActive -b "jumpscale/ubuntu_python" -i ubuntu_python && return 0
 
-    if [ $force -eq 0 ] && ZDoneCheck "ZInstall_python" && ZDockerImageExist "jumpscale/ubuntu_python" ; then
-        echo "[+] install python & deps already done."
-       return 0
-    fi
-
-    ZDoneUnset "ZInstall_python"
-    ZDoneUnset "ZInstall_js9"
+    ZDockerActive -b "jumpscale/ubuntu" -c "ZDockerBuildUbuntu -f" -i ubuntu_python || return 1
 
     echo "[+] installing python"
     container 'apt-get update' || return 1
@@ -40,8 +34,6 @@ ZInstall_python() {
 
     ZDockerCommit -b jumpscale/ubuntu_python || die "docker commit" || return 1
 
-    ZDoneSet "ZInstall_python"
-
     echo "[+] python installed in container(OK)"
 
 }
@@ -54,17 +46,13 @@ ZInstall_js9() {
 
     while getopts "f" opt; do
         case $opt in
-           f )  force=1 ;;
+           f )  docker rmi -f jumpscale/js9 ;;
         esac
     done
 
-    ZDockerActive -b "jumpscale/ubuntu_python" -c "ZInstall_python -f" || return 1
+    ZDockerActive -b "jumpscale/js9" -i js9 && return 0
 
-    if [ $force -eq 0 ] && ZDoneCheck "ZInstall_js9" && ZDockerImageExist "jumpscale/js9" ; then
-        echo "[+] install js9 in container already done."
-       return 0
-    fi
-    ZDoneUnset "ZInstall_js9"
+    ZDockerActive -b "jumpscale/ubuntu_python" -c "ZInstall_python -f" -i js9 || return 1
 
     ZInstall_host_code_jumpscale || return 1
 
@@ -94,8 +82,6 @@ ZInstall_js9() {
 
     echo "[+] js9 installed (OK)"
 
-    ZDoneSet "ZInstall_js9"
-
 }
 
 ZInstall_js9_full() {
@@ -105,18 +91,14 @@ ZInstall_js9_full() {
 
     while getopts "f" opt; do
         case $opt in
-           f )  force=1 ;;
+           f )  docker rmi -f jumpscale/js9_full ;;
         esac
     done
 
-    #check the docker image is there
-    ZDockerActive -b "jumpscale/js9" -c "ZInstall_js9 -f" || return 1
+    ZDockerActive -b "jumpscale/js9_full" -i js9_full && return 0    
 
-    if [ $force -eq 0 ] && ZDoneCheck "ZInstall_js9_full" && ZDockerImageExist "jumpscale/js9_full" ; then
-        echo "[+] install js9 in container already done."
-       return 0
-    fi
-    ZDoneUnset "ZInstall_js9"
+    #check the docker image is there
+    ZDockerActive -b "jumpscale/js9" -c "ZInstall_js9 -f" -i js9_full || return 1
 
     echo "[+] installing jumpscale build dependencies"
     container "apt-get install build-essential python3-dev libvirt-dev libssl-dev libffi-dev libssh-dev -y" || return 1
@@ -131,7 +113,28 @@ ZInstall_js9_full() {
 
     ZDockerCommit -b jumpscale/js9_full || die "docker commit" || return 1
 
-    ZDoneSet "ZInstall_js9_full"
+}
+
+ZInstall_js9_node() {
+
+    local OPTIND
+    local force=0
+
+    while getopts "f" opt; do
+        case $opt in
+           f )  docker rmi -f jumpscale/js9_node ;;
+        esac
+    done
+
+    ZDockerActive -b "jumpscale/js9_node" -i js9_node && return 0    
+
+    #check the docker image is there
+    ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full -f" -i js9_node || return 1
+
+    echo "[+] initializing node on js9"
+    container 'js9 "j.tools.prefab.local.development.nodejs.install()"' || return 1    
+
+    ZDockerCommit -b jumpscale/js9_node || die "docker commit" || return 1
 
 }
 
@@ -142,17 +145,13 @@ ZInstall_docgenerator() {
 
     while getopts "f" opt; do
         case $opt in
-           f )  force=1 ;;
+           f )  docker rmi -f jumpscale/js9_docgenerator ;;
         esac
     done
 
-    ZDockerActive -b "jumpscale/js9" -c "ZInstall_js9 -f" || return 1
+    ZDockerActive -b "jumpscale/js9_docgenerator" -i js9_docgenerator && return 0    
 
-    if [ $force -eq 0 ] && ZDoneCheck "ZInstall_js9_docgenerator" && ZDockerImageExist "jumpscale/js9_docgenerator" ; then
-        echo "[+] install js9 docgenerator in container already done."
-       return 0
-    fi
-    ZDoneUnset "ZInstall_js9_docgenerator"
+    ZDockerActive -b "jumpscale/js9_node" -c "ZInstall_js9_node -f" -i js9_docgenerator || return 1
 
     echo "[+] initializing jumpscale"
     container 'js9_init' || return 1
@@ -163,13 +162,22 @@ ZInstall_docgenerator() {
 
     ZDockerCommit -b jumpscale/js9_docgenerator || die "docker commit" || return 1
 
-    ZDoneSet "ZInstall_js9_docgenerator"
-
 }
 
 ZInstall_ays9() {
 
-    ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full -f" || return 1
+    local OPTIND
+    local force=0
+
+    while getopts "f" opt; do
+        case $opt in
+           f )  docker rmi -f jumpscale/ays9 ;;
+        esac
+    done    
+
+    ZDockerActive -b "jumpscale/ays9" -i ays9 && return 0   
+
+    ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full -f" -i ays9 || return 1
 
     if ZDoneCheck "ZInstall_js9_ays9" ; then
         echo "[+] install ays9 already done."
@@ -188,20 +196,16 @@ ZInstall_ays9() {
     container "pip3 install -e /opt/code/github/jumpscale/ays9" || return 1
     container "js9_init" || return 1
 
-    ZDoneSet "ZInstall_js9_ays9"
-
     ZDockerCommit -b jumpscale/ays9 || die "docker commit" || return 1
-    ZDoneSet "ZInstaller_js9_ays9"
 
 }
 
 ZInstall_portal9() {
-    ZDockerRunUbuntu || return 1
-    if ZDoneCheck "ZInstall_js9_portal9" ; then
-        echo "[+] install portal9 already done."
-       return 0
-    fi
-    ZDoneUnset "ZInstall_js9"
+
+    ZDockerActive -b "jumpscale/portal9" -i portal9 && return 0   
+
+    ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full" -i portal9 || return 1
+
     local port=${RPORT:-2222}
     local addarg="${RNODE:-localhost}"
     echo "[+] install Portal9"
@@ -214,21 +218,23 @@ ZInstall_portal9() {
     ZNodePortSet $port || return 1
     container "cd  /opt/code/github/jumpscale/portal9 && bash install.sh;" || return 1
     container "js9_init" || return 1
-    ZDoneSet "ZInstall_js9_portal9"
+
+    ZDockerCommit -b jumpscale/portal9 || die "docker commit" || return 1
+
 }
 
 ZInstall_issuemanager() {
-    ZDockerRunUbuntu  || return 1
-    if ZDoneCheck "ZInstall_js9_issuemanager" ; then
-        echo "[+] Issue Manager already installed"
-       return 0
-    fi
-    ZDoneUnset "ZInstall_js9"
-    ZInstall_js9_full || return 1
-    ZInstall_portal9 || return 1
+
+    ZDockerActive -b "jumpscale/issuemanager" -i issuemanager && container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.start()"' && return 0   
+
+    ZDockerActive -b "jumpscale/portal9" -c "ZInstall_portal9" -i issuemanager || return 1
+
     echo "[+] Installing IssueManager"
     container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.install()"' || return 1
     container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.start()"' || return 1
+
+    ZDockerCommit -b jumpscale/issuemanager || die "docker commit" || return 1
+
     ZDoneSet "ZInstall_js9_issuemanager"
 }
 
@@ -239,13 +245,13 @@ ZInstall_zerotier() {
     container "curl -s https://install.zerotier.com/ | bash || true" || return 1
 }
 
-ZInstall_openvpn() {
-    echo "[+] install openvpn docker"
-    mkdir -p /etc/ovpn
-    docker run --name=openvpn-as -p 8081:80 -v /etc/ovpn:/config -e INTERFACE=eth0 --net=host --privileged linuxserver/openvpn-as
-# -e PGID=<gid> -e PUID=<uid> \
-# -e TZ=<timezone> \
-# -e INTERFACE=<interface> \
-# --net=host --privileged \
-# linuxserver/openvpn-as
-}
+# ZInstall_openvpn() {
+#     echo "[+] install openvpn docker"
+#     mkdir -p /etc/ovpn
+#     docker run --name=openvpn-as -p 8081:80 -v /etc/ovpn:/config -e INTERFACE=eth0 --net=host --privileged linuxserver/openvpn-as
+# # -e PGID=<gid> -e PUID=<uid> \
+# # -e TZ=<timezone> \
+# # -e INTERFACE=<interface> \
+# # --net=host --privileged \
+# # linuxserver/openvpn-as
+# }
