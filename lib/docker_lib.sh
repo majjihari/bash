@@ -64,7 +64,7 @@ ZDockerCommit() {
     local OPTIND
     local bname=''
     local iname=$ZDockerName
-    local stop = 1
+    local stop=1
     while getopts "b:i:hs" opt; do
         case $opt in
            b )  bname=$OPTARG ;;
