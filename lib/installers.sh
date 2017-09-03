@@ -204,7 +204,7 @@ ZInstall_portal9() {
 
     ZDockerActive -b "jumpscale/portal9" -i portal9 && return 0
 
-    ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full" -i portal9 || return 1
+    ZDockerActive -b "jumpscale/ays9" -c "ZInstall_ays9 -f" -i portal9 || return 1
 
     local port=${RPORT:-2222}
     local addarg="${RNODE:-localhost}"
