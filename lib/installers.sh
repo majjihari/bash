@@ -95,7 +95,7 @@ ZInstall_js9_full() {
         esac
     done
 
-    ZDockerActive -b "jumpscale/js9_full" -i js9_full && return 0    
+    ZDockerActive -b "jumpscale/js9_full" -i js9_full && return 0
 
     #check the docker image is there
     ZDockerActive -b "jumpscale/js9" -c "ZInstall_js9 -f" -i js9_full || return 1
@@ -126,13 +126,13 @@ ZInstall_js9_node() {
         esac
     done
 
-    ZDockerActive -b "jumpscale/js9_node" -i js9_node && return 0    
+    ZDockerActive -b "jumpscale/js9_node" -i js9_node && return 0
 
     #check the docker image is there
     ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full -f" -i js9_node || return 1
 
     echo "[+] initializing node on js9"
-    container 'js9 "j.tools.prefab.local.development.nodejs.install()"' || return 1    
+    container 'js9 "j.tools.prefab.local.development.nodejs.install()"' || return 1
 
     ZDockerCommit -b jumpscale/js9_node || die "docker commit" || return 1
 
@@ -149,7 +149,7 @@ ZInstall_docgenerator() {
         esac
     done
 
-    ZDockerActive -b "jumpscale/js9_docgenerator" -i js9_docgenerator && return 0    
+    ZDockerActive -b "jumpscale/js9_docgenerator" -i js9_docgenerator && return 0
 
     ZDockerActive -b "jumpscale/js9_node" -c "ZInstall_js9_node -f" -i js9_docgenerator || return 1
 
@@ -173,9 +173,9 @@ ZInstall_ays9() {
         case $opt in
            f )  docker rmi -f jumpscale/ays9 ;;
         esac
-    done    
+    done
 
-    ZDockerActive -b "jumpscale/ays9" -i ays9 && return 0   
+    ZDockerActive -b "jumpscale/ays9" -i ays9 && return 0
 
     ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full -f" -i ays9 || return 1
 
@@ -202,7 +202,7 @@ ZInstall_ays9() {
 
 ZInstall_portal9() {
 
-    ZDockerActive -b "jumpscale/portal9" -i portal9 && return 0   
+    ZDockerActive -b "jumpscale/portal9" -i portal9 && return 0
 
     ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full" -i portal9 || return 1
 
@@ -225,7 +225,7 @@ ZInstall_portal9() {
 
 ZInstall_issuemanager() {
 
-    ZDockerActive -b "jumpscale/issuemanager" -i issuemanager && container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.start()"' && return 0   
+    ZDockerActive -b "jumpscale/issuemanager" -i issuemanager && container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.start()"' && return 0
 
     ZDockerActive -b "jumpscale/portal9" -c "ZInstall_portal9" -i issuemanager || return 1
 
