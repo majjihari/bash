@@ -12,10 +12,10 @@ ZInstall_DMG() {
         die "specify name for ZInstall DMG" || return 1
     fi
 
-    VOLUME=`hdiutil attach "$1" | grep Volumes | awk '{print $3}'` > ${ZLogFile} 2>&1  || die || return 1
+    VOLUME=`hdiutil attach "$1" | grep Volumes | awk '{print $3}'` >> ${ZLogFile} 2>&1  || die || return 1
     RSync  "$VOLUME/$2.app/" "/Applications/$2.app/"/ || return 1
-    # cp -rf $VOLUME/*.app /Applications > ${ZLogFile} 2>&1  || die "cp" || return 1
-    hdiutil detach $VOLUME > ${ZLogFile} 2>&1
+    # cp -rf $VOLUME/*.app /Applications >> ${ZLogFile} 2>&1  || die "cp" || return 1
+    hdiutil detach $VOLUME >> ${ZLogFile} 2>&1
 
     Z_popd || return 1
 }
@@ -30,7 +30,7 @@ IPFS_get_install_zip() {
     rm -rf "$2.app"
     rm -f "$2.zip"
     IPFS_get $1 "$2.zip" || return 1
-    unzip "$2.zip" > ${ZLogFile} 2>&1 || die "unzip $1 $2" || return 1
+    unzip "$2.zip" >> ${ZLogFile} 2>&1 || die "unzip $1 $2" || return 1
     RSync_move "$2.app"/ "/Applications/$2.app/" || return 1
     Z_popd || return 1
 }
@@ -53,7 +53,7 @@ IPFS_get() {
     fi
     Z_mkdir_pushd /tmp/zdownloads || return 1
 
-    ipfs get $1 -o "$2" > ${ZLogFile} 2>&1 || die "could not ipfs download $2" || return 1
+    ipfs get $1 -o "$2" >> ${ZLogFile} 2>&1 || die "could not ipfs download $2" || return 1
 
     Z_popd || return 1
 }
@@ -67,9 +67,9 @@ IPFS_get_install_dmg() {
     fi
     Z_mkdir_pushd /tmp/zdownloads || return 1
     IPFS_get $1 "$2.dmg" || return 1
-    # VOLUME=`hdiutil attach "$2.dmg" | grep Volumes | awk '{print $3}'` > ${ZLogFile} 2>&1 || die "hdutil mount" || return 1
-    # cp -rf $VOLUME/*.app /Applications > ${ZLogFile} 2>&1 || die "cp" || return 1
-    # hdiutil detach $VOLUME > ${ZLogFile} 2>&1
+    # VOLUME=`hdiutil attach "$2.dmg" | grep Volumes | awk '{print $3}'` >> ${ZLogFile} 2>&1 || die "hdutil mount" || return 1
+    # cp -rf $VOLUME/*.app /Applications >> ${ZLogFile} 2>&1 || die "cp" || return 1
+    # hdiutil detach $VOLUME >> ${ZLogFile} 2>&1
     ZInstall_DMG "$2.dmg" $2 || return 1
     rm -f "$2.dmg"
     Z_popd || return 1
@@ -82,7 +82,7 @@ IPFS_get_mount_dmg() {
     fi
     Z_mkdir_pushd /tmp/zdownloads || return 1
     IPFS_get $1 "$2.dmg" || die || return 1
-    VOLUME=`hdiutil attach "$2.dmg" | grep Volumes | awk '{print $3}'`  > ${ZLogFile} 2>&1 || die "hdutil mount" || return 1
+    VOLUME=`hdiutil attach "$2.dmg" | grep Volumes | awk '{print $3}'`  >> ${ZLogFile} 2>&1 || die "hdutil mount" || return 1
     Z_popd || return 1
 }
 
@@ -95,7 +95,7 @@ IPFS_get_dir(){
         die "specify name for IPFS_get_dir as 2nd arg" || return 1
     fi
     Z_mkdir_pushd /tmp/zdownloads || return 1
-    ipfs get $1 -o "$2"  > ${ZLogFile} 2>&1 || die "cannot get IPFS $1 to output $2" || return 1
+    ipfs get $1 -o "$2"  >> ${ZLogFile} 2>&1 || die "cannot get IPFS $1 to output $2" || return 1
     Z_mkdir "$3" || return 1
     RSync  "/tmp/zdownloads/$2/" "$3/" || return 1
     Z_popd || return 1

@@ -84,29 +84,29 @@ ZInstall_host_base(){
 
     if [ "$(uname)" == "Darwin" ]; then
         echo "[+] upgrade brew"
-        brew upgrade  > ${ZLogFile} 2>&1 || die "could not upgrade all brew installed components" || return 1
+        brew upgrade  >> ${ZLogFile} 2>&1 || die "could not upgrade all brew installed components" || return 1
 
         echo "[+] installing git, python, mc, tmux, curl, ipfs"
         Z_brew_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs ipfs || return 1
 
         echo "[+] set system config params"
-        echo kern.maxfiles=65536 | sudo tee -a /etc/sysctl.conf > ${ZLogFile} 2>&1 || die || return 1
-        echo kern.maxfilesperproc=65536 | sudo tee -a /etc/sysctl.conf > ${ZLogFile} 2>&1 || die || return 1
-        sudo sysctl -w kern.maxfiles=65536 > ${ZLogFile} 2>&1 || die || return 1
-        sudo sysctl -w kern.maxfilesperproc=65536 > ${ZLogFile} 2>&1 || die || return 1
-        ulimit -n 65536 > ${ZLogFile} 2>&1 || die || return 1
+        echo kern.maxfiles=65536 | sudo tee -a /etc/sysctl.conf >> ${ZLogFile} 2>&1 || die || return 1
+        echo kern.maxfilesperproc=65536 | sudo tee -a /etc/sysctl.conf >> ${ZLogFile} 2>&1 || die || return 1
+        sudo sysctl -w kern.maxfiles=65536 >> ${ZLogFile} 2>&1 || die || return 1
+        sudo sysctl -w kern.maxfilesperproc=65536 >> ${ZLogFile} 2>&1 || die || return 1
+        ulimit -n 65536 >> ${ZLogFile} 2>&1 || die || return 1
 
         echo "[+] start ipfs"
         ipfs init > /dev/null 2>&1
         ipfs config --json API.HTTPHeaders '{"Access-Control-Allow-Origin": ["*"]}'
-        brew services start ipfs  > ${ZLogFile} 2>&1 || die "could not autostart ipfs" || return 1
+        brew services start ipfs  >> ${ZLogFile} 2>&1 || die "could not autostart ipfs" || return 1
 
     elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         dist=''
         dist=`grep DISTRIB_ID /etc/*-release | awk -F '=' '{print $2}'`
         if [ "$dist" == "Ubuntu" ]; then
             echo "[+] updating packages"
-            apt-get update > ${ZLogFile} 2>&1 || die "could not update packages" || return 1
+            apt-get update >> ${ZLogFile} 2>&1 || die "could not update packages" || return 1
 
             echo "[+] installing git, python, mc, tmux, curl"
             Z_apt_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs || return 1
@@ -120,10 +120,10 @@ ZInstall_host_base(){
 
     echo "[+] installing pip system"
     curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py || die "could not download pip" || return 1
-    python3 /tmp/get-pip.py  > ${ZLogFile} 2>&1 || die "pip install" || return 1
+    python3 /tmp/get-pip.py  >> ${ZLogFile} 2>&1 || die "pip install" || return 1
 
     echo "[+] upgrade pip"
-    pip3 install --upgrade pip > ${ZLogFile} 2>&1 || die || return 1
+    pip3 install --upgrade pip >> ${ZLogFile} 2>&1 || die || return 1
 
 
 
@@ -173,7 +173,7 @@ ZInstall_host_base(){
 
 ZCodePluginInstall(){
     Z_mkdir ~/.code_data_dir || return 1
-    code --install-extension $1 --user-data-dir=~/.code_data_dir > ${ZLogFile} 2>&1 || die  "could not code install extension $1" || return 1
+    code --install-extension $1 --user-data-dir=~/.code_data_dir >> ${ZLogFile} 2>&1 || die  "could not code install extension $1" || return 1
 }
 
 ZInstall_host_docgenerator() {
@@ -218,15 +218,15 @@ ZInstall_host_editor() {
       echo "[*] Get Java JDK"
       IPFS_get_mount_dmg QmPqvfiX1aUj9Nyo74qa47j9kPgEtKMbQLBaxTyT9F1fTV  java_jdk || return 1
       echo "[*] Install Java JDK"
-      sudo installer -pkg '/Volumes/Java 8 Update 144/Java 8 Update 144.app/Contents/Resources/JavaAppletPlugin.pkg' -target / > ${ZLogFile} 2>&1 || die "could not install java" || return 1
-      hdiutil detach '/Volumes/Java 8 Update 144'  > ${ZLogFile} 2>&1 || die || return 1
+      sudo installer -pkg '/Volumes/Java 8 Update 144/Java 8 Update 144.app/Contents/Resources/JavaAppletPlugin.pkg' -target / >> ${ZLogFile} 2>&1 || die "could not install java" || return 1
+      hdiutil detach '/Volumes/Java 8 Update 144'  >> ${ZLogFile} 2>&1 || die || return 1
 
       echo "[*] Install Trolcommander"
-      brew cask install trolcommander  > ${ZLogFile} 2>&1 || die || return 1
+      brew cask install trolcommander  >> ${ZLogFile} 2>&1 || die || return 1
 
       echo "[*] Install Calibre"
       IPFS_get_install_dmg QmRV3g2Sy49MdKKEDE2m5WUY7CzFPRC7VsGX8jtwfofEEb calibre || return 1
-      sudo ln -s /Applications/calibre.app/Contents/MacOS/ebook-convert /usr/local/bin  > ${ZLogFile} 2>&1
+      sudo ln -s /Applications/calibre.app/Contents/MacOS/ebook-convert /usr/local/bin  >> ${ZLogFile} 2>&1
 
       echo "[*] install iterm"
       IPFS_get_install_zip QmddU7hgKMMsZbCHKiNgQrHyGRRbahGNNeJuo2r89CZE1z iterm || return 1
@@ -264,12 +264,12 @@ ZInstall_host_editor() {
     # else
 
     echo "[+] installing some python pips (pylint, flake, ...)"
-    pip3 install --upgrade pylint autopep8 flake8 tmuxp gitpython > ${ZLogFile} 2>&1 || die || return 1
+    pip3 install --upgrade pylint autopep8 flake8 tmuxp gitpython >> ${ZLogFile} 2>&1 || die || return 1
 
 
 
     echo "[+] installing mermaid"
-    sudo npm install -g mermaid  > ${ZLogFile} 2>&1 || die "could not install mermaid" || return 1
+    sudo npm install -g mermaid  >> ${ZLogFile} 2>&1 || die "could not install mermaid" || return 1
 
 
     echo "[+] Installing Code Editor Extensions"

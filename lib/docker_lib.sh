@@ -12,7 +12,7 @@ ZDockerInstallSSH(){
 ZDockerInstallLocal(){
     echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
     echo "[+] install docker on local machine."
-    wget -qO- https://get.docker.com/ | sh > ${ZLogFile} 2>&1 || die "could not install docker" || return 1
+    wget -qO- https://get.docker.com/ | sh >> ${ZLogFile} 2>&1 || die "could not install docker" || return 1
 
 }
 
@@ -93,7 +93,7 @@ ZDockerSSHAuthorize() {
     echo "[+]   start ssh"
     docker exec -t "${ZDockerName}" rm -f /etc/service/sshd/down
     docker exec -t "${ZDockerName}" /etc/my_init.d/00_regen_ssh_host_keys.sh
-    docker exec -t "${ZDockerName}" sv start sshd > ${ZLogFile} 2>&1
+    docker exec -t "${ZDockerName}" sv start sshd >> ${ZLogFile} 2>&1
 
     echo "[+]   Waiting for ssh to allow connections"
     while ! ssh-keyscan -p $RPORT localhost 2>&1 | grep -q "OpenSSH"; do
@@ -124,7 +124,7 @@ ZDockerEnableSSH(){
     local ZDockerName="${1:-$ZDockerName}"
 
     echo "[+]   configuring services"
-    docker exec -t $ZDockerName mkdir -p /var/run/sshd > ${ZLogFile} 2>&1 || die || return 1
+    docker exec -t $ZDockerName mkdir -p /var/run/sshd >> ${ZLogFile} 2>&1 || die || return 1
     docker exec -t $ZDockerName  rm -f /etc/service/sshd/down
     docker exec -t $ZDockerName  /etc/my_init.d/00_regen_ssh_host_keys.sh
     #
@@ -152,7 +152,7 @@ ZDockerRemoveImage(){
     ZDockerConfig
     local ZDockerImage="${1:-$ZDockerImage}"
     echo "[+] remove docker image $ZDockerImage"
-    docker rmi  -f "$ZDockerImage"  > ${ZLogFile} 2>&1 || true
+    docker rmi  -f "$ZDockerImage"  >> ${ZLogFile} 2>&1 || true
 }
 
 ZDockerRemoveImagesAll(){
@@ -210,11 +210,11 @@ ZDockerBuildUbuntu() {
 
     #basic deps
     echo "[+] apt update"
-    docker exec -t $ZDockerName apt-get update > ${ZLogFile} 2>&1 || die "apt-get update"  || return 1
+    docker exec -t $ZDockerName apt-get update >> ${ZLogFile} 2>&1 || die "apt-get update"  || return 1
     echo "[+] apt upgrade"
-    docker exec -t $ZDockerName apt-get upgrade -y > ${ZLogFile} 2>&1 || die "apt-get upgrade" || return 1
+    docker exec -t $ZDockerName apt-get upgrade -y >> ${ZLogFile} 2>&1 || die "apt-get upgrade" || return 1
     echo "[+] setting up basic tools (aptget install)"
-    docker exec -t $ZDockerName apt-get install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync -y > ${ZLogFile} 2>&1 || die "basic linux deps" || return 1
+    docker exec -t $ZDockerName apt-get install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync -y >> ${ZLogFile} 2>&1 || die "basic linux deps" || return 1
 
     ZDockerEnableSSH || return 1
 
@@ -348,7 +348,7 @@ ZDockerRun() {
         --cap-add=NET_ADMIN --cap-add=SYS_ADMIN \
         --cap-add=DAC_OVERRIDE --cap-add=DAC_READ_SEARCH \
         ${mounted_volumes} \
-        $bname > ${ZLogFile} 2>&1 || die "docker could not start, please check ${ZLogFile}" || return 1
+        $bname >> ${ZLogFile} 2>&1 || die "docker could not start, please check ${ZLogFile}" || return 1
 
     sleep 1
 
@@ -422,17 +422,17 @@ ZDockerActive() {
 
     return 1
 
-    
+
 
 }
 
 ZDockerRemove(){
-    docker stop $1 > /dev/null 2>&1 
-    docker rm -f $1 > /dev/null  2>&1 
+    docker stop $1 > /dev/null 2>&1
+    docker rm -f $1 > /dev/null  2>&1
 }
 
 ZDockerImageExist() {
-    docker images | grep "$1 "> /dev/null 2>&1 
+    docker images | grep "$1 "> /dev/null 2>&1
     if [ !  $? -eq 0 ]; then
         #means docker image does not exist yet
         return 1
