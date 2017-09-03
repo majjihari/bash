@@ -216,7 +216,7 @@ ZInstall_portal9() {
     echo "[+] installing jumpscale portal9"
     ZNodeSet $addarg || return 1
     ZNodePortSet $port || return 1
-    container "cd  /opt/code/github/jumpscale/portal9 && bash install.sh;" || return 1
+    container "cd  /opt/code/github/jumpscale/portal9 && bash install.sh ${ZBRANCH};" || return 1
     container "js9_init" || return 1
 
     ZDockerCommit -b jumpscale/portal9 || die "docker commit" || return 1
