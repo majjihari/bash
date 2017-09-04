@@ -26,9 +26,25 @@ the basic init script will be added to ~/bash_profile
 
 - when you start a new terminal the tools will be available
 
+After starting new terminal or executing
+```bash
+source /opt/code/github/jumpscale/bash/zlibs.sh
+```
+all the avialable installers can be used.
+
 # to install full jumpscale on host machine
 ```bash
 ZInstall_host_js9_full
+```
+This will install the following:
+- Jumpscale core9
+- Jumpscale libs9
+- Jumpscale prefab9
+
+# to install full jumpscale on a docker contianer
+```bash
+ZDockerInstallLocal
+ZInstall_js9_full
 ```
 
 # to install all editor tools for local machine
@@ -40,7 +56,7 @@ ZInstaller_editor_host
 # to get docker on ubuntu
 
 ```bash
-ZDockerInstall
+ZDockerInstallLocal
 ```
 
 # ssh tools
