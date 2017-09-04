@@ -188,6 +188,9 @@ ZInstall_ays9() {
     local addarg="${RNODE:-localhost}"
     echo "[+] install AYS9"
     local branch="${1:-$ZBRANCH}"
+    if [ -z $branch ] ; then
+        branch='master'
+    fi
     echo "[+] loading or updating AYS source code (branch:$branch)"
     ZCodeGetJS -r ays9 -b $branch || return 1
     echo "[+] installing jumpscale ays9"
@@ -210,6 +213,9 @@ ZInstall_portal9() {
     local addarg="${RNODE:-localhost}"
     echo "[+] install Portal9"
     local branch="${1:-$ZBRANCH}"
+    if [ -z $branch ] ; then
+        branch='master'
+    fi
     echo "[+] loading or updating Portal source code (branch:$branch)"
     ZCodeGetJS -r portal9 -b ${branch}  || return 1
 
