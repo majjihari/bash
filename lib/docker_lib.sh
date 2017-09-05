@@ -416,7 +416,11 @@ ZDockerActive() {
     if [ ! "$res" = "true" ]; then
         #so is not up & running
         echo "[+] docker from image $bname is not active, will try to start"
-        ZDockerRun -b "$bname" -i "$iname" -p $port  || return 1
+        if [[ ! -z "$addarg" ]]; then
+            ZDockerRun -b "$bname" -i "$iname" -p "$port" -a "$addarg" || return 1
+        else
+            ZDockerRun -b "$bname" -i "$iname" -p $port || return 1
+        fi
         echo "[+] docker from image $bname is active, access it through 'ZSSH'"
         return 0
     fi
