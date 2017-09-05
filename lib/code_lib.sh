@@ -79,6 +79,7 @@ Usage: ZCodeGet [-r reponame] [-g giturl] [-a account] [-b branch]
    -r reponame: name or repo which is being downloaded
    -u giturl: e.g. git@github.com:mathieuancelin/duplicates.git
    -b branchname: defaults to master
+   -k sshkey: path to sshkey to use for authorization when connecting to the repository.
    -h: help
 
 check's out any git repo repo to $ZCODEDIR/$type/$account/$reponame
@@ -98,13 +99,15 @@ ZCodeGet() {
     local reponame=''
     local giturl=''
     local branch=${ZBRANCH:-master}
-    while getopts "a:r:u:b:t:h" opt; do
+    local sshkey=''
+    while getopts "a:r:u:b:t:k:h" opt; do
         case $opt in
            a )  account=$OPTARG ;;
            t )  type=$OPTARG ;;
            r )  reponame=$OPTARG ;;
            u )  giturl=$OPTARG ;;
            b )  branch=$OPTARG ;;
+           k )  sshkey=$OPTARG ;;
            h )  ZCodeGetUsage ; return 0 ;;
            \? )  ZCodeGetUsage ; return 1 ;;
         esac
@@ -123,17 +126,30 @@ ZCodeGet() {
 
     Z_mkdir_pushd $ZCODEDIR/$type/$account || return 1
 
+    # check if docs.greenitglobe.com (gogs) in the url
+    if grep -q docs.greenitglobe.com <<< $giturl; then
+        ssh-keyscan -t rsa docs.greenitglobe.com >> ~/.ssh/known_hosts 2>&1 >> ZLogFile || die "ssh keyscan" || return 1 
+    fi
+
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
         ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts 2>&1 >> $ZLogFile || die "ssh keyscan" || return 1
     fi
 
     if [ ! -e $ZCODEDIR/$type/$account/$reponame ]; then
         echo " [+] clone"
-        git clone -b ${branch} $giturl $reponame 2>&1 >> $ZLogFile || die "git clone" || return 1
+        if [ -n $sshkey ]; then
+            ssh-agent bash -c "ssh-add ${sshkey};  git clone -b ${branch} $giturl $reponame 2>&1 >> $ZLogFile" || die "git clone" || return 1
+        else
+            git clone -b ${branch} $giturl $reponame 2>&1 >> $ZLogFile || die "git clone" || return 1
+        fi
     else
         Z_pushd $ZCODEDIR/$type/$account/$reponame || return 1
         echo " [+] pull"
-        git pull  2>&1 >> $ZLogFile || die "could not git pull" || return 1
+        if [ -n $sshkey ]; then
+            ssh-agent bash -c "ssh-add ${sshkey}; git pull 2>&1 >> $ZlogFile" || die "cloud not git pull" || return 1
+        else
+            git pull  2>&1 >> $ZLogFile || die "could not git pull" || return 1
+        fi
         Z_popd || return 1
     fi
     Z_popd || return 1
