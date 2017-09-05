@@ -146,7 +146,7 @@ ZCodeGet() {
         Z_pushd $ZCODEDIR/$type/$account/$reponame || return 1
         echo " [+] pull"
         if [ -n $sshkey ]; then
-            ssh-agent bash -c "ssh-add ${sshkey}; git pull 2>&1 >> $ZlogFile" || die "cloud not git pull" || return 1
+            ssh-agent bash -c "ssh-add ${sshkey}; git pull 2>&1 >> $ZLogFile" || die "cloud not git pull" || return 1
         else
             git pull  2>&1 >> $ZLogFile || die "could not git pull" || return 1
         fi
