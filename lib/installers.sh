@@ -270,6 +270,8 @@ ZInstall_issuemanager_full(){
 
     ZDockerActive -b "jumpscale/issuemanager" -c "ZInstall_issuemanager -f" -i issuemanager_full || return 1
 
+    container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.start()"' || return 1
+
     local type="gogs"
     local reponame="cockpit_issue_manager"
     local account="gig"
@@ -283,7 +285,7 @@ ZInstall_issuemanager_full(){
     fi
 
     echo "[+] Syncing data from gogs"
-    container "ssh-agent bash -c 'cd /opt/code/$type/$account/$reponame; ssh-add gogsdb; python3 syncData.py'" 1>&2 || die "Failed to sync from gogs" || return 1
+    container  "cd /opt/code/gogs/gig/cockpit_issue_manager; python3 syncData.py ${GOGSDB_PASS}" || die "Faield to sync data from gogs" || return 1
     
     ZDockerCommit -b jumpscale/issuemanager_full || die "docker commit" || return 1
 
