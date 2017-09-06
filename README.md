@@ -31,6 +31,20 @@ the basic init script will be added to ~/bash_profile
 ZInstall_host_js9_full
 ```
 
+# to install full jumpscale on a docker
+ - To get basic jumpscale (core + lib + prefab with all their dependencies)
+    ```bash
+    ZInstall_js9_full
+    ```
+ - To get an AYS docker (core + lib + prefab + ays with all their dependencies)
+    ```bash
+    ZInstall_ays9
+    ```
+ - To get a portal as well (core + lib + prefab + ays + portal with all their dependencies)
+    ```bash
+    ZInstall_portal9
+    ```
+
 # to install all editor tools for local machine
 
 ```bash
