@@ -44,6 +44,10 @@ ZInstall_host_js9_full
     ```bash
     ZInstall_portal9
     ```
+Then start with
+```bash
+ZDockerActive -b jumpscale/<imagename> -i <name of your docker>
+```
 
 # to install all editor tools for local machine
 
