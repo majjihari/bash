@@ -233,7 +233,7 @@ ZInstall_issuemanager() {
 
     ZDockerActive -b "jumpscale/issuemanager" -i issuemanager && container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.start()"' && return 0
 
-    ZDockerActive -b "jumpscale/portal9" -c "ZInstall_portal9" -i issuemanager || return 1
+    ZDockerActive -b "jumpscale/portal9" -c "ZInstall_portal9 -f" -i issuemanager || return 1
 
     echo "[+] Installing IssueManager"
     container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.install()"' || return 1
@@ -261,3 +261,33 @@ ZInstall_zerotier() {
 # # --net=host --privileged \
 # # linuxserver/openvpn-as
 # }
+
+
+# This will install issue manager and sync data from gogs
+ZInstall_issuemanager_full(){
+
+    ZDockerActive -b "jumpscale/issuemanager_full" -i issuemanager_full && container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.start()"' && return 0
+
+    ZDockerActive -b "jumpscale/issuemanager" -c "ZInstall_issuemanager -f" -i issuemanager_full || return 1
+
+    container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.start()"' || return 1
+
+    local type="gogs"
+    local reponame="cockpit_issue_manager"
+    local account="gig"
+    local giturl="ssh://git@docs.greenitglobe.com:10022/gig/cockpit_issue_manager.git"
+
+    echo "[+] Cloning cockpit issuemanager repository"
+    if [ -n $GOGS_SSHKEY ]; then
+        ZCodeGet -t $type -r $reponame -a $account -u $giturl -k $GOGS_SSHKEY || return 1
+    else
+        ZCodeGet -t $type -r $reponame -a $account -u $giturl || return 1
+    fi
+
+    echo "[+] Syncing data from gogs"
+    container  "cd /opt/code/gogs/gig/cockpit_issue_manager; python3 syncData.py ${GOGSDB_PASS}" || die "Faield to sync data from gogs" || return 1
+    
+    ZDockerCommit -b jumpscale/issuemanager_full || die "docker commit" || return 1
+
+    ZDoneSet "ZInstall_js9_issuemanager_full"
+}

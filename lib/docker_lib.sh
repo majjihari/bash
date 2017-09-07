@@ -32,7 +32,7 @@ container() {
         return 1
     fi
 
-    ssh -A root@$RNODE -p $RPORT "$@" >> $ZLogFile 2>&1 || die "could not ssh command: $@" || return 1
+    ssh -tA root@$RNODE -p $RPORT "$@" || die "could not ssh command: $@" || return 1
 
 }
 
@@ -215,7 +215,7 @@ ZDockerBuildUbuntu() {
     echo "[+] apt upgrade"
     docker exec -t $ZDockerName apt-get upgrade -y >> ${ZLogFile} 2>&1 || die "apt-get upgrade" || return 1
     echo "[+] setting up basic tools (aptget install)"
-    docker exec -t $ZDockerName apt-get install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync -y >> ${ZLogFile} 2>&1 || die "basic linux deps" || return 1
+    docker exec -t $ZDockerName apt-get install curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet rsync sudo -y >> ${ZLogFile} 2>&1 || die "basic linux deps" || return 1
 
     ZDockerEnableSSH || return 1
 
@@ -380,6 +380,10 @@ EOF
 ZDockerActive() {
     echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
 
+    if [ ! `which docker` ]; then
+        ZDockerInstallLocal || die "Faield to install docker" || return 1
+    fi
+
     ZDockerConfig || return 1
 
     local OPTIND
@@ -416,7 +420,11 @@ ZDockerActive() {
     if [ ! "$res" = "true" ]; then
         #so is not up & running
         echo "[+] docker from image $bname is not active, will try to start"
-        ZDockerRun -b "$bname" -i "$iname" -p $port  || return 1
+        if [[ ! -z "$addarg" ]]; then
+            ZDockerRun -b "$bname" -i "$iname" -p "$port" -a "$addarg" || return 1
+        else
+            ZDockerRun -b "$bname" -i "$iname" -p $port || return 1
+        fi
         echo "[+] docker from image $bname is active, access it through 'ZSSH'"
         return 0
     fi

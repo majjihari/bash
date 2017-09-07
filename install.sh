@@ -69,6 +69,7 @@ ZUtilsGetCode() {
     pushd $ZUTILSDIR 2>&1 >> $ZLogFile
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
+        mkdir -p ~/.ssh
         ssh-keyscan github.com >> ~/.ssh/known_hosts 2>&1 >> $ZLogFile || die || return 1
     fi
 
