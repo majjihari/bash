@@ -322,6 +322,8 @@ ZInstall_host_editor() {
     ZCodePluginInstall streetsidesoftware.code-spell-checker || return 1
     ZCodePluginInstall yzhang.markdown-all-in-one || return 1
     ZCodePluginInstall mdickin.markdown-shortcuts || return 1
+    
+    echo "[+] editor tools MAC installed (OK) !!!!"    
 
 }
 
