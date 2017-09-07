@@ -218,6 +218,7 @@ ZKeysLoad() {
                 if [ "$answer" = "y" ]; then
                     read -p '    . Please specify name of key you want to generate: ' SSHKEYNAME
                     read -p '    . Please specify email addr: ' EMAILADDR
+                    KEYPATH="$HOME/.ssh/$SSHKEYNAME"
                     if [ -z $SSHKEYNAME ] || [ -z $EMAILADDR ] ; then
                         echo "[-] Please specify sshkeyname & emailaddr, cannot continue."
                         return 1
