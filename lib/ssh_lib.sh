@@ -178,15 +178,13 @@ ZNodeEnv() {
 
 ZKeysLoad() {
     
-    pgrep ssh-agent > /dev/null 2>&1
-    if [ $? -ne 0 ]; then
+    if [ -z "$SSH_AUTH_SOCK" ] ; then
         #start ssh-agent if not running yet
-        echo "[+] did not find ssh-agent will start"
-        eval `ssh-agent`
+        eval `ssh-agent -s`
     fi
 
     if [ -z "$SSH_AUTH_SOCK" ] ; then
-        #start ssh-agent if not running yet
+        
         echo "[-] could not find SSH_AUTH_SOCK, please load ssh-agent"
         return 1
     fi
@@ -214,20 +212,21 @@ ZKeysLoad() {
 
             local KEYPATH="$HOME/.ssh/$SSHKEYNAME"
 
-            if [ $SSHKEYNAME = "" ]; then
+            if [ -z $SSHKEYNAME ]; then
                 echo "    . Key name not given, should we generate a sshkey name? press 'y'"
                 read -n 1 answer
                 if [ "$answer" = "y" ]; then
                     read -p '    . Please specify name of key you want to generate: ' SSHKEYNAME
                     read -p '    . Please specify email addr: ' EMAILADDR
+                    KEYPATH="$HOME/.ssh/$SSHKEYNAME"
                     if [ -z $SSHKEYNAME ] || [ -z $EMAILADDR ] ; then
                         echo "[-] Please specify sshkeyname & emailaddr, cannot continue."
                         return 1
                     fi
-                    ssh-keygen -t rsa -b 4096 -f KEYPATH -C "$EMAILADDR"
+                    ssh-keygen -t rsa -b 4096 -f $KEYPATH -C "$EMAILADDR"
                 fi
             else
-                if [ ! -f KEYPATH ]; then
+                if [ ! -f $KEYPATH ]; then
                     echo "[-] did not find the sshkeyname: $KEYPATH, please try again"
                 fi
             fi

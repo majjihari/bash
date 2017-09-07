@@ -37,6 +37,8 @@ ZInstall_host_js9() {
     ZInstall_host_code_jumpscale
 
     ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+    
+    mkdir -p $HOME/js9host
 
     echo "[+] install js9"
     pushd $ZCODEDIR/github/jumpscale/core9
@@ -320,6 +322,8 @@ ZInstall_host_editor() {
     ZCodePluginInstall streetsidesoftware.code-spell-checker || return 1
     ZCodePluginInstall yzhang.markdown-all-in-one || return 1
     ZCodePluginInstall mdickin.markdown-shortcuts || return 1
+    
+    echo "[+] editor tools MAC installed (OK) !!!!"    
 
 }
 
