@@ -11,6 +11,10 @@ ZDockerInstallSSH(){
 
 ZDockerInstallLocal(){
     echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
+    if [ "$(uname)" == "Darwin" ]; then
+        echo "[?] Make sure docker has been installed on OSX"
+        return 0
+    fi
     echo "[+] install docker on local machine."
     wget -qO- https://get.docker.com/ | sh >> ${ZLogFile} 2>&1 || die "could not install docker" || return 1
 
