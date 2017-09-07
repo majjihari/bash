@@ -1,9 +1,9 @@
-# bash
-bash utilities
+# Bash
+Bash utilities
 
-# install
+# Install
 
-go to terminal (in applications/utils)
+Go to terminal (in applications/utils)
 
 ```
 curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
@@ -38,7 +38,7 @@ ZDockerBuildUbuntu            ZDockerRunUsage               ZInstall_host_docker
 
 
 
-# install from branch
+# Install from branch
 
 ```
 export ZUTILSBRANCH=<BRANCH>
@@ -63,7 +63,7 @@ source /opt/code/github/jumpscale/bash/zlibs.sh
 ```
 all the avialable installers can be used.
 
-# to install full jumpscale on host machine
+# To install full jumpscale on host machine
 ```bash
 ZInstall_host_js9_full
 ```
@@ -72,17 +72,15 @@ This will install the following:
 - Jumpscale libs9
 - Jumpscale prefab9
 
-# to install full jumpscale on a docker contianer
-```bash
-ZKeysLoad
-ZInstall_js9_full -f
-```
 
-# to install full jumpscale on a docker
+# To install full jumpscale on a docker
 
-- for OSX make sure docker has been installed !!!
+- For OSX make sure docker has been installed !!!
     - https://docs.docker.com/docker-for-mac/install/
-
+- To make sure your sshkeys are loaded/generated
+    ```bash
+    ZKeysLoad
+    ```
  - To get basic jumpscale (core + lib + prefab with all their dependencies)
     ```bash
     ZInstall_js9_full
@@ -100,19 +98,19 @@ Then start with
 ZDockerActive -b jumpscale/<imagename> -i <name of your docker>
 ```
 
-# to install all editor tools for local machine
+# To install all editor tools for local machine
 
 ```bash
 ZInstaller_editor_host
 ```
 
-# to get docker on ubuntu
+# To get docker on ubuntu
 
 ```bash
 ZDockerInstallLocal
 ```
 
-# ssh tools
+# SSH Tools
 
 ```bash
 #set node we will work on
@@ -138,7 +136,7 @@ ZEXEC -b ls /
 
 ```
 
-# docker tools
+# Docker Tools
 
 ```bash
 ~/code/jumpscale/bash/zlibs.sh
@@ -148,7 +146,7 @@ ZDockerRunJS9
 
 will install js9 & build docker with ubuntu 17.04 and required tools.
 
-# to manually source the zlibs use
+# To manually source the zlibs use
 
 ```
 #LINUX
@@ -158,10 +156,10 @@ will install js9 & build docker with ubuntu 17.04 and required tools.
 . ~/code/github/jumpscale/bash/zlibs.sh
 ```
 
-this will source all methods, codecompletion will now work.
+This will source all methods, codecompletion will now work.
 
 
-# lede tools
+# Lede Tools
 
 ```bash
 #configure a remote lede box, first make sure the ZNodeSet ... is done
