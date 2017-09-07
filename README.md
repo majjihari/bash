@@ -63,6 +63,10 @@ ZInstall_host_js9_full
 ```
 
 # to install full jumpscale on a docker
+
+- for OSX make sure docker has been installed !!!
+    - https://docs.docker.com/docker-for-mac/install/
+
  - To get basic jumpscale (core + lib + prefab with all their dependencies)
     ```bash
     ZInstall_js9_full
