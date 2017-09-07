@@ -3,9 +3,40 @@ bash utilities
 
 # install
 
+go to terminal (in applications/utils)
+
 ```
 curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
 ```
+
+result should show
+```
+[+] Install OK
+```
+
+now do ```Command T``` which will open a new tab
+
+all commands are starting with Z, try Z [TAB] should show you
+
+```
+kristofs-MBP:~ kristofdespiegeleer$ Z
+ZBranchExists                 ZDockerCommit                 ZDockerSSHAuthorize           ZInstall_host_editor          ZNodeSet                      ZSSH_RFORWARD_Usage
+ZCodeConfig                   ZDockerCommitUsage            ZDoneCheck                    ZInstall_host_js9             ZNodeUbuntuPrepare            Z_apt_install
+ZCodeGet                      ZDockerConfig                 ZDoneReset                    ZInstall_host_js9_full        ZResticBackup                 Z_brew_install
+ZCodeGetJS                    ZDockerEnableSSH              ZDoneSet                      ZInstall_issuemanager         ZResticBuild                  Z_exists_dir
+ZCodeGetJSUsage               ZDockerImageExist             ZDoneUnset                    ZInstall_js9                  ZResticCheck                  Z_exists_file
+ZCodeGetUsage                 ZDockerInstallLocal           ZEXEC                         ZInstall_js9_full             ZResticEnv                    Z_mkdir
+ZCodePluginInstall            ZDockerInstallSSH             ZEXECUsage                    ZInstall_js9_node             ZResticEnvReset               Z_mkdir_pushd
+ZCodePush                     ZDockerRemove                 ZInstall_DMG                  ZInstall_portal9              ZResticEnvSet                 Z_popd
+ZCodePushJS                   ZDockerRemoveImage            ZInstall_ays9                 ZInstall_python               ZResticInit                   Z_pushd
+ZCodePushJSUsage              ZDockerRemoveImagesAll        ZInstall_docgenerator         ZInstall_zerotier             ZResticMount                  Z_transcode_mp4
+ZCodePushUsage                ZDockerRun                    ZInstall_host_base            ZKeysLoad                     ZResticSnapshots
+ZDockerActive                 ZDockerRunSomethingUsage      ZInstall_host_code_jumpscale  ZNodeEnv                      ZSSH
+ZDockerActiveUsage            ZDockerRunUbuntu              ZInstall_host_docgenerator    ZNodeEnvDefaults              ZSSHTEST
+ZDockerBuildUbuntu            ZDockerRunUsage               ZInstall_host_docker          ZNodePortSet                  ZSSH_RFORWARD
+```
+
+
 
 # install from branch
 
