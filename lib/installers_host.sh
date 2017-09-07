@@ -37,6 +37,8 @@ ZInstall_host_js9() {
     ZInstall_host_code_jumpscale
 
     ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+    
+    mkdir -p $HOME/js9host
 
     echo "[+] install js9"
     pushd $ZCODEDIR/github/jumpscale/core9
