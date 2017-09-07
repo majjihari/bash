@@ -283,9 +283,11 @@ ZInstall_issuemanager_full(){
     else
         ZCodeGet -t $type -r $reponame -a $account -u $giturl || return 1
     fi
+    
+    sleep 20
 
     echo "[+] Syncing data from gogs"
-    container  "cd /opt/code/gogs/gig/cockpit_issue_manager; python3 syncData.py ${GOGSDB_PASS}" || die "Faield to sync data from gogs" || return 1
+    ssh -tA root@localhost -p 2222 "cd /opt/code/gogs/gig/cockpit_issue_manager; python3 syncData.py ${GOGSDB_PASS}" || die "Faield to sync data from gogs" || return 1
     
     ZDockerCommit -b jumpscale/issuemanager_full || die "docker commit" || return 1
 
