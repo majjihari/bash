@@ -43,8 +43,8 @@ This will install the following:
 
 # to install full jumpscale on a docker contianer
 ```bash
-ZDockerInstallLocal
-ZInstall_js9_full
+ZKeysLoad
+ZInstall_js9_full -f
 ```
 
 # to install all editor tools for local machine
