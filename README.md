@@ -45,7 +45,7 @@ ZDockerActiveUsage            ZDockerRunUbuntu              ZInstall_host_docgen
 ZDockerBuildUbuntu            ZDockerRunUsage               ZInstall_host_docker          ZNodePortSet                  ZSSH_RFORWARD
 ```
 
-Sometimes the bash profile doesn't load (especially on Ubuntu). If that happens type this in a the terminal under root:
+Sometimes the bash profile doesn't load (especially on [Ubuntu](https://askubuntu.com/questions/121413/understanding-bashrc-and-bash-profile)). If that happens type this in a the terminal under root:
 ```
 . ~/.bash_profile
 ```
