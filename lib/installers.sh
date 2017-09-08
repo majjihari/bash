@@ -164,6 +164,34 @@ ZInstall_docgenerator() {
 
 }
 
+ZInstall_web_infrastructure() {
+
+    local OPTIND
+    local force=0
+
+    while getopts "f" opt; do
+        case $opt in
+           f )  docker rmi -f jumpscale/js9_docgenerator ;;
+        esac
+    done
+
+    ZDockerActive -b "jumpscale/js9_webinfra" -i js9_docgenerator && return 0
+
+    ZDockerActive -b "jumpscale/js9_docgenerator" -c "ZInstall_docgenerator -f" -i js9_webinfra || return 1
+
+    echo "[+] initializing jumpscale"
+    container 'js9_init' || return 1
+    container 'apt update; apt upgrade -y; apt install bzip2 -y'
+
+    echo "[+] install extra's for web infrastructure"
+    
+    ZDockerCommit -b jumpscale/js9_webinfra || die "docker commit" || return 1
+
+
+    # j.tools.prefab.local.apps.caddy.install()
+
+}
+
 ZInstall_ays9() {
 
     local OPTIND

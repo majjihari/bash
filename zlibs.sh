@@ -20,7 +20,7 @@ die() {
     echo "[-] something went wrong: $1"
     echo
     echo
-    set -x
+    # set -x
     return 1
 }
 
