@@ -9,10 +9,19 @@ Go to terminal (in applications/utils)
 curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
 ```
 
-result should show
+If everything installed correctly result should show
 ```
 [+] Install OK
 ```
+
+If install failed with "(13: Permission denied)" you need to install as root. Type
+```
+sudo -s
+```
+then try install again with the curl command from above.
+
+
+If everything installed correctly:
 
 now do ```Command T``` which will open a new tab
 
