@@ -9,12 +9,21 @@ Go to terminal (in applications/utils)
 curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
 ```
 
-result should show
+If everything installed correctly result should show
 ```
 [+] Install OK
 ```
 
-now do ```Command T``` which will open a new tab
+If install failed with "(13: Permission denied)" you need to install as root. Type
+```
+sudo -s
+```
+then try install again with the curl command from above.
+
+
+If everything installed correctly:
+
+now do ```Command T``` which will open a new tab or open a new terminal
 
 all commands are starting with Z, try Z [TAB] should show you
 
@@ -35,6 +44,12 @@ ZDockerActive                 ZDockerRunSomethingUsage      ZInstall_host_code_j
 ZDockerActiveUsage            ZDockerRunUbuntu              ZInstall_host_docgenerator    ZNodeEnvDefaults              ZSSHTEST
 ZDockerBuildUbuntu            ZDockerRunUsage               ZInstall_host_docker          ZNodePortSet                  ZSSH_RFORWARD
 ```
+
+Sometimes the bash profile doesn't load (especially on [Ubuntu](https://askubuntu.com/questions/121413/understanding-bashrc-and-bash-profile)). If that happens type this in a the terminal under root:
+```
+. ~/.bash_profile
+```
+After this you should be able to type Z and press [TAB] to see a list of commands. (NOTE: the Z is uppercase)
 
 
 
