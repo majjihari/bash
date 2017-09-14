@@ -100,6 +100,7 @@ This will install the following:
     ```bash
     ZInstall_js9_full
     ```
+    This might take a while! Don't panic! Wait.
  - To get an AYS docker (core + lib + prefab + ays with all their dependencies)
     ```bash
     ZInstall_ays9
