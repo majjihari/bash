@@ -89,9 +89,14 @@ This will install the following:
 
 
 # To install full jumpscale on a docker
+first, make sure your bash_profile is sourced by
+```
+. ~/.bash_profile
+```
 
 - For OSX make sure docker has been installed !!!
     - https://docs.docker.com/docker-for-mac/install/
+    
 - To make sure your sshkeys are loaded/generated
     ```bash
     ZKeysLoad
