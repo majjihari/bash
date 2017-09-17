@@ -258,6 +258,27 @@ ZInstall_portal9() {
 
 }
 
+j.tools.prefab.local.apps.alba.install()
+
+ZInstall_crm() {
+
+    #install & configure caddy (make IYO integration optional, option to this method)  (prefab)
+    #caddy is proxy to crm (prefab)
+    #use postgresql as backend (root/rooter is ok) (prefab)
+    #start all in tmux (prefab)
+
+    ZDockerActive -b "jumpscale/crm" -i crm && container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.crm.start()"' && return 0
+
+    ZDockerActive -b "jumpscale/js9_docgenerator" -c "ZInstall_docgenerator" -i crm || return 1
+
+    echo "[+] Installing CRM"
+    container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.crm.install()"' || return 1
+    container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.crm.start()"' || return 1
+
+    ZDockerCommit -b jumpscale/crm || die "docker commit" || return 1
+
+}
+
 ZInstall_issuemanager() {
 
     ZDockerActive -b "jumpscale/issuemanager" -i issuemanager && container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.issuemanager.start()"' && return 0
@@ -270,7 +291,6 @@ ZInstall_issuemanager() {
 
     ZDockerCommit -b jumpscale/issuemanager || die "docker commit" || return 1
 
-    ZDoneSet "ZInstall_js9_issuemanager"
 }
 
 ZInstall_zerotier() {
