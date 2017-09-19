@@ -258,7 +258,6 @@ ZInstall_portal9() {
 
 }
 
-j.tools.prefab.local.apps.alba.install()
 
 ZInstall_crm() {
 
