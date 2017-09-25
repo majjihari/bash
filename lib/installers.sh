@@ -165,6 +165,29 @@ ZInstall_docgenerator() {
 
 }
 
+ZInstall_js9_celery() {
+
+    local OPTIND
+    local force=0
+
+    while getopts "f" opt; do
+        case $opt in
+           f )  docker rmi -f jumpscale/js9_celery ;;
+        esac
+    done
+
+    ZDockerActive -b "jumpscale/js9_celery" -i js9_celery && return 0
+
+    #check the docker image is there
+    ZDockerActive -b "jumpscale/js9" -c "ZInstall_js9 -f" -i js9_celery || return 1
+
+    echo "[+] initializing celery on js9"
+    container 'js9 "j.tools.prefab.local.apps.celery.install()"' || return 1
+
+    ZDockerCommit -b jumpscale/js9_celery || die "docker commit" || return 1
+
+}
+
 ZInstall_web_infrastructure() {
 
     local OPTIND
@@ -185,7 +208,7 @@ ZInstall_web_infrastructure() {
     container 'apt update; apt upgrade -y; apt install bzip2 -y'
 
     echo "[+] install extra's for web infrastructure"
-    
+
     ZDockerCommit -b jumpscale/js9_webinfra || die "docker commit" || return 1
 
 
@@ -336,7 +359,7 @@ ZInstall_issuemanager_full(){
 
     echo "[+] Syncing data from gogs"
     ssh -tA root@localhost -p 2222 "cd /opt/code/gogs/gig/cockpit_issue_manager; python3 syncData.py ${GOGSDB_PASS}" || die "Faield to sync data from gogs" || return 1
-    
+
     ZDockerCommit -b jumpscale/issuemanager_full || die "docker commit" || return 1
 
     ZDoneSet "ZInstall_js9_issuemanager_full"
