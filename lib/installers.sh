@@ -281,6 +281,22 @@ ZInstall_portal9() {
 
 }
 
+ZInstallCrmUsage() {
+   cat <<EOF
+Usage: ZInstallCrm [-p caddyport] [-D dbname] [-u url] [-o organization_id] [-s client_secret] [-i iname] [-d]
+   -p caddyport: tcp port which caddy will listen to. (default: 80)
+   -i iname: name of container which will have the crm installed (default: crm)
+   -D dbname: postgres database name to create (default:crm)
+   -o organization: client id of organization
+   -s secretid: client secret of organization
+   -u url: url
+   -d: install demo data
+   -h: help
+
+will install crm application in js9 container
+
+EOF
+}
 
 ZInstall_crm() {
 
@@ -289,13 +305,40 @@ ZInstall_crm() {
     #use postgresql as backend (root/rooter is ok) (prefab)
     #start all in tmux (prefab)
 
-    ZDockerActive -b "jumpscale/crm" -i crm && container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.crm.start()"' && return 0
+    local OPTIND
+    local caddyport=80
+    local dbname=crm
+    local iname=crm
+    local demo=False
+    local client_id=""
+    local client_secret=""
+    local url="localhost"
+    while getopts "p:D:o:s:u:i:dh" opt; do
+        case $opt in
+           p )  caddyport=$OPTARG ;;
+           D )  dbname=$OPTARG ;;
+           o )  client_id=$OPTARG ;;
+           s )  client_secret=$OPTARG ;;
+           u )  url=$OPTARG ;;
+           i )  iname=$OPTARG ;;
+           d )  demo=True ;;
+           h )  ZInstallCrmUsage ; return 0 ;;
+           \? )  ZInstallCrmUsage ; return 1 ;;
+        esac
+    done
 
-    ZDockerActive -b "jumpscale/js9_docgenerator" -c "ZInstall_docgenerator" -i crm || return 1
+    install_args="caddy_port=$caddyport, db_name=\"$dbname\", demo=$demo,\
+    start=True, client_id=\"$client_id\", client_secret=\"$client_secret\", domain=\"$url\"";
+    start_args="db_name=\"$dbname\"";
+    start_cmd="python3 -c 'from js9 import j;j.tools.prefab.local.apps.crm.start($start_args)'"
+    install_cmd="python3 -c 'from js9 import j;j.tools.prefab.local.apps.crm.install($install_args)'"
+
+    ZDockerActive -b "jumpscale/crm" -i $iname -a "-p $caddyport:$caddyport"&& container "$start_cmd" && return 0
+
+    ZDockerActive -b "jumpscale/js9_docgenerator" -c "ZInstall_docgenerator" -i $iname || return 1
 
     echo "[+] Installing CRM"
-    container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.crm.install()"' || return 1
-    container 'python3 -c "from js9 import j;j.tools.prefab.local.apps.crm.start()"' || return 1
+    container "$install_cmd" || return 1
 
     ZDockerCommit -b jumpscale/crm || die "docker commit" || return 1
 
