@@ -46,6 +46,9 @@ ZInstall_host_js9() {
     popd
     # pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
 
+    python3 -c 'from JumpScale9 import j;j.tools.executorLocal.initEnv()'
+    python3 -c 'j.tools.jsloader.generate()'
+
     echo "[+] installing jumpscale lib9"
     pushd $ZCODEDIR/github/jumpscale/lib9
     pip3 install --no-deps -e . || die "Coud not install lib9 of js9" || return 1
@@ -54,6 +57,8 @@ ZInstall_host_js9() {
 
     echo "[+] installing jumpscale prefab9"
     pushd $ZCODEDIR/github/jumpscale/prefab9
+    rm -rf /usr/local/lib/python3.6/site-packages/JumpScale9*
+    rm -rf /usr/local/lib/python3.6/site-packages/js9*
     pip3 install -e . || die "Coud not install prefab9" || return 1
     popd
     # pip3 install -e $ZCODEDIR/github/jumpscale/prefab9 || die "could not install prefab9" || return 1
