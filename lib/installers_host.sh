@@ -51,7 +51,7 @@ ZInstall_host_js9() {
     # pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
 
     python3 -c 'from JumpScale9 import j;j.tools.executorLocal.initEnv()'
-    python3 -c 'j.tools.jsloader.generate()'
+    python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()'
 
     echo "[+] installing jumpscale lib9"
     pushd $ZCODEDIR/github/jumpscale/lib9
