@@ -175,6 +175,29 @@ ZNodeEnv() {
     echo "sshport       :  $RPORT"
 }
 
+ZKeysGenDocker() {
+    if [ -z "$SSH_AUTH_SOCK" ] ; then
+        #start ssh-agent if not running yet
+        eval `ssh-agent -s`
+    fi
+    if [ -z "$SSH_AUTH_SOCK" ] ; then
+        echo "[-] could not find SSH_AUTH_SOCK, please load ssh-agent"
+        return 1
+    fi
+
+    local SSHKEYNAME="docker"
+    local KEYPATH="$HOME/.ssh/$SSHKEYNAME"
+    local EMAILADDR="info@nothing.com"
+
+    ssh-keygen -t rsa -b 4096 -f $KEYPATH -C "$EMAILADDR"  -N ""
+
+    if ! ssh-add -l | grep -q $SSHKEYNAME; then
+        echo "[+] Will now try to load sshkey: $HOMEDIR/.ssh/$SSHKEYNAME"
+        ssh-add $HOMEDIR/.ssh/$SSHKEYNAME
+        echo "ssh key $SSHKEYNAME loaded"
+    fi    
+
+}
 
 ZKeysLoad() {
     
@@ -184,7 +207,6 @@ ZKeysLoad() {
     fi
 
     if [ -z "$SSH_AUTH_SOCK" ] ; then
-        
         echo "[-] could not find SSH_AUTH_SOCK, please load ssh-agent"
         return 1
     fi

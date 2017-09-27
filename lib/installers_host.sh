@@ -40,6 +40,10 @@ ZInstall_host_js9() {
     
     mkdir -p $HOME/js9host
 
+    echo "[+] clean previous js9 install"
+    rm -rf /usr/local/lib/python3.6/site-packages/JumpScale9*
+    rm -rf /usr/local/lib/python3.6/site-packages/js9*
+
     echo "[+] install js9"
     pushd $ZCODEDIR/github/jumpscale/core9
     pip3 install -e . || die "Could not install core9 of js9" || return 1
@@ -57,8 +61,6 @@ ZInstall_host_js9() {
 
     echo "[+] installing jumpscale prefab9"
     pushd $ZCODEDIR/github/jumpscale/prefab9
-    rm -rf /usr/local/lib/python3.6/site-packages/JumpScale9*
-    rm -rf /usr/local/lib/python3.6/site-packages/js9*
     pip3 install -e . || die "Coud not install prefab9" || return 1
     popd
     # pip3 install -e $ZCODEDIR/github/jumpscale/prefab9 || die "could not install prefab9" || return 1
@@ -93,8 +95,8 @@ ZInstall_host_base(){
         echo "[+] upgrade brew"
         brew upgrade  >> ${ZLogFile} 2>&1 || die "could not upgrade all brew installed components" || return 1
 
-        echo "[+] installing git, python, mc, tmux, curl, ipfs"
-        Z_brew_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs ipfs || return 1
+        echo "[+] installing git, python3, mc, tmux, curl"
+        Z_brew_install mc wget python3 git unzip rsync tmux curl || return 1
 
         echo "[+] set system config params"
         echo kern.maxfiles=65536 | sudo tee -a /etc/sysctl.conf >> ${ZLogFile} 2>&1 || die || return 1
@@ -103,10 +105,6 @@ ZInstall_host_base(){
         sudo sysctl -w kern.maxfilesperproc=65536 >> ${ZLogFile} 2>&1 || die || return 1
         ulimit -n 65536 >> ${ZLogFile} 2>&1 || die || return 1
 
-        echo "[+] start ipfs"
-        ipfs init > /dev/null 2>&1
-        ipfs config --json API.HTTPHeaders '{"Access-Control-Allow-Origin": ["*"]}'
-        brew services start ipfs  >> ${ZLogFile} 2>&1 || die "could not autostart ipfs" || return 1
 
     elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
         dist=''
@@ -116,10 +114,8 @@ ZInstall_host_base(){
             apt-get update >> ${ZLogFile} 2>&1 || die "could not update packages" || return 1
 
             echo "[+] installing git, python, mc, tmux, curl"
-            Z_apt_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs || return 1
+            Z_apt_install mc wget python3 git unzip rsync tmux curl python3-psutil || return 1
 
-            echo "[+] installing and starting ipfs"
-            ZInstall_ipfs_host
         fi
     else
         die "platform not supported"
@@ -131,8 +127,6 @@ ZInstall_host_base(){
 
     echo "[+] upgrade pip"
     pip3 install --upgrade pip >> ${ZLogFile} 2>&1 || die || return 1
-
-
 
     ZDoneSet "ZInstall_host_base"
 }
@@ -199,6 +193,43 @@ ZInstall_host_editor() {
 
     ZInstall_host_js9 || return 1
     # ZInstall_host_base || return 1
+
+
+    if [ "$(uname)" == "Darwin" ]; then
+        echo "[+] upgrade brew"
+        brew upgrade  >> ${ZLogFile} 2>&1 || die "could not upgrade all brew installed components" || return 1
+
+        echo "[+] installing git, python3, mc, tmux, curl"
+        Z_brew_install pdf2svg graphviz phantomjs ipfs || return 1
+
+        echo "[+] set system config params"
+        echo kern.maxfiles=65536 | sudo tee -a /etc/sysctl.conf >> ${ZLogFile} 2>&1 || die || return 1
+        echo kern.maxfilesperproc=65536 | sudo tee -a /etc/sysctl.conf >> ${ZLogFile} 2>&1 || die || return 1
+        sudo sysctl -w kern.maxfiles=65536 >> ${ZLogFile} 2>&1 || die || return 1
+        sudo sysctl -w kern.maxfilesperproc=65536 >> ${ZLogFile} 2>&1 || die || return 1
+        ulimit -n 65536 >> ${ZLogFile} 2>&1 || die || return 1
+
+        echo "[+] start ipfs"
+        ipfs init > /dev/null 2>&1
+        ipfs config --json API.HTTPHeaders '{"Access-Control-Allow-Origin": ["*"]}'
+        brew services start ipfs  >> ${ZLogFile} 2>&1 || die "could not autostart ipfs" || return 1
+
+    elif [ "$(expr substr $(uname -s) 1 5)" == "Linux" ]; then
+        dist=''
+        dist=`grep DISTRIB_ID /etc/*-release | awk -F '=' '{print $2}'`
+        if [ "$dist" == "Ubuntu" ]; then
+            echo "[+] updating packages"
+            apt-get update >> ${ZLogFile} 2>&1 || die "could not update packages" || return 1
+
+            echo "[+] installing git, python, mc, tmux, curl"
+            Z_apt_install mc wget python3 git pdf2svg unzip rsync graphviz tmux curl phantomjs python3-psutil || return 1
+
+            echo "[+] installing and starting ipfs"
+            ZInstall_ipfs_host
+        fi
+    else
+        die "platform not supported"
+    fi    
 
     if [ "$(uname)" == "Darwin" ]; then
       echo "[+] download visual studio code"
