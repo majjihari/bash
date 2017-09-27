@@ -50,8 +50,9 @@ ZInstall_host_js9() {
     popd
     # pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
 
-    python3 -c 'from JumpScale9 import j;j.tools.executorLocal.initEnv()'
-    python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()'
+    echo "[+] load env"
+    python3 -c 'from JumpScale9 import j;j.tools.executorLocal.initEnv()' > /dev/null || die "Could not install core9 of js9, initenv" || return 1 
+    python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()' > /dev/null || die "Could not install core9 of js9, jsloader" || return 1
 
     echo "[+] installing jumpscale lib9"
     pushd $ZCODEDIR/github/jumpscale/lib9
@@ -72,7 +73,7 @@ ZInstall_host_js9() {
     # rm -rf /usr/local/bin/cmds_guest
 
     echo "[+] initializing jumpscale"
-    python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()' || die "js9 generate" || return 1
+    python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()' > /dev/null || die "Could not install core9 of js9, jsloader" || return 1
 
     echo "[+] js9 installed (OK)"
 
