@@ -91,7 +91,7 @@ EOF
 }
 #to return to original dir do Z_pushd
 ZCodeGet() {
-    echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
+    echo FUNCTION: ${FUNCNAME[0]} > $ZLogFile
     ZCodeConfig || return 1
     local OPTIND
     local type='github'
@@ -137,19 +137,12 @@ ZCodeGet() {
 
     if [ ! -e $ZCODEDIR/$type/$account/$reponame ]; then
         echo " [+] clone"
-        if [ -n $sshkey ]; then
-            ssh-agent bash -c "ssh-add ${sshkey};  git clone -b ${branch} $giturl $reponame 2>&1 >> $ZLogFile" || die "git clone" || return 1
-        else
-            git clone -b ${branch} $giturl $reponame 2>&1 >> $ZLogFile || die "git clone" || return 1
-        fi
+        git clone -b ${branch} $giturl $reponame 2>&1 >> $ZLogFile || die "git clone" || return 1
     else
         Z_pushd $ZCODEDIR/$type/$account/$reponame || return 1
         echo " [+] pull"
-        if [ -n $sshkey ]; then
-            ssh-agent bash -c "ssh-add ${sshkey}; git pull 2>&1 >> $ZLogFile" || die "cloud not git pull" || return 1
-        else
-            git pull  2>&1 >> $ZLogFile || die "could not git pull" || return 1
-        fi
+        echo 'git pull' >> $ZLogFile
+        git pull  2>&1 >> $ZLogFile || die "could not git pull" || return 1
         Z_popd || return 1
     fi
     Z_popd || return 1

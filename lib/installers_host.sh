@@ -32,11 +32,11 @@ ZInstall_host_js9() {
 
     ZCodeConfig
 
-    ZInstall_host_base
+    ZInstall_host_base || die "Could not ZInstall_host_base" || return 1
 
-    ZInstall_host_code_jumpscale
+    ZInstall_host_code_jumpscale || die "Could not ZInstall_host_code_jumpscale" || return 1
 
-    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts
+    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts > ${ZLogFile} 2>&1 
     
     mkdir -p $HOME/js9host
 
@@ -46,23 +46,23 @@ ZInstall_host_js9() {
 
     echo "[+] install js9"
     pushd $ZCODEDIR/github/jumpscale/core9
-    pip3 install -e . || die "Could not install core9 of js9" || return 1
+    pip3 install -e . > ${ZLogFile} 2>&1 || die "Could not install core9 of js9" || return 1
     popd
     # pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
 
     echo "[+] load env"
-    python3 -c 'from JumpScale9 import j;j.tools.executorLocal.initEnv()' > /dev/null || die "Could not install core9 of js9, initenv" || return 1 
-    python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()' > /dev/null || die "Could not install core9 of js9, jsloader" || return 1
+    python3 -c 'from JumpScale9 import j;j.tools.executorLocal.initEnv()' > ${ZLogFile} 2>&1 || die "Could not install core9 of js9, initenv" || return 1 
+    python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()'  > ${ZLogFile} 2>&1  || die "Could not install core9 of js9, jsloader" || return 1
 
     echo "[+] installing jumpscale lib9"
     pushd $ZCODEDIR/github/jumpscale/lib9
-    pip3 install --no-deps -e . || die "Coud not install lib9 of js9" || return 1
+    pip3 install --no-deps -e .  > ${ZLogFile} 2>&1 || die "Coud not install lib9 of js9" || return 1
     popd
     # pip3 install --no-deps -e $ZCODEDIR/github/jumpscale/lib9 || die "could not install lib9 of js9" || return 1
 
     echo "[+] installing jumpscale prefab9"
     pushd $ZCODEDIR/github/jumpscale/prefab9
-    pip3 install -e . || die "Coud not install prefab9" || return 1
+    pip3 install -e .  > ${ZLogFile} 2>&1 || die "Coud not install prefab9" || return 1
     popd
     # pip3 install -e $ZCODEDIR/github/jumpscale/prefab9 || die "could not install prefab9" || return 1
 
@@ -73,7 +73,7 @@ ZInstall_host_js9() {
     # rm -rf /usr/local/bin/cmds_guest
 
     echo "[+] initializing jumpscale"
-    python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()' > /dev/null || die "Could not install core9 of js9, jsloader" || return 1
+    python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()' > ${ZLogFile} 2>&1  || die "Could not install core9 of js9, jsloader" || return 1
 
     echo "[+] js9 installed (OK)"
 
