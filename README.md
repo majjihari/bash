@@ -13,13 +13,14 @@ Bash utilities
  ## 2. Install bash utilities:
    - ### Install from master
      copy/paste into your terminal: `curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh`
+     
    - ### Install from branch
-
     ```
     export ZUTILSBRANCH=<BRANCH>
     export ZBRANCH=<BRANCH>
     curl https://raw.githubusercontent.com/Jumpscale/bash/${ZUTILSBRANCH}/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
-        ```
+    ```
+        
     where `ZUTILSBRANCH` is branch of these utilies you want to install and `ZBRANCH` is the target branch for js9 components (defaults to master)
 
     what happens:
