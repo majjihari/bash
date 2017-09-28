@@ -11,16 +11,16 @@ Bash utilities
        * Ubuntu variants: you might need to substitute `gnome-terminal` for `xfce4-terminal`, konsole or `terminator`
        
  ## 2. Install bash utilities:
-      - ### Install from master
-        copy/paste into your terminal: `curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh`
-      - ### Install from branch
+   - ### Install from master
+     copy/paste into your terminal: `curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh`
+   - ### Install from branch
 
+    ```
+    export ZUTILSBRANCH=<BRANCH>
+    export ZBRANCH=<BRANCH>
+    curl https://raw.githubusercontent.com/Jumpscale/bash/${ZUTILSBRANCH}/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
         ```
-        export ZUTILSBRANCH=<BRANCH>
-        export ZBRANCH=<BRANCH>
-        curl https://raw.githubusercontent.com/Jumpscale/bash/${ZUTILSBRANCH}/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
-        ```
-        where `ZUTILSBRANCH` is branch of these utilies you want to install and `ZBRANCH` is the target branch for js9 components (defaults to master)
+    where `ZUTILSBRANCH` is branch of these utilies you want to install and `ZBRANCH` is the target branch for js9 components (defaults to master)
 
     what happens:
     - xcode-tools will be installed & then brew (https://brew.sh/) (osx only)
