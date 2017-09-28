@@ -32,7 +32,8 @@ Bash utilities
  - If install failed with `(13: Permission denied)` you need to install as root. Type `sudo -s` then try install again with the curl command from above.
 
 
-3. ## Make sure your the bash tools are available by starting new terminal or executing `source ~/.bash_profile`
+3. ## Make sure your the bash tools are available
+    do this by starting new terminal or executing `source ~/.bash_profile`
 
     After this you should be able to type Z and press [TAB] to see a list of commands. (NOTE: the Z is uppercase)
 
