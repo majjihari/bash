@@ -2,7 +2,7 @@
 Bash utilities
 
 # To Install
-1. ## Go to your terminal 
+## 1. Go to your terminal 
    * MacOS: Applications → Utilities → Terminal
    * Linux:
        * Unity: open the dash, type `terminal`
@@ -10,7 +10,7 @@ Bash utilities
        * Otherwise: Control + Alt + T or Alt + F2, `gnome-terminal`
        * Ubuntu variants: you might need to substitute `gnome-terminal` for `xfce4-terminal`, konsole or `terminator`
        
- 2. ## Install bash utilities:
+ ## 2. Install bash utilities:
       - ### Install from master
         copy/paste into your terminal: `curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh`
       - ### Install from branch
@@ -32,7 +32,7 @@ Bash utilities
  - If install failed with `(13: Permission denied)` you need to install as root. Type `sudo -s` then try install again with the curl command from above.
 
 
-3. ## Make sure your the bash tools are available
+## 3. Make sure your the bash tools are available
     do this by starting new terminal or executing `source ~/.bash_profile`
 
     After this you should be able to type Z and press [TAB] to see a list of commands. (NOTE: the Z is uppercase)
@@ -59,7 +59,7 @@ Bash utilities
     . ~/.bash_profile
     ```
 
-4. ## Use the bash utlities!
+## 4. Use the bash utlities!
 
  *  ### To install full jumpscale on host machine
     ```bash
