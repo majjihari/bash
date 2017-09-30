@@ -199,7 +199,7 @@ ZInstall_web_infrastructure() {
         esac
     done
 
-    ZDockerActive -b "jumpscale/js9_webinfra" -i js9_docgenerator && return 0
+    ZDockerActive -b "jumpscale/js9_webinfra" -i js9_webinfra && return 0
 
     ZDockerActive -b "jumpscale/js9_docgenerator" -c "ZInstall_docgenerator -f" -i js9_webinfra || return 1
 
