@@ -288,9 +288,9 @@ ZDockerRunUbuntu() {
 ZDockerRunUsage() {
    cat <<EOF
 Usage: ZDockerRun [-b $bname] [-i $iname] [-p port]
-   -b bname: name of base image, defaults to jumpscale/jsbase (which is ubuntu with some basic tools)
-   -i iname: name of docker which will be spawned, default to 'build'
-   -p port: ssh port for docker defaults to 2222
+   -b bname: name of base image, defaults to jumpscale/js9
+   -i iname: name of docker which will be spawned, default to 'default'
+   -p port: ssh port for docker defaults to 2223
    -a addarg: is additional arguments for docker e.g. -p 10700-10800:10700-10800
    -h: help
 
@@ -305,8 +305,8 @@ ZDockerRun() {
     ZDockerConfig || return 1
     local OPTIND
     local bname='jumpscale/js9'
-    local iname='build'
-    local port=2222
+    local iname='default'
+    local port=2223
     local addarg=''
     while getopts "b:i:p:a:h" opt; do
         case $opt in
@@ -369,7 +369,7 @@ ZDockerRun() {
 ZDockerActiveUsage() {
    cat <<EOF
 Usage: ZDockerRun [-b $bname] [-c command] [-i $iname] [-p port]
-   -b bname: name of base image, defaults to jumpscale/jsbase (which is ubuntu with some basic tools)
+   -b bname: name of base image, defaults to jumpscale/js9 (which is jumpscale sandbox)
    -c cmd: name of command to execute when bname not found as image on docker
    -i iname: name of docker which will be spawned, default to 'build'
    -p port: ssh port for docker defaults to 2222
@@ -385,7 +385,7 @@ ZDockerActive() {
     echo FUNCTION: ${FUNCNAME[0]} >> $ZLogFile
 
     if [ ! `which docker` ]; then
-        ZDockerInstallLocal || die "Faield to install docker" || return 1
+        ZDockerInstallLocal || die "Failed to install docker" || return 1
     fi
 
     ZDockerConfig || return 1
@@ -412,9 +412,9 @@ ZDockerActive() {
         #means docker image does not exist yet
         if [ ! "$cmd" = "" ]; then
             echo "[+] need to build the docker with command: $cmd"
-            `$cmd`
+            `$cmd` || die "could not build docker $cmd" || return 1
         else
-            ZDockerRemove $iname
+            ZDockerRemove $iname 2>&1 > /dev/null
             return 1
         fi
     fi

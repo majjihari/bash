@@ -56,9 +56,10 @@ ZInstall_host_js9() {
 
     echo "[+] installing jumpscale lib9"
     pushd $ZCODEDIR/github/jumpscale/lib9
+    pip3 install docker
     pip3 install --no-deps -e .  > ${ZLogFile} 2>&1 || die "Coud not install lib9 of js9" || return 1
     popd
-    # pip3 install --no-deps -e $ZCODEDIR/github/jumpscale/lib9 || die "could not install lib9 of js9" || return 1
+    
 
     echo "[+] installing jumpscale prefab9"
     pushd $ZCODEDIR/github/jumpscale/prefab9
@@ -173,10 +174,10 @@ ZInstall_host_base(){
 # }
 
 
-ZCodePluginInstall(){
-    Z_mkdir ~/.code_data_dir || return 1
-    code --install-extension $1 --user-data-dir=~/.code_data_dir >> ${ZLogFile} 2>&1 || die  "could not code install extension $1" || return 1
-}
+# ZCodePluginInstall(){
+#     Z_mkdir ~/.code_data_dir || return 1
+#     code --install-extension $1 --user-data-dir=~/.code_data_dir >> ${ZLogFile} 2>&1 || die  "could not code install extension $1" || return 1
+# }
 
 ZInstall_host_docgenerator() {
 

@@ -1,5 +1,5 @@
 
-ZInstall_python() {
+ZBuild_python() {
 
     local OPTIND
     local force=0
@@ -10,7 +10,7 @@ ZInstall_python() {
         esac
     done
 
-    ZDockerActive -b "jumpscale/ubuntu_python" -i ubuntu_python && return 0
+    ZDockerActive -b "jumpscale/ubuntu_python" && return 0
 
     ZDockerActive -b "jumpscale/ubuntu" -c "ZDockerBuildUbuntu -f" -i ubuntu_python || return 1
 
@@ -32,7 +32,7 @@ ZInstall_python() {
     container 'pip3 install tmuxp' || return 1
     container 'pip3 install gitpython' || return 1
 
-    ZDockerCommit -b jumpscale/ubuntu_python || die "docker commit" || return 1
+    ZDockerCommit -b jumpscale/ubuntu_python -s || die "docker commit" || return 1
 
     echo "[+] python installed in container(OK)"
 
