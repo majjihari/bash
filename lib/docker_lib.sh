@@ -412,7 +412,7 @@ ZDockerActive() {
         #means docker image does not exist yet
         if [ ! "$cmd" = "" ]; then
             echo "[+] need to build the docker with command: $cmd"
-            `$cmd` || die "could not build docker $cmd" || return 1
+            `$cmd`
         else
             ZDockerRemove $iname 2>&1 > /dev/null
             return 1
