@@ -46,7 +46,7 @@ ZInstall_js9() {
 
     while getopts "f" opt; do
         case $opt in
-           f )  docker rmi -f jumpscale/js9 ;;
+           f )  ZDockerRemoveImage jumpscale/js9 ;;
         esac
     done
 
@@ -91,7 +91,7 @@ ZInstall_js9_full() {
 
     while getopts "f" opt; do
         case $opt in
-           f )  docker rmi -f jumpscale/js9_full ;;
+           f )  ZDockerRemoveImage jumpscale/js9_full ;;
         esac
     done
 
@@ -122,7 +122,7 @@ ZInstall_js9_node() {
 
     while getopts "f" opt; do
         case $opt in
-           f )  docker rmi -f jumpscale/js9_node ;;
+           f )  ZDockerRemoveImage jumpscale/js9_node ;;
         esac
     done
 
@@ -145,7 +145,7 @@ ZInstall_docgenerator() {
 
     while getopts "f" opt; do
         case $opt in
-           f )  docker rmi -f jumpscale/js9_docgenerator ;;
+           f )  ZDockerRemoveImage jumpscale/js9_docgenerator ;;
         esac
     done
 
@@ -172,7 +172,7 @@ ZInstall_js9_celery() {
 
     while getopts "f" opt; do
         case $opt in
-           f )  docker rmi -f jumpscale/js9_celery ;;
+           f )  ZDockerRemoveImage jumpscale/js9_celery ;;
         esac
     done
 
@@ -195,7 +195,7 @@ ZInstall_web_infrastructure() {
 
     while getopts "f" opt; do
         case $opt in
-           f )  docker rmi -f jumpscale/js9_docgenerator ;;
+           f )  ZDockerRemoveImage jumpscale/js9_docgenerator ;;
         esac
     done
 
@@ -223,7 +223,7 @@ ZInstall_ays9() {
 
     while getopts "f" opt; do
         case $opt in
-           f )  docker rmi -f jumpscale/ays9 ;;
+           f )  ZDockerRemoveImage jumpscale/ays9 ;;
         esac
     done
 
