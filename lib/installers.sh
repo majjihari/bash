@@ -283,13 +283,14 @@ ZInstall_portal9() {
 
 ZInstallCrmUsage() {
    cat <<EOF
-Usage: ZInstallCrm [-p caddyport] [-D dbname] [-u url] [-o organization_id] [-s client_secret] [-i iname] [-d]
+Usage: ZInstallCrm [-p caddyport] [-D dbname] [-u url] [-o organization_id] [-s client_secret] [-i iname] [-e email] [-d]
    -p caddyport: tcp port which caddy will listen to. (default: 80)
    -i iname: name of container which will have the crm installed (default: crm)
    -D dbname: postgres database name to create (default:crm)
    -o organization: client id of organization
    -s secretid: client secret of organization
    -u url: url
+   -e email: email used by let's encrypt to generate certificate
    -d: install demo data
    -h: help
 
@@ -313,7 +314,8 @@ ZInstall_crm() {
     local client_id=""
     local client_secret=""
     local url="localhost"
-    while getopts "p:D:o:s:u:i:dh" opt; do
+    local email="off"
+    while getopts "p:D:o:s:u:i:e:dh" opt; do
         case $opt in
            p )  caddyport=$OPTARG ;;
            D )  dbname=$OPTARG ;;
@@ -321,6 +323,7 @@ ZInstall_crm() {
            s )  client_secret=$OPTARG ;;
            u )  url=$OPTARG ;;
            i )  iname=$OPTARG ;;
+           e )  email=$OPTARG ;;
            d )  demo=True ;;
            h )  ZInstallCrmUsage ; return 0 ;;
            \? )  ZInstallCrmUsage ; return 1 ;;
@@ -328,14 +331,19 @@ ZInstall_crm() {
     done
 
     install_args="caddy_port=$caddyport, db_name=\"$dbname\", demo=$demo,\
-    start=True, client_id=\"$client_id\", client_secret=\"$client_secret\", domain=\"$url\"";
+    start=True, client_id=\"$client_id\", client_secret=\"$client_secret\", domain=\"$url\", tls=\"$email\"";
     start_args="db_name=\"$dbname\"";
     start_cmd="python3 -c 'from js9 import j;j.tools.prefab.local.apps.crm.start($start_args)'"
     install_cmd="python3 -c 'from js9 import j;j.tools.prefab.local.apps.crm.install($install_args)'"
 
-    ZDockerActive -b "jumpscale/crm" -i $iname -a "-p $caddyport:$caddyport"&& container "$start_cmd" && return 0
+    ports="-p $caddyport:$caddyport"
+    # if caddy port is 443 we must expose port 80 also to be able to generate ssl
+    if [[ ${caddyport} == 443 ]];then
+        ports="$ports -p 80:80"
+    fi
+    ZDockerActive -b "jumpscale/crm" -i $iname -a "${ports}" && container "$start_cmd" && return 0
 
-    ZDockerActive -b "jumpscale/js9_docgenerator" -c "ZInstall_docgenerator" -i $iname || return 1
+    ZDockerActive -b "jumpscale/js9_docgenerator" -a "${ports}" -c "ZInstall_docgenerator" -i $iname || return 1
 
     echo "[+] Installing CRM"
     container "$install_cmd" || return 1
