@@ -52,7 +52,7 @@ ZInstall_js9() {
 
     ZDockerActive -b "jumpscale/js9" -i js9 && return 0
 
-    ZDockerActive -b "jumpscale/ubuntu_python" -c "ZInstall_python -f" -i js9 || return 1
+    ZDockerActive -b "jumpscale/ubuntu_python" -c "ZBuild_python -f" -i js9 || return 1
 
     ZInstall_host_code_jumpscale || return 1
 
@@ -78,7 +78,7 @@ ZInstall_js9() {
 
     # container 'js9 "j.tools.develop.dockerconfig()"'
 
-    ZDockerCommit -b jumpscale/js9 || die "docker commit" || return 1
+    ZDockerCommit -b jumpscale/js9 -s || die "docker commit" || return 1
 
     echo "[+] js9 installed (OK)"
 
@@ -111,7 +111,7 @@ ZInstall_js9_full() {
     echo "[+] initializing jumpscale"
     container 'js9_init' || return 1
 
-    ZDockerCommit -b jumpscale/js9_full || die "docker commit" || return 1
+    ZDockerCommit -b jumpscale/js9_full -s || die "docker commit" || return 1
 
 }
 
@@ -251,7 +251,7 @@ ZInstall_ays9() {
     container "pip3 install -e /opt/code/github/jumpscale/ays9" || return 1
     container "js9_init" || return 1
 
-    ZDockerCommit -b jumpscale/ays9 || die "docker commit" || return 1
+    ZDockerCommit -b jumpscale/ays9 -s || die "docker commit" || return 1
 
 }
 
@@ -277,7 +277,7 @@ ZInstall_portal9() {
     container "cd  /opt/code/github/jumpscale/portal9 && bash install.sh ${ZBRANCH};" || return 1
     container "js9_init" || return 1
 
-    ZDockerCommit -b jumpscale/portal9 || die "docker commit" || return 1
+    ZDockerCommit -b jumpscale/portal9 -s || die "docker commit" || return 1
 
 }
 
