@@ -73,7 +73,7 @@ ZDockerCommit() {
         case $opt in
            b )  bname=$OPTARG ;;
            i )  iname=$OPTARG ;;
-           s )  stop=0 ;;
+           s )  stop=1 ;;
            h )  ZDockerCommitUsage ; return 0 ;;
            \? )  ZDockerCommitUsage ; return 1 ;;
         esac
@@ -227,7 +227,7 @@ ZDockerBuildUbuntu() {
     container 'echo "" > /etc/motd' || return 1
     container 'touch /root/.iscontainer' || return 1
 
-    ZDockerCommit -b jumpscale/ubuntu || return 1
+    ZDockerCommit -b jumpscale/ubuntu -s || return 1
 
     echo "[+] DOCKER UBUNTU OK"
 
