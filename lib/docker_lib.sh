@@ -412,7 +412,7 @@ ZDockerActive() {
         #means docker image does not exist yet
         if [ ! "$cmd" = "" ]; then
             echo "[+] need to build the docker with command: $cmd"
-            `$cmd`
+            $cmd
         else
             ZDockerRemove $iname 2>&1 > /dev/null
             return 1
@@ -420,8 +420,7 @@ ZDockerActive() {
     fi
 
     # container "ls /"
-    local res=`docker inspect -f '{{.State.Running}}' $iname`
-    if [ ! "$res" = "true" ]; then
+    if [ ! "$(docker ps | grep $iname)" ]; then
         #so is not up & running
         echo "[+] docker from image $bname is not active, will try to start"
         if [[ ! -z "$addarg" ]]; then
@@ -451,4 +450,10 @@ ZDockerImageExist() {
         return 1
     fi
     return 0
+}
+
+ZDockerRemoveImage(){
+  if ZDockerImageExist $1; then
+    docker rmi -f $1 > /dev/null 2>&1
+  fi
 }
