@@ -16,7 +16,7 @@ ZBuild_python() {
 
     echo "[+] installing python"
     container 'apt-get update' || return 1
-    container 'apt-get install -y curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet' || return 1
+    container 'apt-get install -y curl mc openssh-server git net-tools iproute2 tmux localehelper psmisc telnet libffi-dev build-essential' || return 1
     if [[ $1 == "full" ]]; then
         container 'apt-get install -y python3' || return 1
     else
