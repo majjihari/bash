@@ -220,10 +220,12 @@ ZInstall_ays9() {
 
     local OPTIND
     local force=0
+    local branch=""
 
-    while getopts "f" opt; do
-        case $opt in
+    while getopts ":f:b:" opt; do
+        case "${opt}" in
            f )  ZDockerRemoveImage jumpscale/ays9 ;;
+           b ) branch="${OPTARG}";;
         esac
     done
 
@@ -239,9 +241,8 @@ ZInstall_ays9() {
     local port=${RPORT:-2222}
     local addarg="${RNODE:-localhost}"
     echo "[+] install AYS9"
-    local branch="${1:-$ZBRANCH}"
-    if [ -z $branch ] ; then
-        branch='master'
+    if [ -z $branch ] && [ -n $ZBRANCH ]; then
+        branch=$ZBRANCH
     fi
     echo "[+] loading or updating AYS source code (branch:$branch)"
     ZCodeGetJS -r ays9 -b $branch || return 1
