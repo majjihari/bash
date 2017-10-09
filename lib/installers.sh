@@ -229,7 +229,7 @@ ZInstall_ays9() {
 
     local OPTIND
     local force=0
-    local branch=""
+    local branch=${ZBRANCH:-master}
 
     while getopts ":f:b:" opt; do
         case "${opt}" in
@@ -250,9 +250,6 @@ ZInstall_ays9() {
     local port=${RPORT:-2222}
     local addarg="${RNODE:-localhost}"
     echo "[+] install AYS9"
-    if [ -z $branch ] && [ -n $ZBRANCH ]; then
-        branch=$ZBRANCH
-    fi
     echo "[+] loading or updating AYS source code (branch:$branch)"
     ZCodeGetJS -r ays9 -b $branch || return 1
     echo "[+] installing jumpscale ays9"
