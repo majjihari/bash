@@ -98,7 +98,13 @@ ZInstall_js9_full() {
     ZDockerActive -b "jumpscale/js9_full" -i js9_full && return 0
 
     #check the docker image is there
-    ZDockerActive -b "jumpscale/js9" -c "ZInstall_js9 -f" -i js9_full || return 1
+    ZDockerActive -b "jumpscale/ubuntu_python" -c "ZBuild_python -f" -i js9_full || return 1
+    
+    echo "[+] install js9"
+    container "cp /opt/code/github/jumpscale/core9/mascot /root/.mascot.txt"
+
+    container "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts" || return 1
+    container "pip3 install -e /opt/code/github/jumpscale/core9" || return 1
 
     echo "[+] installing jumpscale build dependencies"
     container "apt-get install build-essential python3-dev libvirt-dev libssl-dev libffi-dev libssh-dev -y" || return 1
@@ -107,6 +113,9 @@ ZInstall_js9_full() {
 
     echo "[+] install lib9 with dependencies (can take long time)"
     container 'cd  /opt/code/github/jumpscale/lib9 && bash install.sh;' || return 1
+
+    echo "[+] installing jumpscale prefab9"
+    container 'cd  /opt/code/github/jumpscale/prefab9 && bash install.sh;' || return 1
 
     echo "[+] initializing jumpscale"
     container 'js9_init' || return 1
