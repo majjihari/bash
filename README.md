@@ -87,11 +87,11 @@ Bash utilities
         This might take a while! Don't panic! Wait.
      - To get an AYS docker (core + lib + prefab + ays with all their dependencies)
         ```bash
-        ZInstall_ays9
+        ZInstall_ays9 [-a "-p 5000:5000" # to expose port 5000 from container]
         ```
      - To get a portal as well (core + lib + prefab + ays + portal with all their dependencies)
         ```bash
-        ZInstall_portal9
+        ZInstall_portal9 [-a "-p 8200:8200" # to expose port 8200 from container]
         ```
     Then start with
     ```bash
