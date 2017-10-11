@@ -232,15 +232,16 @@ ZInstall_ays9() {
     local OPTIND
     local force=0
     local branch=${ZBRANCH:-master}
+    local addargs=''
 
-    while getopts ":f:b:" opt; do
+    while getopts ":f:b:a:" opt; do
         case "${opt}" in
+           a ) addargs="${OPTARG}";;
            f )  ZDockerRemoveImage jumpscale/ays9 ;;
            b ) branch="${OPTARG}";;
         esac
     done
-
-    ZDockerActive -b "jumpscale/ays9" -i ays9 && return 0
+    ZDockerActive -b "jumpscale/ays9" -i ays9 -a "$addargs" && return 0
 
     ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full -f" -i ays9 || return 1
 
@@ -266,17 +267,23 @@ ZInstall_ays9() {
 
 ZInstall_portal9() {
 
-    ZDockerActive -b "jumpscale/portal9" -i portal9 && return 0
+    local OPTIND
+    local branch=${ZBRANCH:-master}
+    local addargs=''
+
+    while getopts ":a:b:" opt; do
+        case "${opt}" in
+           a ) addargs="${OPTARG}";;
+           b ) branch="${OPTARG}";;
+        esac
+    done
+    ZDockerActive -b "jumpscale/portal9" -i portal9 -a "$addargs" && return 0
 
     ZDockerActive -b "jumpscale/ays9" -c "ZInstall_ays9 -f" -i portal9 || return 1
 
     local port=${RPORT:-2222}
     local addarg="${RNODE:-localhost}"
     echo "[+] install Portal9"
-    local branch="${1:-$ZBRANCH}"
-    if [ -z $branch ] ; then
-        branch='master'
-    fi
     echo "[+] loading or updating Portal source code (branch:$branch)"
     ZCodeGetJS -r portal9 -b ${branch}  || return 1
 
