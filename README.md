@@ -16,12 +16,11 @@ Bash utilities
      
    - ### Install from branch
     ```
-    export ZUTILSBRANCH=<BRANCH>
-    export ZBRANCH=<BRANCH>
-    curl https://raw.githubusercontent.com/Jumpscale/bash/${ZUTILSBRANCH}/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
+    export ZUTILSBRANCH=something
+    curl https://raw.githubusercontent.com/Jumpscale/bash/${ZBRANCH}/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
     ```
         
-    where `ZUTILSBRANCH` is branch of these utilies you want to install and `ZBRANCH` is the target branch for js9 components (defaults to master)
+    where `ZUTILSBRANCH` is branch of these utilies you want to install
 
     what happens:
     - xcode-tools will be installed & then brew (https://brew.sh/) (osx only)
@@ -62,41 +61,55 @@ Bash utilities
 
 ## 4. Use the bash utlities!
 
- *  ### To install full jumpscale on host machine
-    ```bash
-    ZInstall_host_js9_full
-    ```
-    This will install the following:
-    - Jumpscale core9
-    - Jumpscale libs9
-    - Jumpscale prefab9
+### install jumpscale
+
+```bash
+##optional change the branch for js9
+#export JS9BRANCH=9.3.0
+ZInstall_host_js9
+```
+
+### To install full jumpscale on host machine
+
+```bash
+##optional change the branch for js9
+#export JS9BRANCH=master
+ZInstall_host_js9_full
+```
+This will install the following:
+- Jumpscale core9
+- Jumpscale libs9
+- Jumpscale prefab9
 
 
- * ### To install full jumpscale on a docker
-    - For OSX make sure docker has been installed !!!
-        - https://docs.docker.com/docker-for-mac/install/
+ ### To install full jumpscale in a docker container
 
-    - To make sure your sshkeys are loaded/generated
-        ```bash
-        ZKeysLoad
-        ```
-     - To get basic jumpscale (core + lib + prefab with all their dependencies)
-        ```bash
-        ZInstall_js9_full
-        ```
-        This might take a while! Don't panic! Wait.
-     - To get an AYS docker (core + lib + prefab + ays with all their dependencies)
-        ```bash
-        ZInstall_ays9 [-a "-p 5000:5000" # to expose port 5000 from container]
-        ```
-     - To get a portal as well (core + lib + prefab + ays + portal with all their dependencies)
-        ```bash
-        ZInstall_portal9 [-a "-p 8200:8200" # to expose port 8200 from container]
-        ```
-    Then start with
-    ```bash
-    ZDockerActive -b jumpscale/<imagename> -i <name of your docker>
-    ```
+- For OSX make sure docker has been installed !!!
+    - https://docs.docker.com/docker-for-mac/install/
+
+- To make sure your sshkeys are loaded/generated
+
+```bash
+ZKeysLoad
+```
+- To get basic jumpscale (core + lib + prefab with all their dependencies)
+```bash
+ZInstall_js9_full
+```
+This might take a while! Don't panic! Wait.
+- To get an AYS docker (core + lib + prefab + ays with all their dependencies)
+```bash
+ZInstall_ays9 [-a "-p 5000:5000" # to expose port 5000 from container]
+```
+- To get a portal as well (core + lib + prefab + ays + portal with all their dependencies)
+```bash
+ZInstall_portal9 [-a "-p 8200:8200" # to expose port 8200 from container]
+```
+
+Then start with
+```bash
+ZDockerActive -b jumpscale/<imagename> -i <name of your docker>
+```
 
  - ### To install all editor tools for local machine
 

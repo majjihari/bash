@@ -41,7 +41,7 @@ ZCodeGetJS() {
     local OPTIND
     local account='jumpscale'
     local reponame=''
-    local branch=${ZBRANCH:-master}
+    local branch=${JS9BRANCH:-master}
     while getopts "r:b:h" opt; do
         case $opt in
            r )  reponame=$OPTARG ;;
@@ -63,8 +63,8 @@ ZCodeGetJS() {
     # local giturl="git@github.com:Jumpscale/$reponame.git"
     local githttpsurl="https://github.com/jumpscale/$reponame.git"
 
-    # check if specificed branch or $ZBRANCH exist, if not then fallback to master
-    ZBranchExists ${githttpsurl} ${branch} || branch=master
+    # check if specificed branch or $JS9BRANCH exist, if not then fallback to master
+    JS9BRANCHExists ${githttpsurl} ${branch} || branch=master
 
     # ZCodeGet -r $reponame -a $account -u $giturl -b $branch  || ZCodeGet -r $reponame -a $account -u $githttpsurl -b $branch || return 1
     ZCodeGet -r $reponame -a $account -u $githttpsurl -b $branch || return 1
@@ -98,7 +98,7 @@ ZCodeGet() {
     local account='varia'
     local reponame=''
     local giturl=''
-    local branch=${ZBRANCH:-master}
+    local branch=${JS9BRANCH:-master}
     local sshkey=''
     while getopts "a:r:u:b:t:k:h" opt; do
         case $opt in
@@ -262,9 +262,9 @@ ZCodePushJS(){
     fi
 }
 
-ZBranchExists() {
+JS9BRANCHExists() {
     local giturl="$1"
-    local branch=${2:-${ZBRANCH}}
+    local branch=${2:-${JS9BRANCH}}
 
     # remove the trailing .git from the giturl if exist
     giturl=${giturl%.git}

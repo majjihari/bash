@@ -231,7 +231,7 @@ ZInstall_ays9() {
 
     local OPTIND
     local force=0
-    local branch=${ZBRANCH:-master}
+    local branch=${JS9BRANCH:-master}
     local addargs=''
 
     while getopts ":f:b:a:" opt; do
@@ -268,7 +268,7 @@ ZInstall_ays9() {
 ZInstall_portal9() {
 
     local OPTIND
-    local branch=${ZBRANCH:-master}
+    local branch=${JS9BRANCH:-master}
     local addargs=''
 
     while getopts ":a:b:" opt; do
@@ -290,7 +290,7 @@ ZInstall_portal9() {
     echo "[+] installing jumpscale portal9"
     ZNodeSet $addarg || return 1
     ZNodePortSet $port || return 1
-    container "cd  /opt/code/github/jumpscale/portal9 && bash install.sh ${ZBRANCH};" || return 1
+    container "cd  /opt/code/github/jumpscale/portal9 && bash install.sh ${JS9BRANCH};" || return 1
     container "js9_init" || return 1
 
     ZDockerCommit -b jumpscale/portal9 -s || die "docker commit" || return 1

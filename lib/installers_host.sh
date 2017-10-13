@@ -8,8 +8,8 @@ ZInstall_host_code_jumpscale() {
     fi
 
     local branch=$1
-    if [ -n ${ZBRANCH} ] && [ -z $branch ] ; then
-        branch=${ZBRANCH}
+    if [ -n ${JS9BRANCH} ] && [ -z $branch ] ; then
+        branch=${JS9BRANCH}
     fi
     if [ -z $branch ] ; then
         branch='master'
