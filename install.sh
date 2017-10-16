@@ -41,6 +41,10 @@ if [ "$(uname)" == "Darwin" ]; then
 elif [ -f /etc/redhat-release ]; then
     dnf update
     dnf install curl git wget -y
+    export ZUTILSDIR=${ZUTILSDIR:-/opt/code/github/jumpscale}
+elif [ -f /etc/arch-release ]; then
+    pacman -S --noconfirm curl git wget
+    export ZUTILSDIR=${ZUTILSDIR:-/opt/code/github/jumpscale}
 else
     #TODO: *2 need to support windows as well
     apt-get update
