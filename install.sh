@@ -2,6 +2,11 @@
 
 set -e
 
+sudo rm -rf $TMPDIR/zutils_done
+sudo rm -rf /tmp/zutils_done
+sudo rm -rf /opt/code/github/jumpscale/bash
+sudo rm /tmp/install.sh
+
 if [ -z "$HOMEDIR" ] ; then
     export HOMEDIR="$HOME"
 fi
@@ -9,12 +14,6 @@ fi
 if [ -z "$HOMEDIR" ] ; then
     echo "[-] ERROR, could not specify homedir"
     exit 1
-fi
-
-
-#then in /opt
-if [ -e /opt/code/github/jumpscale ]; then
-    export ZUTILSDIR=/opt/code/github/jumpscale
 fi
 
 if [ "$(uname)" == "Darwin" ]; then
