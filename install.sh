@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set +e
+set +ex
 
 sudo rm -rf $TMPDIR/zutils_done > /dev/null 2>&1
 sudo rm -rf /tmp/zutils_done > /dev/null 2>&1
