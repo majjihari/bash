@@ -11,10 +11,6 @@ if [ -z "$HOMEDIR" ] ; then
     exit 1
 fi
 
-#first check is in home
-if [ -e ~/code/github/jumpscale ]; then
-    export ZUTILSDIR=~/code/github/jumpscale
-fi
 
 #then in /opt
 if [ -e /opt/code/github/jumpscale ]; then
