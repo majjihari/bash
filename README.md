@@ -2,31 +2,31 @@
 Bash utilities
 
 # To Install
-## 1. Go to your terminal 
+## 1. Go to your terminal
    * MacOS: Applications → Utilities → Terminal
    * Linux:
        * Unity: open the dash, type `terminal`
        * old style menus: Applications → Accessories → Terminal.
        * Otherwise: Control + Alt + T or Alt + F2, `gnome-terminal`
        * Ubuntu variants: you might need to substitute `gnome-terminal` for `xfce4-terminal`, konsole or `terminator`
-       
+
  ## 2. Install bash utilities:
    - ### Install from master
      copy/paste into your terminal: `curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh`
-     
+
    - ### Install from branch
     ```
     export ZUTILSBRANCH=something
-    curl https://raw.githubusercontent.com/Jumpscale/bash/${ZBRANCH}/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
+    curl https://raw.githubusercontent.com/Jumpscale/bash/${ZUTILSBRANCH}/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
     ```
-        
+
     where `ZUTILSBRANCH` is branch of these utilies you want to install
 
     what happens:
     - xcode-tools will be installed & then brew (https://brew.sh/) (osx only)
     - ssh-key will be looked for & created if it doesn't exist yet
     - the basic init script will be added to ~/bash_profile
-    
+
  - If everything installed correctly result should show `[+] Install OK`
 
  - If install failed with `(13: Permission denied)` you need to install as root. Type `sudo -s` then try install again with the curl command from above.
