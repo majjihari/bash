@@ -36,8 +36,8 @@ ZInstall_host_js9() {
 
     ZInstall_host_code_jumpscale || die "Could not ZInstall_host_code_jumpscale" || return 1
 
-    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts > ${ZLogFile} 2>&1 
-    
+    ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts > ${ZLogFile} 2>&1
+
     mkdir -p $HOME/js9host
 
     echo "[+] clean previous js9 install"
@@ -46,12 +46,13 @@ ZInstall_host_js9() {
 
     echo "[+] install js9"
     pushd $ZCODEDIR/github/jumpscale/core9
+    cp /$ZCODEDIR/github/jumpscale/core9/mascot /root/.mascot.txt
     pip3 install -e . > ${ZLogFile} 2>&1 || die "Could not install core9 of js9" || return 1
     popd
     # pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
 
     echo "[+] load env"
-    python3 -c 'from JumpScale9 import j;j.tools.executorLocal.initEnv()' > ${ZLogFile} 2>&1 || die "Could not install core9 of js9, initenv" || return 1 
+    python3 -c 'from JumpScale9 import j;j.tools.executorLocal.initEnv()' > ${ZLogFile} 2>&1 || die "Could not install core9 of js9, initenv" || return 1
     python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()'  > ${ZLogFile} 2>&1  || die "Could not install core9 of js9, jsloader" || return 1
 
     echo "[+] installing jumpscale lib9"
@@ -59,7 +60,7 @@ ZInstall_host_js9() {
     pip3 install docker
     pip3 install --no-deps -e .  > ${ZLogFile} 2>&1 || die "Coud not install lib9 of js9" || return 1
     popd
-    
+
 
     echo "[+] installing jumpscale prefab9"
     pushd $ZCODEDIR/github/jumpscale/prefab9
@@ -231,7 +232,7 @@ ZInstall_host_editor() {
         fi
     else
         die "platform not supported"
-    fi    
+    fi
 
     if [ "$(uname)" == "Darwin" ]; then
       echo "[+] download visual studio code"
@@ -360,8 +361,8 @@ ZInstall_host_editor() {
     ZCodePluginInstall streetsidesoftware.code-spell-checker || return 1
     ZCodePluginInstall yzhang.markdown-all-in-one || return 1
     ZCodePluginInstall mdickin.markdown-shortcuts || return 1
-    
-    echo "[+] editor tools MAC installed (OK) !!!!"    
+
+    echo "[+] editor tools MAC installed (OK) !!!!"
 
 }
 
