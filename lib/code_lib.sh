@@ -4,13 +4,12 @@
 
 ZCodeConfig() {
     if [ -e /opt/code ]; then
-        export ZCODEDIR=/opt/code
+        export ZCODEDIR=${ZCODEDIR:-/opt/code}
     else
         export ZCODEDIR=${ZCODEDIR:-~/code}
     fi
 
 }
-
 
 ZCodeGetJSUsage() {
    cat <<EOF
@@ -128,7 +127,7 @@ ZCodeGet() {
 
     # check if docs.greenitglobe.com (gogs) in the url
     if grep -q docs.greenitglobe.com <<< $giturl; then
-        ssh-keyscan -t rsa docs.greenitglobe.com >> ~/.ssh/known_hosts 2>&1 >> $ZLogFile || die "ssh keyscan" || return 1 
+        ssh-keyscan -t rsa docs.greenitglobe.com >> ~/.ssh/known_hosts 2>&1 >> $ZLogFile || die "ssh keyscan" || return 1
     fi
 
     if ! grep -q ^github.com ~/.ssh/known_hosts 2> /dev/null; then
