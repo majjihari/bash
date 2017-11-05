@@ -252,7 +252,6 @@ ZInstall_tarantool() {
     echo "[+] install extra's for tarantool"
 
     container 'js9 "j.tools.prefab.local.db.tarantool.install()"' || return 1
-    container 'js9 "j.tools.prefab.local.db.tarantool.start()"' || return 1
 
     ZDockerCommit -b jumpscale/js9_tarantool || die "docker commit" || return 1
 
