@@ -220,12 +220,45 @@ ZInstall_web_infrastructure() {
 
     echo "[+] install extra's for web infrastructure"
 
+    #NOT IMPLEMENTED YET
+    # j.tools.prefab.local.apps.caddy.install()
+
     ZDockerCommit -b jumpscale/js9_webinfra || die "docker commit" || return 1
 
 
-    # j.tools.prefab.local.apps.caddy.install()
+
 
 }
+
+ZInstall_tarantool() {
+
+    local OPTIND
+    local force=0
+
+    while getopts "f" opt; do
+        case $opt in
+           f )  ZDockerRemoveImage jumpscale/js9_tarantool ;;
+        esac
+    done
+
+    ZDockerActive -b "jumpscale/js9_tarantool" -i js9_tarantool && return 0
+
+    ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full" -i js9_tarantool || return 1
+
+    echo "[+] initializing jumpscale"
+    container 'js9_init' || return 1
+    container 'apt update; apt upgrade -y'
+
+    echo "[+] install extra's for tarantool"
+
+    container 'js9 "j.tools.prefab.local.db.tarantool.install()"' || return 1
+    container 'js9 "j.tools.prefab.local.db.tarantool.start()"' || return 1
+
+    ZDockerCommit -b jumpscale/js9_tarantool || die "docker commit" || return 1
+
+
+}
+
 
 ZInstall_ays9() {
 
