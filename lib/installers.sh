@@ -100,7 +100,7 @@ ZInstall_js9_full() {
     #check the docker image is there
     ZDockerActive -b "jumpscale/ubuntu_python" -c "ZBuild_python -f" -i js9_full || return 1
 
-    ZInstall_host_code_jumpscale || return 1
+    ZInstall_host_code_jumpscale '9.3.0' || return 1
     
     echo "[+] install js9"
     container "cp /opt/code/github/jumpscale/core9/mascot /root/.mascot.txt"
@@ -143,7 +143,7 @@ ZInstall_js9_node() {
     ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full -f" -i js9_node || return 1
 
     echo "[+] initializing node on js9"
-    container 'js9 "j.tools.prefab.local.development.nodejs.install()"' || return 1
+    container 'js9 "j.tools.prefab.local.runtimes.nodejs.install()"' || return 1
 
     ZDockerCommit -b jumpscale/js9_node || die "docker commit" || return 1
 
@@ -169,7 +169,7 @@ ZInstall_docgenerator() {
     container 'apt update; apt upgrade -y; apt install bzip2 -y'
 
     echo "[+] install docgenerator (can take long time)"
-    container 'js9 "j.tools.prefab.local.development.golang.install()"' || return 1
+    container 'js9 "j.tools.prefab.local.runtimes.golang.install()"' || return 1
     container 'js9 "j.tools.docgenerator.install()"' || return 1
 
     ZDockerCommit -b jumpscale/js9_docgenerator || die "docker commit" || return 1
