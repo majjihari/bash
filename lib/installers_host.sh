@@ -424,9 +424,6 @@ ZInstall_host_ays9(){
     /bin/bash install.sh || die "Coud not install ays9" || return 1
     popd
 
-    echo "[+] initializing ays"
-    python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()' || die "js9 generate" || return 1
-
     echo "[+] ays9 installed (OK)"
 
     ZDoneSet "ZInstall_host_ays9"
@@ -446,11 +443,8 @@ ZInstall_host_portal9(){
 
     echo "[+] installing portal"
     pushd $ZCODEDIR/github/jumpscale/portal9
-    /bin/bash install.sh || die "Coud not install portal9" || return 1
+    /bin/bash install.sh ${JS9BRANCH} || die "Coud not install portal9" || return 1
     popd
-
-    echo "[+] initializing portal"
-    python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()' || die "js9 generate" || return 1
 
     echo "[+] portal9 installed (OK)"
 
