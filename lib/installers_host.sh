@@ -26,7 +26,7 @@ ZInstall_host_code_jumpscale() {
 ZInstall_host_js9() {
 
     if ZDoneCheck "ZInstall_host_js9" ; then
-        echo "[+] update jumpscale code was already done."
+        echo "[+] Host jumpscale installation already done."
        return 0
     fi
 
@@ -370,7 +370,7 @@ ZInstall_host_editor() {
 ZInstall_host_js9_full() {
 
     if ZDoneCheck "ZInstall_host_js9_full" ; then
-        echo "[+] update jumpscale code was already done."
+        echo "[+] Host jumpsacle full isntallation already done."
        return 0
     fi
 
@@ -405,5 +405,49 @@ ZInstall_host_js9_full() {
     echo "[+] js9 installed (OK)"
 
     ZDoneSet "ZInstall_host_js9_full"
+
+}
+
+ZInstall_host_ays9(){
+    if ZDoneCheck "ZInstall_host_ays9" ; then
+        echo "[+] Jumpsacle with AYS installation already done."
+       return 0
+    fi
+
+    ZInstall_host_js9_full
+
+    echo "[+] getting ays code"
+    ZCodeGetJS -r ays9 || return 1
+
+    echo "[+] installing ays"
+    pushd $ZCODEDIR/github/jumpscale/ays9
+    /bin/bash install.sh || die "Coud not install ays9" || return 1
+    popd
+
+    echo "[+] ays9 installed (OK)"
+
+    ZDoneSet "ZInstall_host_ays9"
+
+}
+
+ZInstall_host_portal9(){
+    if ZDoneCheck "ZInstall_host_portal9" ; then
+        echo "[+] Jumpsacle with portal installation already done."
+       return 0
+    fi
+
+    ZInstall_host_js9_full
+
+    echo "[+] getting portal code"
+    ZCodeGetJS -r portal9 || return 1
+
+    echo "[+] installing portal"
+    pushd $ZCODEDIR/github/jumpscale/portal9
+    /bin/bash install.sh ${JS9BRANCH} || die "Coud not install portal9" || return 1
+    popd
+
+    echo "[+] portal9 installed (OK)"
+
+    ZDoneSet "ZInstall_host_portal9"
 
 }

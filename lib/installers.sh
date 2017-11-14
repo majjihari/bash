@@ -302,17 +302,24 @@ ZInstall_portal9() {
     local OPTIND
     local branch=${JS9BRANCH:-master}
     local addargs=''
+    local fullinstall=0
 
-    while getopts ":a:b:" opt; do
+    while getopts ":a:b:u" opt; do
         case "${opt}" in
            a ) addargs="${OPTARG}";;
            b ) branch="${OPTARG}";;
+           u ) fullinstall=1
         esac
     done
-    ZDockerActive -b "jumpscale/portal9" -i portal9 -a "$addargs" && return 0
 
-    ZDockerActive -b "jumpscale/ays9" -c "ZInstall_ays9 -f" -i portal9 || return 1
-
+    if [ "$fullinstall" == 1 ]; then
+        ZDockerActive -b "jumpscale/js9all" -i js9all -a "$addargs" && return 0
+        ZDockerActive -b "jumpscale/ays9" -c "ZInstall_ays9 -f" -i js9all || return 1
+    else
+        ZDockerActive -b "jumpscale/portal9" -i portal9 -a "$addargs" && return 0
+        ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full -f" -i portal9 || return 1
+    fi
+    
     local port=${RPORT:-2222}
     local addarg="${RNODE:-localhost}"
     echo "[+] install Portal9"
@@ -325,10 +332,33 @@ ZInstall_portal9() {
     container "cd  /opt/code/github/jumpscale/portal9 && bash install.sh ${JS9BRANCH};" || return 1
     container "js9_init" || return 1
 
-    ZDockerCommit -b jumpscale/portal9 -s || die "docker commit" || return 1
+    if [ "$fullinstall" == 1 ]; then
+        ZDockerCommit -b jumpscale/js9all -s || die "docker commit" || return 1
+    else
+        ZDockerCommit -b jumpscale/portal9 -s || die "docker commit" || return 1
+    fi
 
 }
 
+ZInstall_js9_all() {
+
+    local OPTIND
+    local force=0
+    local branch=${JS9BRANCH:-master}
+    local addargs=''
+
+    while getopts ":f:b:a:" opt; do
+        case "${opt}" in
+            a ) addargs="${OPTARG}";;
+            f )  ZDockerRemoveImage jumpscale/js9all ;;
+            b ) branch="${OPTARG}";;
+        esac
+    done
+    ZDockerActive -b "jumpscale/js9all" -i js9all -a "$addargs" && return 0
+
+    ZInstall_portal9  -u -a $addargs -b $branch
+
+}
 ZInstallCrmUsage() {
    cat <<EOF
 Usage: ZInstallCrm [-p caddyport] [-D dbname] [-u url] [-o organization_id] [-s client_secret] [-i iname] [-e email] [-d]

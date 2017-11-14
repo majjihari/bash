@@ -81,6 +81,24 @@ This will install the following:
 - Jumpscale libs9
 - Jumpscale prefab9
 
+### Installing ays and portal on host machine
+
+To install ays on host:
+
+```bash
+ZInstall_host_ays9
+```
+
+To install portal on host:
+
+```bash
+ZInstall_host_portal9
+```
+In both cases the following will be installed in addition to the chosen component( if they are not already installed):
+- Jumpscale core9
+- Jumpscale libs9
+- Jumpscale prefab9
+
 
  ### To install full jumpscale in a docker container
 
@@ -101,9 +119,14 @@ This might take a while! Don't panic! Wait.
 ```bash
 ZInstall_ays9 [-a "-p 5000:5000" # to expose port 5000 from container]
 ```
-- To get a portal as well (core + lib + prefab + ays + portal with all their dependencies)
+- To get a portal as well (core + lib + prefab + portal with all their dependencies)
 ```bash
 ZInstall_portal9 [-a "-p 8200:8200" # to expose port 8200 from container]
+```
+
+- To get a complete installation(core + lib + prefab + ays + portal with all their dependencies)
+```bash
+ZInstall_js9_all [-a "-p 8200:8200" # to expose port 8200 from container]
 ```
 
 Then start with
