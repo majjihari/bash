@@ -2,7 +2,7 @@
 
 PS4='(${BASH_SOURCE}:${LINENO}): ${FUNCNAME[0]} - [${SHLVL},${BASH_SUBSHELL}, $?]'
 
-if [ -d "/opt/code/github/jumpscale" ]; then
+if [ -d "/opt/code/github/jumpscale" ] && [ "$(uname)" != "Darwin" ] ; then
     export ZUTILSDIR='/opt/code/github/jumpscale'
 else
     export ZUTILSDIR=${ZUTILSDIR:-~/code/github/jumpscale}
