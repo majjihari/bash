@@ -290,7 +290,7 @@ ZInstall_ays9() {
     echo "[+] installing jumpscale ays9"
     ZNodeSet $addarg  || return 1
     ZNodePortSet $port || return 1
-    container "pip3 install -e /opt/code/github/jumpscale/ays9" || return 1
+    container "cd  /opt/code/github/jumpscale/ays9 && bash install.sh;" || return 1
     container "js9_init" || return 1
 
     ZDockerCommit -b jumpscale/ays9 -s || die "docker commit" || return 1
