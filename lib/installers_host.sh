@@ -95,7 +95,7 @@ ZInstall_host_base(){
     fi
 
     if [ "$(uname)" == "Darwin" ]; then
-        echo "[+] upgrade brew (this can take a very long time, do 'tail -f /tmp/zutils.log' to see progress)"
+        echo "[+] upgrade brew"
         brew upgrade  >> ${ZLogFile} 2>&1 || die "could not upgrade all brew installed components" || return 1
 
         echo "[+] installing git, python3, mc, tmux, curl"
