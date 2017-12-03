@@ -27,7 +27,7 @@ ZInstall_host_code_jumpscale() {
 ZInstall_host_js9() {
 
     if ZDoneCheck "ZInstall_host_js9" ; then
-        echo "[+] update jumpscale code was already done."
+        echo "[+] Host jumpscale installation already done."
        return 0
     fi
 
@@ -96,7 +96,7 @@ ZInstall_host_base(){
     fi
 
     if [ "$(uname)" == "Darwin" ]; then
-        echo "[+] upgrade brew"
+        echo "[+] upgrade brew (this can take a very long time, do 'tail -f /tmp/zutils.log' to see progress)"
         brew upgrade  >> ${ZLogFile} 2>&1 || die "could not upgrade all brew installed components" || return 1
 
         echo "[+] installing git, python3, mc, tmux, curl"
@@ -125,12 +125,16 @@ ZInstall_host_base(){
         die "platform not supported"
     fi
 
-    echo "[+] installing pip system"
-    curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py || die "could not download pip" || return 1
-    python3 /tmp/get-pip.py  >> ${ZLogFile} 2>&1 || die "pip install" || return 1
+    if [ "$(uname)" == "Darwin" ]; then
+        echo "no need to install pip, should be installed already"
+    else
+        curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py || die "could not download pip" || return 1
+        python3 /tmp/get-pip.py  >> ${ZLogFile} 2>&1 || die "pip install" || return 1
+        rm -f /tmp/get-pip.py
+    fi
 
     echo "[+] upgrade pip"
-    pip3 install --upgrade pip >> ${ZLogFile} 2>&1 || die || return 1
+    pip3 install --upgrade pip >> ${ZLogFile} 2>&1 || die "pip upgrade" || return 1
 
     ZDoneSet "ZInstall_host_base"
 }
@@ -371,7 +375,7 @@ ZInstall_host_editor() {
 ZInstall_host_js9_full() {
 
     if ZDoneCheck "ZInstall_host_js9_full" ; then
-        echo "[+] update jumpscale code was already done."
+        echo "[+] Host jumpsacle full isntallation already done."
        return 0
     fi
 
@@ -406,5 +410,49 @@ ZInstall_host_js9_full() {
     echo "[+] js9 installed (OK)"
 
     ZDoneSet "ZInstall_host_js9_full"
+
+}
+
+ZInstall_host_ays9(){
+    if ZDoneCheck "ZInstall_host_ays9" ; then
+        echo "[+] Jumpsacle with AYS installation already done."
+       return 0
+    fi
+
+    ZInstall_host_js9_full
+
+    echo "[+] getting ays code"
+    ZCodeGetJS -r ays9 || return 1
+
+    echo "[+] installing ays"
+    pushd $ZCODEDIR/github/jumpscale/ays9
+    /bin/bash install.sh || die "Coud not install ays9" || return 1
+    popd
+
+    echo "[+] ays9 installed (OK)"
+
+    ZDoneSet "ZInstall_host_ays9"
+
+}
+
+ZInstall_host_portal9(){
+    if ZDoneCheck "ZInstall_host_portal9" ; then
+        echo "[+] Jumpsacle with portal installation already done."
+       return 0
+    fi
+
+    ZInstall_host_js9_full
+
+    echo "[+] getting portal code"
+    ZCodeGetJS -r portal9 || return 1
+
+    echo "[+] installing portal"
+    pushd $ZCODEDIR/github/jumpscale/portal9
+    /bin/bash install.sh ${JS9BRANCH} || die "Coud not install portal9" || return 1
+    popd
+
+    echo "[+] portal9 installed (OK)"
+
+    ZDoneSet "ZInstall_host_portal9"
 
 }

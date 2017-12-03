@@ -3,7 +3,7 @@
 ############ CODE
 
 ZCodeConfig() {
-    if [ -e /opt/code ]; then
+    if [ -e /opt/code ] && [ "$(uname)" != "Darwin" ] ; then
         export ZCODEDIR=${ZCODEDIR:-/opt/code}
     else
         export ZCODEDIR=${ZCODEDIR:-~/code}

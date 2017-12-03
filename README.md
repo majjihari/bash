@@ -81,6 +81,24 @@ This will install the following:
 - Jumpscale libs9
 - Jumpscale prefab9
 
+### Installing ays and portal on host machine
+
+To install ays on host:
+
+```bash
+ZInstall_host_ays9
+```
+
+To install portal on host:
+
+```bash
+ZInstall_host_portal9
+```
+In both cases the following will be installed in addition to the chosen component( if they are not already installed):
+- Jumpscale core9
+- Jumpscale libs9
+- Jumpscale prefab9
+
 
  ### To install full jumpscale in a docker container
 
@@ -99,16 +117,26 @@ ZInstall_js9_full
 This might take a while! Don't panic! Wait.
 - To get an AYS docker (core + lib + prefab + ays with all their dependencies)
 ```bash
-ZInstall_ays9 [-a "-p 5000:5000" # to expose port 5000 from container]
+ZInstall_ays9
 ```
-- To get a portal as well (core + lib + prefab + ays + portal with all their dependencies)
+- To get a portal as well (core + lib + prefab + portal with all their dependencies)
 ```bash
-ZInstall_portal9 [-a "-p 8200:8200" # to expose port 8200 from container]
+ZInstall_portal9
+```
+
+- To get a complete installation(core + lib + prefab + ays + portal with all their dependencies)
+```bash
+ZInstall_js9_all
 ```
 
 Then start with
 ```bash
 ZDockerActive -b jumpscale/<imagename> -i <name of your docker>
+```
+
+To expose ports from container use the `-a` option to specify your portforwards.For example for AYS installation you might want to expose the port on which the server is running on to allow access from outside the container. This is done as follows:
+```bash
+ZDockerActive -b jumpscale/ays9 -i <name of your docker> -a "-p 5000:5000"
 ```
 
  - ### To install all editor tools for local machine
