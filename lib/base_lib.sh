@@ -128,7 +128,7 @@ Z_brew_install(){
 
 Z_apt_install(){
   echo "apt-get install: $@" >> $ZLogFile
-  apt-get -y install $@ >> $ZLogFile 2>&1 || die "could not install package $@" || return 1
+  sudo apt-get -y install $@ >> $ZLogFile 2>&1 || die "could not install package $@" || return 1
 }
 
 Z_exists_dir(){
