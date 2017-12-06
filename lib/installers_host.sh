@@ -95,7 +95,7 @@ ZInstall_host_base(){
     fi
 
     if [ "$(uname)" == "Darwin" ]; then
-        echo "[+] upgrade brew"
+        echo "[+] upgrade brew (this can take a very long time, do 'tail -f /tmp/zutils.log' to see progress)"
         brew upgrade  >> ${ZLogFile} 2>&1 || die "could not upgrade all brew installed components" || return 1
 
         echo "[+] installing git, python3, mc, tmux, curl"
@@ -124,12 +124,16 @@ ZInstall_host_base(){
         die "platform not supported"
     fi
 
-    echo "[+] installing pip system"
-    curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py || die "could not download pip" || return 1
-    python3 /tmp/get-pip.py  >> ${ZLogFile} 2>&1 || die "pip install" || return 1
+    if [ "$(uname)" == "Darwin" ]; then
+        echo "no need to install pip, should be installed already"
+    else
+        curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py || die "could not download pip" || return 1
+        python3 /tmp/get-pip.py  >> ${ZLogFile} 2>&1 || die "pip install" || return 1
+        rm -f /tmp/get-pip.py
+    fi
 
     echo "[+] upgrade pip"
-    pip3 install --upgrade pip >> ${ZLogFile} 2>&1 || die || return 1
+    pip3 install --upgrade pip >> ${ZLogFile} 2>&1 || die "pip upgrade" || return 1
 
     ZDoneSet "ZInstall_host_base"
 }
