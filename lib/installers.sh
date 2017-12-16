@@ -196,36 +196,36 @@ ZInstall_js9_celery() {
 
 }
 
-ZInstall_web_infrastructure() {
+# ZInstall_web_infrastructure() {
 
-    local OPTIND
-    local force=0
+#     local OPTIND
+#     local force=0
 
-    while getopts "f" opt; do
-        case $opt in
-           f )  ZDockerRemoveImage jumpscale/js9_docgenerator ;;
-        esac
-    done
+#     while getopts "f" opt; do
+#         case $opt in
+#            f )  ZDockerRemoveImage jumpscale/js9_docgenerator ;;
+#         esac
+#     done
 
-    ZDockerActive -b "jumpscale/js9_webinfra" -i js9_webinfra && return 0
+#     ZDockerActive -b "jumpscale/js9_webinfra" -i js9_webinfra && return 0
 
-    ZDockerActive -b "jumpscale/js9_docgenerator" -c "ZInstall_docgenerator -f" -i js9_webinfra || return 1
+#     ZDockerActive -b "jumpscale/js9_docgenerator" -c "ZInstall_docgenerator -f" -i js9_webinfra || return 1
 
-    echo "[+] initializing jumpscale"
-    container 'js9_init' || return 1
-    container 'apt update; apt upgrade -y; apt install bzip2 -y'
+#     echo "[+] initializing jumpscale"
+#     container 'js9_init' || return 1
+#     container 'apt update; apt upgrade -y; apt install bzip2 -y'
 
-    echo "[+] install extra's for web infrastructure"
+#     echo "[+] install extra's for web infrastructure"
 
-    #NOT IMPLEMENTED YET
-    # j.tools.prefab.local.apps.caddy.install()
+#     #NOT IMPLEMENTED YET
+#     # j.tools.prefab.local.apps.caddy.install()
 
-    ZDockerCommit -b jumpscale/js9_webinfra || die "docker commit" || return 1
-
-
+#     ZDockerCommit -b jumpscale/js9_webinfra || die "docker commit" || return 1
 
 
-}
+
+
+# }
 
 ZInstall_tarantool() {
 
