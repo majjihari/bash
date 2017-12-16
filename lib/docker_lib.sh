@@ -36,7 +36,8 @@ container() {
         return 1
     fi
 
-    ssh -A root@$RNODE -p $RPORT "$@" 2>&1 >> $ZLogFile || die "could not ssh command: $@" || return 1
+    # ssh -A root@$RNODE -p $RPORT "$@" 2>&1 >> $ZLogFile || die "could not ssh command: $@" || return 1
+    ssh -A root@$RNODE -p $RPORT "$@" || die "could not ssh command: $@" || return 1
 
 }
 
@@ -168,8 +169,8 @@ ZDockerRemoveImagesAll(){
 }
 
 ZDockerStoppAll(){
-    docker stop $(docker ps -a -q) 2>&1 > /dev/null
-    docker rm $(docker ps -a -q) 2>&1 > /dev/null
+    docker stop $(docker ps -a -q) > /dev/null 2>&1
+    docker rm $(docker ps -a -q) > /dev/null 2>&1
 }
 
 

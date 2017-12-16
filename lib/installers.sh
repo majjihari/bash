@@ -59,7 +59,7 @@ ZInstall_js9() {
     ZInstall_host_code_jumpscale || die "could not get code for jumpscale (git)" || return 1
 
     echo "[+] install js9"
-    container "cp /opt/code/github/jumpscale/core9/mascot $HOMEDIR/.mascot.txt"
+    container "cp /opt/code/github/jumpscale/core9/mascot /root/.mascot.txt" || return 1
 
     container "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts" || return 1
     container "pip3 install -e /opt/code/github/jumpscale/core9" || return 1
@@ -100,19 +100,13 @@ ZInstall_js9_full() {
     ZDockerActive -b "jumpscale/js9_full" -i js9_full && return 0
 
     #check the docker image is there
-    ZDockerActive -b "jumpscale/ubuntu_python" -c "ZBuild_python -f" -i js9_full || return 1
-
-    ZInstall_host_code_jumpscale || return 1
+    ZDockerActive -b "jumpscale/js9" -c "ZInstall_js9" -i js9_full || return 1
     
-    echo "[+] install js9"
-    container "cp /opt/code/github/jumpscale/core9/mascot /root/.mascot.txt"
-
-    container "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts" || return 1
-    container "pip3 install -e /opt/code/github/jumpscale/core9" || return 1
+    echo "[+] install js9 full"
 
     echo "[+] installing jumpscale build dependencies"
     container "apt-get install build-essential python3-dev libvirt-dev libssl-dev libffi-dev libssh-dev -y" || return 1
-    echo "[+] installing jumpscale core9"
+    echo "[+] installing pip3 dependencies"
     container "pip3 install Cython>=0.25.2 asyncssh>=1.9.0 numpy>=1.12.1 tarantool>=0.5.4" || return 1
 
     echo "[+] install lib9 with dependencies (can take long time)"
@@ -172,6 +166,7 @@ ZInstall_docgenerator() {
 
     echo "[+] install docgenerator (can take long time)"
     container 'js9 "j.tools.prefab.local.runtimes.golang.install()"' || return 1
+    container 'js9 "j.tools.prefab.local.runtimes.golang.goraml()"' || return 1
     container 'js9 "j.tools.docgenerator.install()"' || return 1
 
     ZDockerCommit -b jumpscale/js9_docgenerator || die "docker commit" || return 1
