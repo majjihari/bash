@@ -1,6 +1,6 @@
 language: python
 sudo: enabled
-dist: trusty
+dist: xerus
 group: edge
 
 # whitelist master branch only
