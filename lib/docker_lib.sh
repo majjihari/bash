@@ -167,6 +167,12 @@ ZDockerRemoveImagesAll(){
     docker rmi -f $(docker images -f dangling=true -q) 2>&1 > /dev/null
 }
 
+ZDockerStoppAll(){
+    docker stop $(docker ps -a -q) 2>&1 > /dev/null
+    docker rm $(docker ps -a -q) 2>&1 > /dev/null
+}
+
+
 ZDockerBuildUbuntu() {
 
     local OPTIND
@@ -420,11 +426,11 @@ ZDockerActive() {
         fi
     fi
 
-    set -ex
     # container "ls /"
     if [ ! "$(docker ps | grep $iname)" ]; then
         #so is not up & running
         echo "[+] docker from image $bname is not active, will try to start"
+        ZDockerStoppAll #first make sure all are stopped
         if [[ ! -z "$addarg" ]]; then
             ZDockerRun -b "$bname" -i "$iname" -p "$port" -a "$addarg" || return 1
         else
