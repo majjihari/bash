@@ -7,3 +7,4 @@ sudo -HE bash -c "source /opt/code/github/jumpscale/bash/zlibs.sh; ZDockerActive
 
 # Run tests
 sudo -HE bash -c "ssh -tA  root@localhost -p 2222 \"cd /opt/code/github/jumpscale/bash; /bin/bash test.sh\""
+
