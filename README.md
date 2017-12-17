@@ -47,7 +47,7 @@ This will
 - remove all content from ~/code/github/jumpscale
 - remove all old config files
 
-do not forget to reset docker, can do this in preferences and ask hard reset.
+
 
 
 
