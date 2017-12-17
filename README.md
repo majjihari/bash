@@ -1,8 +1,5 @@
 # Bash
-
-Bash utilities, are a set of utilities to let you install & play around with jumpscale 9.3+.
-
-The main install happens by means of docker.
+Bash utilities
 
 ## Install
  
@@ -33,25 +30,8 @@ what happens:
 
 - If install failed with `(13: Permission denied)` you need to install as root. Type `sudo -s` then try install again with the curl command from above.
 
-### OSX: hard reset (DANGEROUS)
 
-```bash 
-curl https://raw.githubusercontent.com/Jumpscale/bash/master/hardreset.sh?$RANDOM > /tmp/hardreset.sh;bash /tmp/hardreset.sh
-```
-
-This will 
-
-- remove brew
-- reinstall brew
-- remove all content from ~/opt
-- remove all content from ~/code/github/jumpscale
-- remove all old config files
-
-
-
-
-
-## Make sure your the bash tools are available
+## 3. Make sure your the bash tools are available
 
 do this by starting new terminal or executing `source ~/.bash_profile`
 
@@ -79,7 +59,7 @@ ZDockerBuildUbuntu            ZDockerRunUsage               ZInstall_host_docker
 . ~/.bash_profile
 ```
 
-## Use the bash utlities!
+## 4. Use the bash utlities!
 
 ### install jumpscale
 
