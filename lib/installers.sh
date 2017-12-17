@@ -54,12 +54,10 @@ ZInstall_js9() {
 
     ZDockerActive -b "jumpscale/ubuntu_python" -c "ZBuild_python -f" -i js9 || return 1
 
-    # ZInstall_host_code_jumpscale '9.3.0' || return 1
-
-    ZInstall_host_code_jumpscale || die "could not get code for jumpscale (git)" || return 1
+    ZInstall_host_code_jumpscale '9.3.0' || return 1
 
     echo "[+] install js9"
-    container "cp /opt/code/github/jumpscale/core9/mascot $HOMEDIR/.mascot.txt"
+    container "cp /opt/code/github/jumpscale/core9/mascot /root/.mascot.txt"
 
     container "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts" || return 1
     container "pip3 install -e /opt/code/github/jumpscale/core9" || return 1
