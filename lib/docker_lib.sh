@@ -80,7 +80,6 @@ ZDockerCommit() {
         esac
     done
     if [ -z "$bname" ]; then ZDockerCommitUsage;return 0; fi
-    # container 'rm -rf /tmp; /mkdir /tmp*'
     echo "[+] Commit docker: $iname to $bname"
     docker commit $iname $bname || "cannot docker commit $iname $bname" || return 1
     export ZDockerImage=$bname
