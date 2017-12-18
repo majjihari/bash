@@ -7,12 +7,13 @@ ZInstall_host_code_jumpscale() {
        return 0
     fi
 
-    local branch=$1
-    if [ -n ${JS9BRANCH} ] && [ -z $branch ] ; then
+    local branch='master'
+    if [ ! -z $1 ]
+    then
+        branch=$1
+    elif [ ! -z ${JS9BRANCH} ]
+    then
         branch=${JS9BRANCH}
-    fi
-    if [ -z $branch ] ; then
-        branch='master'
     fi
     echo "[+] loading or updating jumpscale source code (branch:$branch)"
     ZCodeGetJS -r core9 -b $branch || return 1
