@@ -47,7 +47,7 @@ ZInstall_host_js9() {
 
     echo "[+] install js9"
     pushd $ZCODEDIR/github/jumpscale/core9
-    cp /$ZCODEDIR/github/jumpscale/core9/mascot $HOMEDIR/.mascot.txt || die "Could not copy mascot" || return 1
+    cp /$ZCODEDIR/github/jumpscale/core9/mascot /root/.mascot.txt
     pip3 install -e . > ${ZLogFile} 2>&1 || die "Could not install core9 of js9" || return 1
     popd
     # pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
@@ -96,7 +96,7 @@ ZInstall_host_base(){
     fi
 
     if [ "$(uname)" == "Darwin" ]; then
-        echo "[+] upgrade brew (this can take a very long time, do 'tail -f /tmp/zutils.log' to see progress)"
+        echo "[+] upgrade brew"
         brew upgrade  >> ${ZLogFile} 2>&1 || die "could not upgrade all brew installed components" || return 1
 
         echo "[+] installing git, python3, mc, tmux, curl"

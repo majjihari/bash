@@ -36,8 +36,7 @@ container() {
         return 1
     fi
 
-    # ssh -A root@$RNODE -p $RPORT "$@" 2>&1 >> $ZLogFile || die "could not ssh command: $@" || return 1
-    ssh -A root@$RNODE -p $RPORT "$@" || die "could not ssh command: $@" || return 1
+    ssh -A root@$RNODE -p $RPORT "$@" 2>&1 >> $ZLogFile || die "could not ssh command: $@" || return 1
 
 }
 
@@ -80,7 +79,6 @@ ZDockerCommit() {
         esac
     done
     if [ -z "$bname" ]; then ZDockerCommitUsage;return 0; fi
-    # container 'rm -rf /tmp; /mkdir /tmp*'
     echo "[+] Commit docker: $iname to $bname"
     docker commit $iname $bname || "cannot docker commit $iname $bname" || return 1
     export ZDockerImage=$bname
@@ -168,12 +166,6 @@ ZDockerRemoveImagesAll(){
     docker rmi -f $(docker images -a -q) 2>&1 > /dev/null
     docker rmi -f $(docker images -f dangling=true -q) 2>&1 > /dev/null
 }
-
-ZDockerStoppAll(){
-    docker stop $(docker ps -a -q) > /dev/null 2>&1
-    docker rm $(docker ps -a -q) > /dev/null 2>&1
-}
-
 
 ZDockerBuildUbuntu() {
 
@@ -420,10 +412,13 @@ ZDockerActive() {
         #means docker image does not exist yet
         if [ ! "$cmd" = "" ]; then
             echo "[+] need to build the docker with command: $cmd"
+<<<<<<< HEAD
             $cmd || die "could not build docker $cmd" || return 1
+=======
+            $cmd
+>>>>>>> 12af9623ca28115aeb1f90a5bf47913b31c76610
         else
             ZDockerRemove $iname 2>&1 > /dev/null
-            echo "[-] could not find image: $bname, cannot start, prob need to build."
             return 1
         fi
     fi
@@ -432,7 +427,6 @@ ZDockerActive() {
     if [ ! "$(docker ps | grep $iname)" ]; then
         #so is not up & running
         echo "[+] docker from image $bname is not active, will try to start"
-        ZDockerStoppAll #first make sure all are stopped
         if [[ ! -z "$addarg" ]]; then
             ZDockerRun -b "$bname" -i "$iname" -p "$port" -a "$addarg" || return 1
         else

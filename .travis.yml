@@ -1,6 +1,6 @@
 language: python
 sudo: enabled
-dist: xenial
+dist: trusty
 group: edge
 
 # whitelist master branch only
