@@ -222,7 +222,7 @@ ZKeysLoad() {
 
         while [ ! -f $KEYPATH ] ; do
             echo "[+] Found following keys on filesystem (select one if relevant):"
-            cd ~/.ssh;find . -type f -print -o -name . -o -prune| grep -v .pub|grep -v known_hosts| sed s/"\/"//| sed s/\./" - "/
+            cd ~/.ssh;find . -type f ! -name 'authorized_keys' -print -o -name . -o -prune| grep -v .pub|grep -v known_hosts| sed s/"\/"//| sed s/\./" - "/
             echo
             echo "    . Please give name of ssh key to load, if empty (press enter) will ask to generate"
             echo
