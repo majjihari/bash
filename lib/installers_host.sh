@@ -47,7 +47,7 @@ ZInstall_host_js9() {
 
     echo "[+] install js9"
     pushd $ZCODEDIR/github/jumpscale/core9
-    cp /$ZCODEDIR/github/jumpscale/core9/mascot /root/.mascot.txt
+    cp /$ZCODEDIR/github/jumpscale/core9/mascot $HOMEDIR/.mascot.txt || die "Could not copy mascot" || return 1
     pip3 install -e . > ${ZLogFile} 2>&1 || die "Could not install core9 of js9" || return 1
     popd
     # pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
