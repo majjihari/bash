@@ -260,7 +260,7 @@ ZInstall_ays9() {
 
     local OPTIND
     local force=0
-    local branch=${JS9BRANCH:-master}
+    local branch=${JS9BRANCH:-development}
     local addargs=''
 
     while getopts ":f:b:a:" opt; do
@@ -297,7 +297,7 @@ ZInstall_ays9() {
 ZInstall_portal9() {
 
     local OPTIND
-    local branch=${JS9BRANCH:-master}
+    local branch=${JS9BRANCH:-development}
     local addargs=''
     local fullinstall=0
 
@@ -341,7 +341,7 @@ ZInstall_js9_all() {
 
     local OPTIND
     local force=0
-    local branch=${JS9BRANCH:-master}
+    local branch=${JS9BRANCH:-development}
     local addargs=''
 
     while getopts ":f:b:a:" opt; do

@@ -133,7 +133,7 @@ ZNodeUbuntuPrepare() {
     ZNodeEnvDefaults  || return 1
     ZSSH 'apt-get update;apt-get upgrade -y'  || return 1
     ZDockerInstall  || return 1
-    ZSSH "curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;sh /tmp/install.sh"  || return 1
+    ZSSH "curl https://raw.githubusercontent.com/Jumpscale/bash/development/install.sh?$RANDOM > /tmp/install.sh;sh /tmp/install.sh"  || return 1
 }
 
 

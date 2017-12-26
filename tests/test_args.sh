@@ -1,5 +1,5 @@
 #!/bin/bash
-# export ZBRANCH=${ZBRANCH:-master}
+# export ZBRANCH=${ZBRANCH:-development}
 # export ZCODEDIR=${ZCODEDIR:-~/code}
 
 export ZLogFile='/tmp/z.log'

@@ -6,12 +6,12 @@ The main install happens by means of docker.
 
 ## Install
  
-### Install from master
+### Install from development
 
 copy/paste into your terminal: 
 
 ```bash 
-curl https://raw.githubusercontent.com/Jumpscale/bash/master/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
+curl https://raw.githubusercontent.com/Jumpscale/bash/development/install.sh?$RANDOM > /tmp/install.sh;bash /tmp/install.sh
 ```
 
 ### Install from branch
@@ -36,7 +36,7 @@ what happens:
 ### OSX: hard reset (DANGEROUS)
 
 ```bash 
-curl https://raw.githubusercontent.com/Jumpscale/bash/master/hardreset.sh?$RANDOM > /tmp/hardreset.sh;bash /tmp/hardreset.sh
+curl https://raw.githubusercontent.com/Jumpscale/bash/development/hardreset.sh?$RANDOM > /tmp/hardreset.sh;bash /tmp/hardreset.sh
 ```
 
 This will 
@@ -93,7 +93,7 @@ ZInstall_host_js9
 
 ```bash
 ##optional change the branch for js9
-#export JS9BRANCH=master
+#export JS9BRANCH=development
 ZInstall_host_js9_full
 ```
 This will install the following:
