@@ -7,7 +7,7 @@ ZInstall_host_code_jumpscale() {
        return 0
     fi
 
-    local branch='master'
+    local branch='development'
     if [ ! -z $1 ]
     then
         branch=$1
@@ -249,7 +249,7 @@ ZInstall_host_editor() {
       echo "[+] Code Editor Installed"
 
       echo "[+] install jumpscale python snippets"
-      ZCodeGetJS -r python-snippets -b master || return 1
+      ZCodeGetJS -r python-snippets -b development || return 1
       RSync ~/code/github/jumpscale/python-snippets/ ~/.vscode/extensions/python-snippets-js9 || return 1
 
       echo "[+] download sourcetree"
