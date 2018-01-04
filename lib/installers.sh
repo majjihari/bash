@@ -394,7 +394,7 @@ ZInstall_crm() {
     local email="off"
     local sendgrid_api_key=""
     local support_email=""
-    while getopts "p:D:o:s:u:i:e:dh" opt; do
+    while getopts "p:D:o:s:u:i:e:m:z:dh" opt; do
         case $opt in
            p )  caddyport=$OPTARG ;;
            D )  dbname=$OPTARG ;;
