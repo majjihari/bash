@@ -422,13 +422,13 @@ ZInstall_crm() {
     if [[ ${caddyport} == 443 ]];then
         ports="$ports -p 80:80"
     fi
-    ZDockerActive -b "jumpscale/crm" -i $iname -a "${ports}" && container "$start_cmd" && return 0
 
-    ZDockerActive -b "jumpscale/js9_docgenerator" -a "${ports}" -c "ZInstall_docgenerator" -i $iname || return 1
+    ZDockerActive -b "jumpscale/crm" -i $iname -a "${ports}"
+    #ZDockerActive -b "jumpscale/js9_docgenerator" -a "${ports}" -c "ZInstall_docgenerator" -i $iname || return 1
 
     echo "[+] Installing CRM"
     container "$install_cmd" || return 1
-
+    container "$start_cmd" || return 1
     ZDockerCommit -b jumpscale/crm || die "docker commit" || return 1
 
 }
