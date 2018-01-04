@@ -367,6 +367,8 @@ Usage: ZInstallCrm [-p caddyport] [-D dbname] [-u url] [-o organization_id] [-s 
    -u url: url
    -e email: email used by let's encrypt to generate certificate
    -d: install demo data
+   -m: sendgrid_api_key: sendfrid api key
+   -z: support_email: Support email
    -h: help
 
 will install crm application in js9 container
@@ -390,6 +392,8 @@ ZInstall_crm() {
     local client_secret=""
     local url="localhost"
     local email="off"
+    local sendgrid_api_key=""
+    local support_email=""
     while getopts "p:D:o:s:u:i:e:dh" opt; do
         case $opt in
            p )  caddyport=$OPTARG ;;
@@ -400,6 +404,8 @@ ZInstall_crm() {
            i )  iname=$OPTARG ;;
            e )  email=$OPTARG ;;
            d )  demo=True ;;
+           m )  sendgrid_api_key=$OPTARG ;;
+           z )  support_email=$OPTARG ;;
            h )  ZInstallCrmUsage ; return 0 ;;
            \? )  ZInstallCrmUsage ; return 1 ;;
         esac
@@ -407,11 +413,11 @@ ZInstall_crm() {
 
     install_args="caddy_port=$caddyport, db_name=\"$dbname\", demo=$demo,\
     start=True, client_id=\"$client_id\", client_secret=\"$client_secret\", domain=\"$url\", tls=\"$email\"";
-    start_args="db_name=\"$dbname\"";
+    start_args="db_name=\"$dbname\",sendgrid_api_key=\"$sendgrid_api_key\",support_email=\"$support_email\",domain=\"$domain\"";
     start_cmd="python3 -c 'from js9 import j;j.tools.prefab.local.apps.crm.start($start_args)'"
     install_cmd="python3 -c 'from js9 import j;j.tools.prefab.local.apps.crm.install($install_args)'"
 
-    ports="-p $caddyport:$caddyport"
+    ports="-p $caddyport:$caddyport -p 25:25"
     # if caddy port is 443 we must expose port 80 also to be able to generate ssl
     if [[ ${caddyport} == 443 ]];then
         ports="$ports -p 80:80"
