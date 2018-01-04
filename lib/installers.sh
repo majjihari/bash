@@ -367,8 +367,8 @@ Usage: ZInstallCrm [-p caddyport] [-D dbname] [-u url] [-o organization_id] [-s 
    -u url: url
    -e email: email used by let's encrypt to generate certificate
    -d: install demo data
-   -m: sendgrid_api_key: sendfrid api key
-   -z: support_email: Support email
+   -m sendgrid_api_key: sendfrid api key
+   -z support_email: Support email
    -h: help
 
 will install crm application in js9 container
