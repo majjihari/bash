@@ -413,9 +413,9 @@ ZInstall_crm() {
 
     install_args="caddy_port=$caddyport, db_name=\"$dbname\", demo=$demo,\
     start=True, client_id=\"$client_id\", client_secret=\"$client_secret\", domain=\"$url\", tls=\"$email\"";
-    start_args="db_name=\"$dbname\",sendgrid_api_key=\"$sendgrid_api_key\",support_email=\"$support_email\",domain=\"$domain\"";
-    start_cmd="python3 -c 'from js9 import j;j.tools.prefab.local.apps.crm.start($start_args)'"
-    install_cmd="python3 -c 'from js9 import j;j.tools.prefab.local.apps.crm.install($install_args)'"
+    start_args="db_name=\"$dbname\",sendgrid_api_key=\"$sendgrid_api_key\",support_email=\"$support_email\"";
+    start_cmd="python3 -c 'from js9 import j;j.tools.prefab.local.js9.crm.start($start_args)'"
+    install_cmd="python3 -c 'from js9 import j;j.tools.prefab.local.js9.crm.install($install_args)'"
 
     ports="-p $caddyport:$caddyport -p 25:25"
     # if caddy port is 443 we must expose port 80 also to be able to generate ssl
