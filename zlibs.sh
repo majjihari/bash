@@ -86,8 +86,6 @@ pushd $ZUTILSDIR/bash > /dev/null 2>&1
 . lib/installers.sh
 . lib/tmux.sh
 . lib/rsync.sh
-. lib/lede.sh
-. lib/js9.sh
 . lib/installers_host.sh
 . lib/base_lib.sh
 
