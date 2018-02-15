@@ -160,6 +160,42 @@ ZInstall_ays9() {
 }
 
 
+
+ZInstall_0_robot() {
+
+    local OPTIND
+    local force=0
+    local branch=${JS9BRANCH:-master}
+    local addargs=''
+
+    while getopts ":f:b:a:" opt; do
+        case "${opt}" in
+           a ) addargs="${OPTARG}";;
+           f )  ZDockerRemoveImage jumpscale/0-robot ;;
+           b ) branch="${OPTARG}";;
+        esac
+    done
+    ZDockerActive -b "jumpscale/0-robot" -i 0-robot -a "$addargs" && return 0
+
+    ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full -f" -i 0-robot || return 1
+    local port=${RPORT:-2222}
+    local addarg="${RNODE:-localhost}"
+    echo "[+] install 0-Robot"
+    echo "[+] loading or updating 0-robot source code (branch:$branch)"
+    ZCodeGetJS -r 0-robot -b $branch || return 1
+    echo "[+] installing 0-Robot"
+    ZNodeSet $addarg  || return 1
+    ZNodePortSet $port || return 1
+    container "apt-get install libsqlite3-dev -y" || return 1
+    container "cd  /opt/code/github/jumpscale/0-robot && pip install -r requirements.txt;" || return 1
+    container "cd /opt/code/github/jumpscale/0-robot && pip install ." || return 1
+
+    ZDockerCommit -b jumpscale/0-robot -s || die "docker commit" || return 1
+
+}
+
+
+
 # ZInstall_js9_node() {
 
 #     local OPTIND
