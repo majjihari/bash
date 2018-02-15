@@ -123,11 +123,10 @@ ZInstall_js9_full() {
 }
 
 ZInstall_ays9() {
-
     local OPTIND
     local force=0
     local branch=${JS9BRANCH:-development}
-    local addargs=''
+    local addargs='-p 5000:5000'
 
     while getopts ":f:b:a:" opt; do
         case "${opt}" in
@@ -138,7 +137,7 @@ ZInstall_ays9() {
     done
     ZDockerActive -b "jumpscale/ays9" -i ays9 -a "$addargs" && return 0
 
-    ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full -f" -i ays9 || return 1
+    ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full -f" -i ays9 -a "$addargs" || return 1
 
     if ZDoneCheck "ZInstall_js9_ays9" ; then
         echo "[+] install ays9 already done."
