@@ -187,6 +187,7 @@ ZInstall_0_robot() {
     echo "[+] installing 0-Robot"
     ZNodeSet $addarg  || return 1
     ZNodePortSet $port || return 1
+    container "apt-get install libsqlite3-dev -y" || return 1
     container "cd  /opt/code/github/jumpscale/0-robot && pip install -r requirements.txt;" || return 1
     container "cd /opt/code/github/jumpscale/0-robot && pip install ." || return 1
 
