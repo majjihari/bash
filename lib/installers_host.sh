@@ -7,7 +7,7 @@ ZInstall_host_code_jumpscale() {
        return 0
     fi
 
-    local branch='master'
+    local branch='development'
     if [ ! -z $1 ]
     then
         branch=$1
@@ -47,7 +47,7 @@ ZInstall_host_js9() {
 
     echo "[+] install js9"
     pushd $ZCODEDIR/github/jumpscale/core9
-    cp /$ZCODEDIR/github/jumpscale/core9/mascot /root/.mascot.txt
+    cp /$ZCODEDIR/github/jumpscale/core9/mascot $HOMEDIR/.mascot.txt || die "Could not copy mascot" || return 1
     pip3 install -e . > ${ZLogFile} 2>&1 || die "Could not install core9 of js9" || return 1
     popd
     # pip3 install -e $ZCODEDIR/github/jumpscale/core9 || die "could not install core9 of js9" || return 1
@@ -249,7 +249,7 @@ ZInstall_host_editor() {
       echo "[+] Code Editor Installed"
 
       echo "[+] install jumpscale python snippets"
-      ZCodeGetJS -r python-snippets -b master || return 1
+      ZCodeGetJS -r python-snippets -b development || return 1
       RSync ~/code/github/jumpscale/python-snippets/ ~/.vscode/extensions/python-snippets-js9 || return 1
 
       echo "[+] download sourcetree"

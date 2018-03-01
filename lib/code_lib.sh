@@ -15,7 +15,7 @@ ZCodeGetJSUsage() {
    cat <<EOF
 Usage: ZCodeGet [-r reponame] [-g giturl] [-a account] [-b branch]
    -r reponame: name or repo which is being downloaded
-   -b branchname: defaults to master
+   -b branchname: defaults to development
    -h: help
 
 check's out jumpscale repo to $ZCODEDIR/github/jumpscale/$reponame
@@ -40,7 +40,7 @@ ZCodeGetJS() {
     local OPTIND
     local account='jumpscale'
     local reponame=''
-    local branch=${JS9BRANCH:-master}
+    local branch=${JS9BRANCH:-development}
     while getopts "r:b:h" opt; do
         case $opt in
            r )  reponame=$OPTARG ;;
@@ -62,8 +62,8 @@ ZCodeGetJS() {
     # local giturl="git@github.com:Jumpscale/$reponame.git"
     local githttpsurl="https://github.com/jumpscale/$reponame.git"
 
-    # check if specificed branch or $JS9BRANCH exist, if not then fallback to master
-    JS9BRANCHExists ${githttpsurl} ${branch} || branch=master
+    # check if specificed branch or $JS9BRANCH exist, if not then fallback to development
+    JS9BRANCHExists ${githttpsurl} ${branch} || branch=development
 
     # ZCodeGet -r $reponame -a $account -u $giturl -b $branch  || ZCodeGet -r $reponame -a $account -u $githttpsurl -b $branch || return 1
     ZCodeGet -r $reponame -a $account -u $githttpsurl -b $branch || return 1
@@ -77,7 +77,7 @@ Usage: ZCodeGet [-r reponame] [-g giturl] [-a account] [-b branch]
    -a account: will default to 'varia', but can be account name
    -r reponame: name or repo which is being downloaded
    -u giturl: e.g. git@github.com:mathieuancelin/duplicates.git
-   -b branchname: defaults to master
+   -b branchname: defaults to development
    -k sshkey: path to sshkey to use for authorization when connecting to the repository.
    -h: help
 
@@ -97,7 +97,7 @@ ZCodeGet() {
     local account='varia'
     local reponame=''
     local giturl=''
-    local branch=${JS9BRANCH:-master}
+    local branch=${JS9BRANCH:-development}
     local sshkey=''
     while getopts "a:r:u:b:t:k:h" opt; do
         case $opt in

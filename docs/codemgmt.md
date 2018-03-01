@@ -18,7 +18,7 @@ Usage: ZGetCode [-r reponame] [-g giturl] [-a account] [-b branch]
    -a account: will default to 'varia', but can be account name
    -r reponame: name or repo which is being downloaded
    -u giturl: e.g. git@github.com:mathieuancelin/duplicates.git
-   -b branchname: defaults to master
+   -b branchname: defaults to development
    -h: help
 
 checks out any git repo repo to ~/code/$account/$reponame
@@ -35,7 +35,7 @@ checkout specific jumpscale repo's
 $ ZGetCodeJS -h
 Usage: ZGetCode [-r reponame] [-g giturl] [-a account] [-b branch]
    -r reponame: name or repo which is being downloaded
-   -b branchname: defaults to master
+   -b branchname: defaults to development
    -h: help
 
 checks out jumpscale repo to ~/code/jumpscale/
