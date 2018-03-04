@@ -27,7 +27,7 @@ what happens:
 
 - xcode-tools will be installed & then brew (https://brew.sh/) (osx only)
 - ssh-key will be looked for & created if it doesn't exist yet
-- the basic init script will be added to ~/bash_profile
+- the basic init script will be added to ~/bashrc
 
 - If everything installed correctly result should show `[+] Install OK`
 
@@ -53,7 +53,7 @@ do not forget to reset docker, can do this in preferences and ask hard reset.
 
 ## Make sure your the bash tools are available
 
-do this by starting new terminal or executing `source ~/.bash_profile`
+do this by starting new terminal or executing `source ~/.bashrc`
 
 After this you should be able to type Z and press [TAB] to see a list of commands. (NOTE: the Z is uppercase)
 
@@ -76,7 +76,7 @@ ZDockerBuildUbuntu            ZDockerRunUsage               ZInstall_host_docker
 ```
 *Sometimes the bash profile doesn't load (especially on [Ubuntu](https://askubuntu.com/questions/121413/understanding-bashrc-and-bash-profile)). If that happens type this in a the terminal under root:
 ```
-. ~/.bash_profile
+. ~/.bashrc
 ```
 
 ## Use the bash utlities!
