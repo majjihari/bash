@@ -407,6 +407,7 @@ ZInstall_host_js9_full() {
     echo "[+] initializing jumpscale"
     python3 -c 'from JumpScale9 import j;j.tools.jsloader.generate()' || die "js9 generate" || return 1
 
+    python3 -c 'from JumpScale9 import j;j.tools.configmanager.init()' || die "configmanager init failed" || return 1
     echo "[+] js9 installed (OK)"
 
     ZDoneSet "ZInstall_host_js9_full"
