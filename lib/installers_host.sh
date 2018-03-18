@@ -96,8 +96,8 @@ ZInstall_host_base(){
     fi
 
     if [ "$(uname)" == "Darwin" ]; then
-        echo "[+] upgrade brew"
-        brew upgrade  >> ${ZLogFile} 2>&1 || die "could not upgrade all brew installed components" || return 1
+        # echo "[+] upgrade brew"
+        # brew upgrade  >> ${ZLogFile} 2>&1 || die "could not upgrade all brew installed components" || return 1
 
         echo "[+] installing git, python3, mc, tmux, curl"
         Z_brew_install mc wget python3 git unzip rsync tmux curl || return 1
