@@ -254,12 +254,12 @@ ZKeysLoad() {
             fi
 
             #remove old
-            sed -i.bak '/export SSHKEYNAME/d' $HOMEDIR/.bash_profile
-            sed -i.bak '/.*zlibs.sh/d' $HOMEDIR/.bash_profile
+            sed -i.bak '/export SSHKEYNAME/d' $HOMEDIR/.bashrc
+            sed -i.bak '/.*zlibs.sh/d' $HOMEDIR/.bashrc
 
-            echo "export SSHKEYNAME=$SSHKEYNAME" >> $HOMEDIR/.bash_profile
+            echo "export SSHKEYNAME=$SSHKEYNAME" >> $HOMEDIR/.bashrc
             #re-insert source of zlibs.sh            
-            echo ". ${ZUTILSDIR}/bash/zlibs.sh" >> $HOMEDIR/.bash_profile
+            echo ". ${ZUTILSDIR}/bash/zlibs.sh" >> $HOMEDIR/.bashrc
             
 
         done
