@@ -20,7 +20,7 @@ ZBuild_python() {
     if [[ $1 == "full" ]]; then
         container 'apt-get install -y python3' || return 1
     else
-        container 'apt-get install -y python3 python3-cryptography python3-paramiko python3-psutil' || return 1
+        container 'apt-get install -y python3 build-essential python3-dev python3-cryptography python3-paramiko' || return 1
     fi
 
     echo "[+] installing pip system"
@@ -101,11 +101,11 @@ ZInstall_js9_full() {
 
     #check the docker image is there
     ZDockerActive -b "jumpscale/js9" -c "ZInstall_js9" -i js9_full || return 1
-    
+
     echo "[+] install js9 full"
 
     echo "[+] installing jumpscale build dependencies"
-    container "apt-get install build-essential python3-dev libvirt-dev libssl-dev libffi-dev libssh-dev -y" || return 1
+    container "apt-get install libvirt-dev libssl-dev libffi-dev libssh-dev -y" || return 1
     echo "[+] installing jumpscale core9"
     container "pip3 install Cython>=0.25.2 asyncssh>=1.9.0 numpy>=1.12.1 tarantool>=0.5.4" || return 1
 
@@ -353,7 +353,7 @@ ZInstall_0_robot() {
 #         ZDockerActive -b "jumpscale/portal9" -i portal9 -a "$addargs" && return 0
 #         ZDockerActive -b "jumpscale/js9_full" -c "ZInstall_js9_full -f" -i portal9 || return 1
 #     fi
-    
+
 #     local port=${RPORT:-2222}
 #     local addarg="${RNODE:-localhost}"
 #     echo "[+] install Portal9"
