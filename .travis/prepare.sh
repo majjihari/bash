@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+sudo ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
 export SSHKEYNAME=id_rsa
 
 export ZUTILSBRANCH=${ZUTILSBRANCH:-master}
