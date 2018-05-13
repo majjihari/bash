@@ -4,7 +4,6 @@ set -e
 
 sudo rm -rf $TMPDIR/zutils_done > /dev/null 2>&1
 sudo rm -rf /tmp/zutils_done > /dev/null 2>&1
-sudo rm -rf /opt/code/github/jumpscale/bash > /dev/null 2>&1
 
 if [ -z "$HOMEDIR" ] ; then
     export HOMEDIR="$HOME"
