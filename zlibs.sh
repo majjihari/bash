@@ -95,6 +95,10 @@ if [ -z "$HOMEDIR" ] ; then
     export HOMEDIR="$HOME"
 fi
 
+if [ -z "$LC_ALL" ] ; then
+    export LC_ALL="C.UTF-8"
+fi
+
 if [ -z "$HOMEDIR" ] || [ ! -d "$HOMEDIR" ]; then
     echo "[-] ERROR, could not find homedir $HOMEDIR"
     return 1
