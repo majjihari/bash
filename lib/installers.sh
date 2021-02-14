@@ -26,6 +26,7 @@ ZBuild_python() {
     echo "[+] installing pip system"
     container "curl -sk https://bootstrap.pypa.io/get-pip.py > /tmp/get-pip.py" || return 1
     container 'python3.8 /tmp/get-pip.py' || return 1
+    container 'python3.8 -m pip install --upgrade pip setuptools wheel'
 
     echo "[+] installing some pip dependencies"
     container 'pip3 install --upgrade pip' || return 1
