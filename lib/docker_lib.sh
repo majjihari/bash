@@ -189,7 +189,7 @@ ZDockerBuildUbuntu() {
     ZDockerConfig || die || return
     local OPTIND
     local bname='phusion/baseimage'
-    local iname='build'
+    local iname='latest-amd64'
     local port=2222
     local addarg=''
     while getopts "b:i:p:a:h" opt; do
@@ -204,6 +204,9 @@ ZDockerBuildUbuntu() {
     done
 
     export SSHNOAUTH=1
+
+
+    echo "hari bname=${bname} iname=${iname} port=${port} addrarg=${addarg}"
 
     if [[ ! -z "$addarg" ]]; then
         ZDockerRun -b $bname -i $iname -p $port -a $addarg || return 1
