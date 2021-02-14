@@ -194,9 +194,9 @@ ZDockerBuildUbuntu() {
     local addarg=''
     while getopts "b:i:p:a:h" opt; do
         case $opt in
-           b )  bname=$OPTARG ;;
-           i )  iname=$OPTARG ;;
-           p )  port=$OPTARG ;;
+           b )  bname=$OPTARG echo "hari bname=${OPTARG}" ;;
+           i )  iname=$OPTARG echo "hari iname=${OPTARG}";;
+           p )  port=$OPTARG echo "hari port=${port}";;
            a )  addarg=$OPTARG ;;
            h )  ZDockerRunUsage ; return 0 ;;
            \? )  ZDockerRunUsage ; return 1 ;;
