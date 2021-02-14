@@ -325,8 +325,11 @@ ZDockerRun() {
     export ZDockerName=$iname
 
     echo "[+] start docker $bname -> $iname (port:$port)"
+    echo "hari ^/${iname}$"
 
     existing="$(docker ps -aq -f name=^/${iname}$)" || return 1
+    echo "hari existing=${existing}"
+
 
     if [[ ! -z "$existing" ]]; then
         ZDockerRemove $iname || return 1
