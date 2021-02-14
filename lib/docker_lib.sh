@@ -36,6 +36,8 @@ container() {
         return 1
     fi
 
+    echo "hari RNODE=${RNODE} RPORT=${RPORT}"
+
     ssh -A root@$RNODE -p $RPORT "$@" 2>&1 >> $ZLogFile || die "could not ssh command: $@" || return 1
 
 }
