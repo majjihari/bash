@@ -351,6 +351,7 @@ ZDockerRun() {
     # fi
 
     docker run --name $iname \
+        --env DEBIAN_FRONTEND=noninteractive
         --hostname $iname \
         -d \
         -p ${port}:22 ${addarg} \
