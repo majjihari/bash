@@ -188,8 +188,8 @@ ZDockerBuildUbuntu() {
 
     ZDockerConfig || die || return
     local OPTIND
-    local bname='phusion/baseimage'
-    local iname='latest-amd64'
+    local bname='phusion/baseimage:latest-amd64'
+    local iname='build'
     local port=2222
     local addarg=''
     while getopts "b:i:p:a:h" opt; do
